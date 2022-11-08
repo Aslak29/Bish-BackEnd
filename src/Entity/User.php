@@ -42,11 +42,15 @@ class User
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commande::class)]
     private Collection $commandes;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Contact::class)]
+    private Collection $Contacts;
+
     public function __construct()
     {
         $this->adresse = new ArrayCollection();
         $this->Logs = new ArrayCollection();
         $this->commandes = new ArrayCollection();
+        $this->Relation = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -210,6 +214,36 @@ class User
             // set the owning side to null (unless already changed)
             if ($commande->getUser() === $this) {
                 $commande->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Contact>
+     */
+    public function getContacts(): Collection
+    {
+        return $this->Contacts;
+    }
+
+    public function addContacts(Contact $contact): self
+    {
+        if (!$this->Contacts->contains($contact)) {
+            $this->Contacts->add($contact);
+            $contact->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContacts(Contact $contact): self
+    {
+        if ($this->Contacts->removeElement($contact)) {
+            // set the owning side to null (unless already changed)
+            if ($contact->getUser() === $this) {
+                $contact->setUser(null);
             }
         }
 

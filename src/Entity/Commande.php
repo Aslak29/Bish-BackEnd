@@ -20,10 +20,14 @@ class Commande
     #[ORM\Column(length:255)]
     private string $etatCommande;
 
+    #[ORM\ManyToOne(inversedBy: 'commandes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     #[ORM\OneToMany(mappedBy: 'commandes',targetEntity: ProduitInCommande::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?ProduitInCommande $ProduitInCommande = null;
-    
+
 
 
     /**
@@ -82,6 +86,18 @@ class Commande
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }

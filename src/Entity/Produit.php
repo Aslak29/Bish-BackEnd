@@ -37,6 +37,14 @@ class Produit
     #[ORM\Column]
     private ?bool $isAvailable = null;
 
+    #[ORM\ManyToMany(targetEntity: Categorie::class, mappedBy: 'produits')]
+    private Collection $categories;
+
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+    }
+
     #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
     private ?ProduitInCommande $ProduitInCommande = null;
 
@@ -125,6 +133,33 @@ class Produit
     public function setIsAvailable(bool $isAvailable): self
     {
         $this->isAvailable = $isAvailable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Categorie>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Categorie $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+            $category->addProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Categorie $category): self
+    {
+        if ($this->categories->removeElement($category)) {
+            $category->removeProduit($this);
+        }
 
         return $this;
     }

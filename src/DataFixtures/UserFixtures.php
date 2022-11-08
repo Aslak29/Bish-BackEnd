@@ -18,6 +18,16 @@ class UserFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
 
+        $user = (new User())
+            ->setName('admin')
+            ->setFirstname('admin')
+            ->setEmail('admin@bish.fr')
+            ->setRoles(['ROLE_ADMIN'])
+            ->setPhone(0671201001)
+        ;
+        $user->setPassword($this->encoder->hashPassword($user, 'admin'));
+        $manager->persist($user);
+
         for ($i = 1; $i < 10; $i++ ){
 
             $user = (new User())
@@ -27,7 +37,7 @@ class UserFixtures extends Fixture
                 ->setRoles(['ROLE_USER'])
                 ->setPhone(0671201001)
             ;
-            $user->setPassword($this->encoder->hashPassword($user, 'bish'.$i));
+            $user->setPassword($this->encoder->hashPassword($user, 'pass'));
             $this->addReference('user_'.$i, $user);
             $manager->persist($user);
         }

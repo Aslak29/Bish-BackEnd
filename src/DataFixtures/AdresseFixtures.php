@@ -5,26 +5,24 @@ namespace App\DataFixtures;
 use App\Entity\Adresse;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class AdresseFixtures extends Fixture
+class AdresseFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        // $product = new Product();
-        // $manager->persist($product);
-        /*for ($i = 1; $i < 10; $i++ ){
+        for ($i = 1; $i < 10; $i++ ){
 
             $adresse = (new Adresse())
                 ->setRue('rue du pont')
                 ->setCity('Lille')
                 ->setPostalCode(59000)
-                ->setUser($this->getReference('user_'.random_int(1,6)))
+                ->setUser($this->getReference('user_'.$i))
             ;
-
             $manager->persist($adresse);
         }
-        $manager->flush();*/
+        $manager->flush();
     }
     public function getDependencies(): array
     {

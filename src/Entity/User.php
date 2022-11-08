@@ -45,12 +45,16 @@ class User
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Contact::class)]
     private Collection $Contacts;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notation::class)]
+    private Collection $Note;
+
     public function __construct()
     {
         $this->adresse = new ArrayCollection();
         $this->Logs = new ArrayCollection();
         $this->commandes = new ArrayCollection();
         $this->Relation = new ArrayCollection();
+        $this->Note = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -244,6 +248,36 @@ class User
             // set the owning side to null (unless already changed)
             if ($contact->getUser() === $this) {
                 $contact->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notation>
+     */
+    public function getNote(): Collection
+    {
+        return $this->Note;
+    }
+
+    public function addNote(Notation $note): self
+    {
+        if (!$this->Note->contains($note)) {
+            $this->Note->add($note);
+            $note->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Notation $note): self
+    {
+        if ($this->Note->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getUser() === $this) {
+                $note->setUser(null);
             }
         }
 

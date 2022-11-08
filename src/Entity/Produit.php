@@ -47,6 +47,7 @@ class Produit
     {
         $this->categories = new ArrayCollection();
         $this->produitBySize = new ArrayCollection();
+        $this->Note = new ArrayCollection();
     }
 
     #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
@@ -54,6 +55,9 @@ class Produit
 
     #[ORM\ManyToOne(inversedBy: 'Produits')]
     private ?Promotions $promotions = null;
+
+    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: Notation::class)]
+    private Collection $Note;
 
     public function getId(): ?int
     {
@@ -219,6 +223,36 @@ class Produit
             // set the owning side to null (unless already changed)
             if ($produitBySize->getProduit() === $this) {
                 $produitBySize->setProduit(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notation>
+     */
+    public function getNote(): Collection
+    {
+        return $this->Note;
+    }
+
+    public function addNote(Notation $note): self
+    {
+        if (!$this->Note->contains($note)) {
+            $this->Note->add($note);
+            $note->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNote(Notation $note): self
+    {
+        if ($this->Note->removeElement($note)) {
+            // set the owning side to null (unless already changed)
+            if ($note->getProduit() === $this) {
+                $note->setProduit(null);
             }
         }
 

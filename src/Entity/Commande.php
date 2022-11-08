@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\CommandeRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,6 +19,10 @@ class Commande
 
     #[ORM\Column(length:255)]
     private string $etatCommande;
+
+    #[ORM\OneToMany(mappedBy: 'commandes',targetEntity: ProduitInCommande::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ProduitInCommande $ProduitInCommande = null;
     
 
 
@@ -77,6 +82,18 @@ class Commande
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getProduitInCommande(): ?ProduitInCommande
+    {
+        return $this->ProduitInCommande;
+    }
+
+    public function setProduitInCommande(?ProduitInCommande $ProduitInCommande): self
+    {
+        $this->ProduitInCommande = $ProduitInCommande;
 
         return $this;
     }

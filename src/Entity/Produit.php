@@ -40,9 +40,13 @@ class Produit
     #[ORM\ManyToMany(targetEntity: Categorie::class, mappedBy: 'produits')]
     private Collection $categories;
 
+    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: ProduitBySize::class)]
+    private Collection $produitBySize;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->produitBySize = new ArrayCollection();
     }
 
     #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
@@ -187,6 +191,36 @@ class Produit
     public function setPromotions(?Promotions $promotions): self
     {
         $this->promotions = $promotions;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProduitBySize>
+     */
+    public function getProduitBySize(): Collection
+    {
+        return $this->produitBySize;
+    }
+
+    public function addProduitBySize(ProduitBySize $produitBySize): self
+    {
+        if (!$this->produitBySize->contains($produitBySize)) {
+            $this->produitBySize->add($produitBySize);
+            $produitBySize->setProduit($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduitBySize(ProduitBySize $produitBySize): self
+    {
+        if ($this->produitBySize->removeElement($produitBySize)) {
+            // set the owning side to null (unless already changed)
+            if ($produitBySize->getProduit() === $this) {
+                $produitBySize->setProduit(null);
+            }
+        }
 
         return $this;
     }

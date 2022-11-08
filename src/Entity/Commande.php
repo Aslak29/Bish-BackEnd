@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Repository\CommandeRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,7 +23,11 @@ class Commande
     #[ORM\ManyToOne(inversedBy: 'commandes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
-    
+
+    #[ORM\OneToMany(mappedBy: 'commandes',targetEntity: ProduitInCommande::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ProduitInCommande $ProduitInCommande = null;
+
 
 
     /**
@@ -93,6 +98,18 @@ class Commande
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getProduitInCommande(): ?ProduitInCommande
+    {
+        return $this->ProduitInCommande;
+    }
+
+    public function setProduitInCommande(?ProduitInCommande $ProduitInCommande): self
+    {
+        $this->ProduitInCommande = $ProduitInCommande;
 
         return $this;
     }

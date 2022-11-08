@@ -45,6 +45,9 @@ class Produit
         $this->categories = new ArrayCollection();
     }
 
+    #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
+    private ?ProduitInCommande $ProduitInCommande = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -157,6 +160,18 @@ class Produit
         if ($this->categories->removeElement($category)) {
             $category->removeProduit($this);
         }
+
+        return $this;
+    }
+
+    public function getProduitInCommande(): ?ProduitInCommande
+    {
+        return $this->ProduitInCommande;
+    }
+
+    public function setProduitInCommande(?ProduitInCommande $ProduitInCommande): self
+    {
+        $this->ProduitInCommande = $ProduitInCommande;
 
         return $this;
     }

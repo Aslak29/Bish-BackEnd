@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PromotionsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,6 +24,14 @@ class Promotions
 
     #[ORM\Column]
     private ?float $remise = null;
+
+    #[ORM\OneToMany(mappedBy: 'promotions', targetEntity: Produit::class)]
+    private Collection $Produits;
+
+    public function __construct()
+    {
+        $this->Produits = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -60,6 +70,36 @@ class Promotions
     public function setRemise(float $remise): self
     {
         $this->remise = $remise;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Produit>
+     */
+    public function getProduits(): Collection
+    {
+        return $this->Produits;
+    }
+
+    public function addProduit(Produit $produit): self
+    {
+        if (!$this->Produits->contains($produit)) {
+            $this->Produits->add($produit);
+            $produit->setPromotions($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduit(Produit $produit): self
+    {
+        if ($this->Produits->removeElement($produit)) {
+            // set the owning side to null (unless already changed)
+            if ($produit->getPromotions() === $this) {
+                $produit->setPromotions(null);
+            }
+        }
 
         return $this;
     }

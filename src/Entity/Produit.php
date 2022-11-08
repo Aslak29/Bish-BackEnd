@@ -48,6 +48,9 @@ class Produit
     #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
     private ?ProduitInCommande $ProduitInCommande = null;
 
+    #[ORM\ManyToOne(inversedBy: 'Produits')]
+    private ?Promotions $promotions = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -172,6 +175,18 @@ class Produit
     public function setProduitInCommande(?ProduitInCommande $ProduitInCommande): self
     {
         $this->ProduitInCommande = $ProduitInCommande;
+
+        return $this;
+    }
+
+    public function getPromotions(): ?Promotions
+    {
+        return $this->promotions;
+    }
+
+    public function setPromotions(?Promotions $promotions): self
+    {
+        $this->promotions = $promotions;
 
         return $this;
     }

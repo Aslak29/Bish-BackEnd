@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TailleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TailleRepository::class)]
@@ -15,6 +17,14 @@ class Taille
 
     #[ORM\Column(length: 255)]
     private ?string $taille = null;
+
+    #[ORM\OneToMany(mappedBy: 'taille', targetEntity: ProduitBySize::class)]
+    private Collection $produitBySize;
+
+    public function __construct()
+    {
+        $this->produitBySize = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -29,6 +39,36 @@ class Taille
     public function setTaille(string $taille): self
     {
         $this->taille = $taille;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProduitBySize>
+     */
+    public function getProduitBySize(): Collection
+    {
+        return $this->produitBySize;
+    }
+
+    public function addProduitBySize(ProduitBySize $produitBySize): self
+    {
+        if (!$this->produitBySize->contains($produitBySize)) {
+            $this->produitBySize->add($produitBySize);
+            $produitBySize->setTaille($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduitBySize(ProduitBySize $produitBySize): self
+    {
+        if ($this->produitBySize->removeElement($produitBySize)) {
+            // set the owning side to null (unless already changed)
+            if ($produitBySize->getTaille() === $this) {
+                $produitBySize->setTaille(null);
+            }
+        }
 
         return $this;
     }

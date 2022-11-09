@@ -49,6 +49,9 @@ class User implements PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notation::class)]
     private Collection $Note;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
+
     public function __construct()
     {
         $this->adresse = new ArrayCollection();
@@ -56,6 +59,7 @@ class User implements PasswordAuthenticatedUserInterface
         $this->commandes = new ArrayCollection();
         $this->Relation = new ArrayCollection();
         $this->Note = new ArrayCollection();
+        $this->Contacts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -281,6 +285,18 @@ class User implements PasswordAuthenticatedUserInterface
                 $note->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    {
+        $this->created_at = $created_at;
 
         return $this;
     }

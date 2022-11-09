@@ -4,8 +4,10 @@ namespace App\DataFixtures;
 
 use App\Entity\Adresse;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Monolog\DateTimeImmutable;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
@@ -15,8 +17,14 @@ class UserFixtures extends Fixture
     public function __construct(UserPasswordHasherInterface $passwordHasher) {
         $this->encoder = $passwordHasher;
     }
+
+    /**
+     * @throws \Exception
+     */
     public function load(ObjectManager $manager): void
     {
+        $dt = new DateTimeImmutable(0);
+        $dt->format('Y-m-d H:i:s');
 
         $user = (new User())
             ->setName('admin')
@@ -24,6 +32,7 @@ class UserFixtures extends Fixture
             ->setEmail('admin@bish.fr')
             ->setRoles(['ROLE_ADMIN'])
             ->setPhone(0671201001)
+            ->setCreatedAt($dt)
         ;
         $user->setPassword($this->encoder->hashPassword($user, 'admin'));
         $manager->persist($user);
@@ -32,10 +41,11 @@ class UserFixtures extends Fixture
 
             $user = (new User())
                 ->setName('Demo '. $i)
-                ->setFirstname('firtname'. $i)
+                ->setFirstname('firstname'. $i)
                 ->setEmail('demo'.$i.'@bish.fr')
                 ->setRoles(['ROLE_USER'])
                 ->setPhone(0671201001)
+                ->setCreatedAt($dt)
             ;
             $user->setPassword($this->encoder->hashPassword($user, 'pass'));
             $this->addReference('user_'.$i, $user);

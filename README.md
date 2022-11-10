@@ -19,10 +19,44 @@ git remote add origin https://gitlab.com/incubateur_m2i_afpa_2/team-les-codetenu
 git branch -M main
 git push -uf origin main
 ```
+## Initialisation du Projet avec la base de données
+
+- [ ] [Installer Composer si vous ne l'avez pas !](https://getcomposer.org/)
+- [ ] initialisation de composer avec le projet
+```
+cd back_end
+composer update
+```
+
+- [ ] Configurer la connexion de votre base de données
+- Copier Coller le ```.env``` et renomer le en ```.env.local```
+- Ensuite configurer le ```.env.local```
+```
+DATABASE_URL="mysql://{NomUtilisateur}:{Motdepasse}@127.0.0.1:3306/#NomBDD#?serverVersion=5.7.36&charset=utf8mb4"
+```
+
+- [ ] Si la base de donnée est déjà existante avec des données
+    - il faudra d'abord la supprimer (pour éviter toutes **_erreur_**)
+```
+php bin/console doctrine:database:drop --force
+```
+
+- [ ] Initialisation de la base de données
+```
+php bin/console doctrine:database:create
+php bin/console make:migration
+php bin/console doctrine:migration:migrate
+```
+
+- [ ] Générer les données fictives
+```
+php bin/console doctrine:fixtures:load
+```
 
 ## Integrate with your tools
 
 - [ ] [Set up project integrations](https://gitlab.com/incubateur_m2i_afpa_2/team-les-codetenus/back_end/-/settings/integrations)
+
 
 ## Collaborate with your team
 

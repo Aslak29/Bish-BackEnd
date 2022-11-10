@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\BlogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Monolog\DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: BlogRepository::class)]
 class Blog
@@ -25,6 +26,13 @@ class Blog
 
     #[ORM\Column(length: 255)]
     private ?string $pathImage = null;
+
+    public function __construct()
+    {
+        $dt = new DateTimeImmutable(0);
+        $dt->format('Y-m-d H:i:s');
+        $this->date =  $dt;
+    }
 
     public function getId(): ?int
     {

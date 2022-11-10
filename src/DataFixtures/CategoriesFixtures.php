@@ -12,10 +12,9 @@ class CategoriesFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         for ($i = 1; $i < 10; $i++) {
-            $bool = rand(0, 1);
             $categorie = (new Categorie())
                 ->setName("Catégories" . $i)
-                ->setIsTrend($bool);
+                ->setIsTrend(rand(0, 1));
             $this->addReference('categorie_' . $i, $categorie);
             $manager->persist($categorie);
         }

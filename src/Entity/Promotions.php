@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PromotionsRepository;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -31,6 +32,7 @@ class Promotions
     public function __construct()
     {
         $this->Produits = new ArrayCollection();
+        $this->date_start = new DateTime();
     }
 
     public function getId(): ?int

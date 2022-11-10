@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Monolog\DateTimeImmutable;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 #[ORM\Entity(repositoryClass: ProduitRepository::class)]
 class Produit
@@ -45,9 +47,12 @@ class Produit
 
     public function __construct()
     {
+        $dt = new DateTimeImmutable(0);
+        $dt->format('Y-m-d H:i:s');
         $this->categories = new ArrayCollection();
         $this->produitBySize = new ArrayCollection();
         $this->Note = new ArrayCollection();
+        $this->created_at = $dt;
     }
 
     #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]

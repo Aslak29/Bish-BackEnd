@@ -7,6 +7,7 @@
 /public/bundles/
 /var/
 /vendor/
+/migrations
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -18,3 +19,6 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+migrations/Version20221107111720.php
+migrations/Version20221107111803.php
+

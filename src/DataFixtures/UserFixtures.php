@@ -37,7 +37,7 @@ class UserFixtures extends Fixture
         $user->setPassword($this->encoder->hashPassword($user, 'admin'));
         $manager->persist($user);
 
-        for ($i = 1; $i < 10; $i++ ){
+        for ($i = 1; $i < 30; $i++ ){
 
             $user = (new User())
                 ->setName('Demo '. $i)

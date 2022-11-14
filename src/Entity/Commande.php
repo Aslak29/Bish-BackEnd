@@ -15,7 +15,7 @@ class Commande
     private int $id;
 
     #[ORM\Column]
-    private DateTimeImmutable $dateFacture; 
+    private DateTimeImmutable $dateFacture;
 
     #[ORM\Column(length:255)]
     private string $etatCommande;
@@ -28,6 +28,15 @@ class Commande
     #[ORM\JoinColumn(nullable: false)]
     private ?ProduitInCommande $ProduitInCommande = null;
 
+    /**
+     * @param DateTimeImmutable $dateFacture
+     */
+    public function __construct()
+    {
+        $dt = new \Monolog\DateTimeImmutable(0);
+        $dt->format('Y-m-d H:i:s');
+        $this->dateFacture = $dt;
+    }
 
 
     /**

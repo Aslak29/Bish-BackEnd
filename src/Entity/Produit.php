@@ -45,6 +45,15 @@ class Produit
     #[ORM\OneToMany(mappedBy: 'produit', targetEntity: ProduitBySize::class)]
     private Collection $produitBySize;
 
+    #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
+    private Collection $ProduitInCommande;
+
+    #[ORM\ManyToOne(inversedBy: 'Produits')]
+    private ?Promotions $promotions = null;
+
+    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: Notation::class)]
+    private Collection $Note;
+
     public function __construct()
     {
         $dt = new DateTimeImmutable(0);
@@ -52,17 +61,11 @@ class Produit
         $this->categories = new ArrayCollection();
         $this->produitBySize = new ArrayCollection();
         $this->Note = new ArrayCollection();
+        $this->ProduitInCommande = new ArrayCollection();
         $this->created_at = $dt;
     }
 
-    #[ORM\OneToMany(mappedBy: 'produits',targetEntity: ProduitInCommande::class)]
-    private ?ProduitInCommande $ProduitInCommande = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Produits')]
-    private ?Promotions $promotions = null;
-
-    #[ORM\OneToMany(mappedBy: 'produit', targetEntity: Notation::class)]
-    private Collection $Note;
 
     public function getId(): ?int
     {
@@ -180,16 +183,9 @@ class Produit
         return $this;
     }
 
-    public function getProduitInCommande(): ?ProduitInCommande
+    public function getProduitInCommande(): Collection
     {
         return $this->ProduitInCommande;
-    }
-
-    public function setProduitInCommande(?ProduitInCommande $ProduitInCommande): self
-    {
-        $this->ProduitInCommande = $ProduitInCommande;
-
-        return $this;
     }
 
     public function getPromotions(): ?Promotions

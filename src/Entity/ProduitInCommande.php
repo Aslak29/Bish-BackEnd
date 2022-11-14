@@ -22,16 +22,10 @@ class ProduitInCommande
     private ?float $price = null;
 
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'ProduitInCommande')]
-    private Collection $produits;
+    private Produit $produits;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ProduitInCommande')]
-    private Collection $commandes;
-
-    public function __construct()
-    {
-        $this->produits = new ArrayCollection();
-        $this->commandes = new ArrayCollection();
-    }
+    private Commande $commandes;
 
     public function getId(): ?int
     {
@@ -63,63 +57,37 @@ class ProduitInCommande
     }
 
     /**
-     * @return Collection<int, Produit>
+     * @return Produit
      */
-    public function getProduits(): Collection
+    public function getProduit(): Produit
     {
         return $this->produits;
     }
 
-    public function addProduit(Produit $produit): self
+    /**
+     * @param Produit $produits
+     */
+    public function setProduit(Produit $produits): void
     {
-        if (!$this->produits->contains($produit)) {
-            $this->produits->add($produit);
-            $produit->setProduitInCommande($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProduit(Produit $produit): self
-    {
-        if ($this->produits->removeElement($produit)) {
-            // set the owning side to null (unless already changed)
-            if ($produit->getProduitInCommande() === $this) {
-                $produit->setProduitInCommande(null);
-            }
-        }
-
-        return $this;
+        $this->produits = $produits;
     }
 
     /**
-     * @return Collection<int, Commande>
+     * @return Commande
      */
-    public function getCommandes(): Collection
+    public function getCommande(): Commande
     {
         return $this->commandes;
     }
 
-    public function addCommande(Commande $commande): self
+    /**
+     * @param Commande $commandes
+     */
+    public function setCommande(Commande $commandes): void
     {
-        if (!$this->commandes->contains($commande)) {
-            $this->commandes->add($commande);
-            $commande->setProduitInCommande($this);
-        }
-
-        return $this;
+        $this->commandes = $commandes;
     }
 
-    public function removeCommande(Commande $commande): self
-    {
-        if ($this->commandes->removeElement($commande)) {
-            // set the owning side to null (unless already changed)
-            if ($commande->getProduitInCommande() === $this) {
-                $commande->setProduitInCommande(null);
-            }
-        }
 
-        return $this;
-    }
 
 }

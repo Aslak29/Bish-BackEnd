@@ -65,6 +65,7 @@ class User implements PasswordAuthenticatedUserInterface
         $this->Relation = new ArrayCollection();
         $this->Note = new ArrayCollection();
         $this->Contacts = new ArrayCollection();
+        $this->roles = ["ROLE_USER"];
     }
 
     public function getId(): ?int

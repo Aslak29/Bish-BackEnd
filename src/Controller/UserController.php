@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Doctrine\Persistence\ObjectManager;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +21,24 @@ class UserController extends AbstractController
         $this->encoder = $passwordHasher;
     }
 
-    #[Route('/register/{name}/{firstname}/{email}/{password}', name: 'user_register', methods: ["GET","POST"])]
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/register/{name}/{firstname}/{email}/{password}', name: 'user_register', methods: ["POST"])]
     public function register(UserRepository $userRepository, Request $request): JsonResponse{
 
         $user = new User();
         $user->setName($request->attributes->get('name'));
         $user->setFirstname($request->attributes->get('firstname'));
         $user->setEmail($request->attributes->get('email'));
-        $user->setPassword($request->attributes->get('password'));
+        $user->setPassword($this->encoder->hashPassword($user, $request->attributes->get('password')));
 
         $userRepository->save($user,true);
 

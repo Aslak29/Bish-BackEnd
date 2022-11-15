@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Monolog\DateTimeImmutable;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -54,12 +55,17 @@ class User implements PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $dt = new DateTimeImmutable(0);
+        $dt->format('Y-m-d H:i:s');
+        $this->created_at = $dt;
+
         $this->adresse = new ArrayCollection();
         $this->Logs = new ArrayCollection();
         $this->commandes = new ArrayCollection();
         $this->Relation = new ArrayCollection();
         $this->Note = new ArrayCollection();
         $this->Contacts = new ArrayCollection();
+        $this->roles = ["ROLE_USER"];
     }
 
     public function getId(): ?int

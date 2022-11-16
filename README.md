@@ -56,6 +56,19 @@ php bin/console doctrine:migration:migrate
 ```
 php bin/console doctrine:fixtures:load
 ```
+## Générer les Clés privés pour Token JWT
+
+Installer le .exe de [Win64 OpenSSL v3.0.7 Light](https://slproweb.com/products/Win32OpenSSL.html)
+
+Dans votre terminal :
+
+``` composer update ```
+
+``` php bin/console lexik:jwt:generate-keypair ```
+
+Vous pouvez maintenant vous connecter sur le site.
+
+
 
 ## Integrate with your tools
 

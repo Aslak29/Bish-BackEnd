@@ -8,9 +8,9 @@ use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('api/user')]
 class UserController extends AbstractController
@@ -31,14 +31,33 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/register/{name}/{surname}/{email}/{password}', name: 'user_register', methods: ["POST"])]
-    public function register(UserRepository $userRepository, Request $request): JsonResponse{
+    #[Route('/register/{name}/{surname}/{email}/{password}/{passwordConfirm}', name: 'user_register', methods: ["POST"])]
+    public function register(UserRepository $userRepository, Request $request, ValidatorInterface $validator): JsonResponse{
 
+        /* Récupération des attributs dans la requètes POST en les settant à la nouvelle entitée User*/
         $user = new User();
         $user->setName($request->attributes->get('name'));
         $user->setSurname($request->attributes->get('surname'));
         $user->setEmail($request->attributes->get('email'));
-        $user->setPassword($this->encoder->hashPassword($user, $request->attributes->get('password')));
+
+        $password = $request->attributes->get('password');
+        $passwordConfirm = $request->attributes->get('passwordConfirm');
+        $user->setPassword($password);
+
+
+
+        /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+            return new JsonResponse($errorsString,400);
+        }
+
+        if ($password === $passwordConfirm) {
+            $user->setPassword($this->encoder->hashPassword($user, $user->getPassword()));
+        }else {
+            return new JsonResponse(["error" => "les mots de passe ne sont pas idendique"],400);
+        }
 
         $userRepository->save($user,true);
 

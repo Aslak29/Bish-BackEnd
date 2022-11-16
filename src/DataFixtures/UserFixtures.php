@@ -28,7 +28,7 @@ class UserFixtures extends Fixture
 
         $user = (new User())
             ->setName('admin')
-            ->setFirstname('admin')
+            ->setSurname('admin')
             ->setEmail('admin@bish.fr')
             ->setRoles(['ROLE_ADMIN'])
             ->setPhone(0671201001)
@@ -41,7 +41,7 @@ class UserFixtures extends Fixture
 
             $user = (new User())
                 ->setName('Demo '. $i)
-                ->setFirstname('firstname'. $i)
+                ->setSurname('firstname'. $i)
                 ->setEmail('demo'.$i.'@bish.fr')
                 ->setRoles(['ROLE_USER'])
                 ->setPhone(0671201001)

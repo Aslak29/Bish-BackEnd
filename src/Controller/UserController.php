@@ -31,12 +31,12 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/register/{name}/{firstname}/{email}/{password}', name: 'user_register', methods: ["POST"])]
+    #[Route('/register/{name}/{surname}/{email}/{password}', name: 'user_register', methods: ["POST"])]
     public function register(UserRepository $userRepository, Request $request): JsonResponse{
 
         $user = new User();
         $user->setName($request->attributes->get('name'));
-        $user->setFirstname($request->attributes->get('firstname'));
+        $user->setSurname($request->attributes->get('surname'));
         $user->setEmail($request->attributes->get('email'));
         $user->setPassword($this->encoder->hashPassword($user, $request->attributes->get('password')));
 

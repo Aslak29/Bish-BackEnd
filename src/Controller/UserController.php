@@ -44,5 +44,4 @@ class UserController extends AbstractController
 
         return new JsonResponse(null,200);
     }
-
 }

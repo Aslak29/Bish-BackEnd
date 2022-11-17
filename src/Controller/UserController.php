@@ -59,7 +59,15 @@ class UserController extends AbstractController
             return new JsonResponse(["error" => "les mots de passe ne sont pas idendique"],400);
         }
 
+        if ($userRepository->findUserByMail($user->getEmail()) != null){
+            return new JsonResponse([
+                "errorCode" => "001",
+                "errorMessage" => "L'adresse email est déjà inscrite dans la base de donnée"
+                ],409);
+        } ;
+
         $userRepository->save($user,true);
+
 
         return new JsonResponse(null,200);
     }

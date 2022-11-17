@@ -7,8 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Monolog\DateTimeImmutable;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @method string getUserIdentifier()
@@ -27,10 +29,13 @@ class User implements UserInterface
     #[ORM\Column(length: 255)]
     private ?string $surname = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(min: 8, max: 255, minMessage: "le mot de passe doit contenir minimum 8 caratères !")]
+    #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@.!%?&]{8,}$/", message: "Le mot de passe doit contenir 1 Majuscule, 1 chiffre et doit contenir 8 caratères")]
     private ?string $password = null;
 
     #[ORM\Column]

@@ -75,6 +75,8 @@ Vous pouvez maintenant vous connecter sur le site.
 | <a id="request2">2</a> |  User   |      /api/user/register/{name}/{surname}/{email}/{password}/{passwordConfirm}       |  POST  |     200     |       Permet d'enregister un utilisateur        |
 | <a id="request3">3</a> | Produit |                                    /api/produit                                     |  GET   |     200     | Permet de retourner tout les produits existants |
 | <a id="request4">4</a> | Produit | /api/produit/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available} |  POST  |     200     |           Permet d'ajouter un produit           |
+| <a id="request5">5</a> | Contact |                                    /api/contact/                                    |  GET   |     200     | Permet de retourner tout les contacts existants |
+| <a id="request6">6</a> | Contact |             /api/contact/add/{name}/{surname}/{email}/{message}/{phone}             |  POST  |     200     |           Permet d'ajouter un contact           |
 
 ## Erreur Gérer par l'application
 | Code d'erreur |                     Message d'erreur                     | Status HTTP | Erreur généré par |

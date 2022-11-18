@@ -37,7 +37,6 @@ class BlogController extends AbstractController
                 'pathImage' => $blog->getPathImage()
             ];
         }
-
         return new JsonResponse($blogArray);
     }
 }

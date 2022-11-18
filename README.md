@@ -58,7 +58,7 @@ php bin/console doctrine:fixtures:load
 ```
 ## Générer les Clés privés pour Token JWT
 
-Installer le .exe de [Win64 OpenSSL v3.0.7 Light](https://slproweb.com/products/Win32OpenSSL.html)
+Installer le .exe de [Win64 OpenSSL v3.0.7 Light](https://slproweb.com/productscd/Win32OpenSSL.html)
 
 Dans votre terminal :
 

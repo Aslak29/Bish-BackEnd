@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('api/user')]
+#[Route('api/security')]
 class UserController extends AbstractController
 {
     /**
@@ -25,11 +25,11 @@ class UserController extends AbstractController
      * )
      */
     // RECUPERATION DU MOT DE PASSE PAR MAIL
-    #[Route('/register/{email}', name: 'user_register', methods: ["POST"])]
+    #[Route('/forgot/{email}', name: 'user_forgot', methods: ["POST"])]
 
 
     public function register(UserRepository $userRepository, Request $request, ValidatorInterface $validator): JsonResponse{
-        $user = new User;
+        $user = User;
         /* Récupération des attributs dans la requètes POST en les settant à la nouvelle entitée User*/
         $user->setEmail($request->attributes->get('email'));
         $newPassword = $request->attributes->get('password');
@@ -39,11 +39,7 @@ class UserController extends AbstractController
         $this->newPassword = $password;
 
         return $this;
-        #[ORM\Column(length: 255)]
-        #[Assert\Length(min: 8, max: 255, minMessage: "le mot de passe doit contenir minimum 8 caratères !")]
-        #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@.!%?&]{8,}$/", message: "Le mot de passe doit contenir 1 Majuscule, 1 chiffre et doit contenir 8 caratères")]
-        private ?string $newPassword = null;
-        public function setPassword(string $password): self
+
         {
         
         /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/

@@ -12,6 +12,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+use function PHPSTORM_META\map;
+
 #[Route('api/user')]
 class UserController extends AbstractController
 {
@@ -70,5 +72,27 @@ class UserController extends AbstractController
 
 
         return new JsonResponse(null,200);
+    }
+
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/getUserByMail/{email}', name: 'user_getByMail', methods: "GET")]
+    public function getUserByMail(UserRepository $userRepository, Request $request): JsonResponse
+    {
+        $user = $userRepository->findOneBy(array('email' => $request->attributes->get('email')));
+        $userArray = [
+        'id' => $user->getId(),
+        'name' => $user->getName(),
+        'surname' => $user->getSurname(),
+        ];
+        return new JsonResponse($userArray);
     }
 }

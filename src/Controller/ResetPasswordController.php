@@ -7,6 +7,7 @@ use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
 use App\Repository\ResetPasswordRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Util\Json;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +40,7 @@ class ResetPasswordController extends AbstractController
      * @param Request $request
      * @param MailerInterface $mailer
      * @return Response
-     * @OA\Tag (name="Security")
+     * @OA\Tag (name="ResetPassWord")
      * @OA\Response(
      *     response="200",
      *     description = "OK"
@@ -56,8 +57,13 @@ class ResetPasswordController extends AbstractController
 
     /**
      * Confirmation page after a user has requested a password reset.
+     * @return JsonResponse
+     * @OA\Tag (name="ResetPassWord")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK")
      */
-    #[Route('/check-email', name: 'app_check_email')]
+    #[Route('/check-email', name: 'app_check_email', methods: ['GET'])]
     public function checkEmail(): JsonResponse
     {
         // Generate a fake token if the user does not exist or someone hit this page directly.
@@ -74,7 +80,7 @@ class ResetPasswordController extends AbstractController
 
     /**
      * Validates and process the reset URL that the user clicked in their email.
-     *  @OA\Tag (name="Security")
+     *  @OA\Tag (name="ResetPassWord")
      *  @OA\Response(
      *  response="200",
      *  description = "OK"

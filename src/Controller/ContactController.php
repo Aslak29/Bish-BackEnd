@@ -83,7 +83,7 @@ class ContactController extends AbstractController
 
         $contactRepository->save($contact,true);
         return new JsonResponse([
-            'successCode' => '013',
+            'successCode' => '003',
             'successMessage' => 'This contact has been create'
         ],200);
     }
@@ -113,7 +113,7 @@ class ContactController extends AbstractController
         }
 
         return new JsonResponse([
-            'successCode' => "013",
+            'successCode' => "004",
             'successMessage' => "This contact has been remove"
         ],200);
 

@@ -17,7 +17,7 @@ git remote add origin https://gitlab.com/incubateur_m2i_afpa_2/team-les-codetenu
 git branch -M main
 git push -uf origin main
 ```
-
+---
 ## Initialisation du Projet avec la base de données
 
 - [ ] [Installer Composer si vous ne l'avez pas !](https://getcomposer.org/)
@@ -56,9 +56,10 @@ php bin/console doctrine:migration:migrate
 ```
 php bin/console doctrine:fixtures:load
 ```
+---
 ## Générer les Clés privés pour Token JWT
 
-Installer le .exe de [Win64 OpenSSL v3.0.7 Light](https://slproweb.com/productscd/Win32OpenSSL.html)
+Installer le .exe de [Win64 OpenSSL v3.0.7 Light](https://slproweb.com/download/Win64OpenSSL_Light-3_0_7.exe)
 
 Dans votre terminal :
 
@@ -68,16 +69,51 @@ Dans votre terminal :
 
 Vous pouvez maintenant vous connecter sur le site.
 
+---
+## Configuration de Mailer
+
+- Pour utiliser mailer il faut configurer le `.env.local` comme ci-dessous.
+
+``` 
+###> symfony/mailer ###
+MAILER_DSN=gmail+smtp://{email}:{motdepasse d'application}@default
+```
+- Une fois `MAILER_DSN` configuré vous allez pouvoir lancer le service d'envoi de mail avec cette ligne de commande.
+
+``` 
+php bin/console messenger:consume -vv 
+```
+- Puis selectionner `async,failed`.
+```bash
+ Select receivers to consume: [async]:
+  [0] async
+  [1] failed
+ > async,failed
+```
+---
 ## Les Différentes requêtes
-|           N°           | Entity  |                                         URI                                         | Method | Status HTTP |                   Description                   |
-|:----------------------:|:-------:|:-----------------------------------------------------------------------------------:|:------:|:-----------:|:-----------------------------------------------:|
-| <a id="request1">1</a> |  Blog   |                                      /api/blog                                      |  GET   |     200     |  Permet de retourner tout les blogs existants   |
-| <a id="request2">2</a> |  User   |      /api/user/register/{name}/{surname}/{email}/{password}/{passwordConfirm}       |  POST  |     200     |       Permet d'enregister un utilisateur        |
-| <a id="request3">3</a> | Produit |                                    /api/produit                                     |  GET   |     200     | Permet de retourner tout les produits existants |
-| <a id="request4">4</a> | Produit | /api/produit/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available} |  POST  |     200     |           Permet d'ajouter un produit           |
-| <a id="request5">5</a> | Contact |                                    /api/contact/                                    |  GET   |     200     | Permet de retourner tout les contacts existants |
-| <a id="request6">6</a> | Contact |             /api/contact/add/{name}/{surname}/{email}/{message}/{phone}             |  POST  |     200     |           Permet d'ajouter un contact           |
-| <a id="request7">7</a> | Contact |                                  /api/remove/{id}                                   | DELETE |     200     |         Permet de supprimer un contact          |
+|            N°            |    Entity     |                                         URI                                         | Method | Status HTTP |                               Description                                |
+|:------------------------:|:-------------:|:-----------------------------------------------------------------------------------:|:------:|:-----------:|:------------------------------------------------------------------------:|
+|  <a id="request1">1</a>  |     Blog      |                                      /api/blog                                      |  GET   |     200     |               Permet de retourner tout les blogs existants               |
+|  <a id="request2">2</a>  |     User      |      /api/user/register/{name}/{surname}/{email}/{password}/{passwordConfirm}       |  POST  |     200     |                    Permet d'enregister un utilisateur                    |
+| <a id="request10">10</a> |     User      |                           /api/user/getUserByMail/{email}                           |  GET   |     200     |             Permet de récupérer un utilisateur via son email             |
+|  <a id="request3">3</a>  |    Produit    |                                    /api/produit                                     |  GET   |     200     |             Permet de retourner tout les produits existants              |
+|  <a id="request4">4</a>  |    Produit    | /api/produit/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available} |  POST  |     200     |                       Permet d'ajouter un produit                        |
+|  <a id="request5">5</a>  |    Contact    |                                    /api/contact/                                    |  GET   |     200     |             Permet de retourner tout les contacts existants              |
+|  <a id="request6">6</a>  |    Contact    |             /api/contact/add/{name}/{surname}/{email}/{message}/{phone}             |  POST  |     200     |                       Permet d'ajouter un contact                        |
+|  <a id="request7">7</a>  |    Contact    |                                  /api/remove/{id}                                   | DELETE |     200     |                      Permet de supprimer un contact                      |
+|  <a id="request8">8</a>  | ResetPassword |                        /api/reset-password/sendMail/{email}                         |  GET   |     200     | Permet d'envoyer un mail avec un lien de reintialisation de mot de passe |
+|  <a id="request9">9</a>  | ResetPassword |           /api/reset-password/reset/{token}/{password}/{passwordConfirm}            |  POST  |     200     |          Permet de creer le nouveau mot de passe avec un token           |
+
+
+## Success Gérer par l'application
+| Success Code |            Error Message            | Status HTTP | Success generated by |
+|:------------:|:-----------------------------------:|:-----------:|:--------------------:|
+|     002      |   Your password has been changed    |     200     |    [9](#request9)    | 
+|     003      |    This contact has been create     |     200     |    [6](#request6)    | 
+|     004      |    This contact has been remove     |     200     |    [7](#request7)    |
+
+
 
 ## Erreur Gérer par l'application
 | Error Code |                      Error Message                       | Status HTTP | Error generated by |

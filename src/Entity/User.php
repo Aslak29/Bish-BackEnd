@@ -62,6 +62,7 @@ class User implements UserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
+
     public function __construct()
     {
         $dt = new DateTimeImmutable(0);

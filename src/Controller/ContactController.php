@@ -33,7 +33,7 @@ class ContactController extends AbstractController
         $arrayContacts = [];
 
         foreach ($contacts as $contact){
-            $arrayContacts = [
+            $arrayContacts[] = [
                 'id' => $contact->getId(),
                 'name' => $contact->getName(),
                 'surname' => $contact->getSurname(),

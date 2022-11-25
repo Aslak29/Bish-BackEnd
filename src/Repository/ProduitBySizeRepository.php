@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ProduitBySize;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,6 +40,19 @@ class ProduitBySizeRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllStockByIdProduct($idProduct){
+
+        return $this->createQueryBuilder('p')
+            ->join('p.taille', 't')
+            ->addSelect('t')
+            ->where('p.produit = :idProduct')
+            ->setParameters([
+                "idProduct" => $idProduct
+            ])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 //    /**
 //     * @return ProduitBySize[] Returns an array of ProduitBySize objects
 //     */

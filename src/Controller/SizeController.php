@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
 
-#[Route('/api/size/')]
+#[Route('api/size')]
 
 class SizeController extends AbstractController
 {
@@ -27,14 +27,16 @@ class SizeController extends AbstractController
      */
     #[Route('/allSizeProduct/{idProduct}', name: 'app_size', methods: "GET")]
     public function allSizeProduct(ProduitBySizeRepository $produitBySizeRepo, Request $request): JsonResponse{
-        $productBySize = $produitBySizeRepo->findBy(["produit" => $request->attributes->get('idProduct')]);
+        $productBySize = $produitBySizeRepo->findAllStockByIdProduct($request->attributes->get('idProduct'));
+
         $allSizeProductArray = [];
         foreach($productBySize as $oneSizeProduct){
             $allSizeProductArray[] = [
-            // $oneSizeProduct->getTaille() => $oneSizeProduct->getStock()
+                "taille" => $oneSizeProduct->getTaille()->getTaille(),
+                "stock" => $oneSizeProduct->getStock()
             ];
         }
-        return new JsonResponse($allSizeProductArray);
+        return new JsonResponse($allSizeProductArray,200);
     }
 }
 

@@ -31,8 +31,7 @@ class SizeController extends AbstractController
 
         $allSizeProductArray = [];
         foreach($productBySize as $oneSizeProduct){
-            $allSizeProductArray[] = [
-                "taille" => $oneSizeProduct->getTaille()->getTaille(),
+            $allSizeProductArray[ $oneSizeProduct->getTaille()->getTaille()] = [
                 "stock" => $oneSizeProduct->getStock()
             ];
         }

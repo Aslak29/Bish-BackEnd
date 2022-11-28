@@ -11,6 +11,8 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Produit;
+use function PHPUnit\Framework\isEmpty;
+
 // exporter vers AdminProductView ? - Flo
 #[Route('api/produit')]
 class ProductController extends AbstractController
@@ -41,6 +43,39 @@ class ProductController extends AbstractController
                 'is_available' => $produit->isIsAvailable()
             ];
         }
+        return new JsonResponse($produitArray);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="ProduitById")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/{id}', name: 'app_produit_by_id', methods:"GET")]
+    public function findProductById(ProduitRepository $produitRepository,Request $request): JsonResponse
+    {
+        $produit = $produitRepository->findOneBy(array('id' => $request->attributes->get('id')));
+        if (!$produit){
+            return new JsonResponse([
+                "errorCode" => "002",
+                "errorMessage" => "le produit n'éxiste pas !"
+            ],404);
+        }
+        $produitArray[] = [
+            'id' => $produit->getId(),
+            'name' => $produit->getName(),
+            'description' => $produit->getDescription(),
+            'pathImage' => $produit->getPathImage(),
+            'price' => $produit->getPrice(),
+            'is_trend' => $produit->isIsTrend(),
+            'is_available' => $produit->isIsAvailable()
+        ];
+
         return new JsonResponse($produitArray);
     }
 

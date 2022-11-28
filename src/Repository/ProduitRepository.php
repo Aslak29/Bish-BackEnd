@@ -47,8 +47,8 @@ class ProduitRepository extends ServiceEntityRepository
     public function findAllProductsByIdCateg($idCateg){
 
         return $this->createQueryBuilder('p')
-            ->join('p.id', 'p')
-            ->where('p.id = :idCateg')
+            ->join('p.categories', 'c')
+            ->where('c.id = :idCateg')
             ->setParameters([
                 "idCateg" => $idCateg
             ])

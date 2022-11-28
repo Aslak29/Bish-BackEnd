@@ -71,8 +71,9 @@ class ProductController extends AbstractController
     }
 
 
-            /**
+    /**
      * @param ProduitRepository $produitRepository
+     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Produit")
      * @OA\Response(
@@ -80,11 +81,10 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-
-    #[Route('/suggestions', name: 'product_suggest', methods: "GET")]
-    public function findFourProductsByCat(ProduitRepository $produitRepository): JsonResponse
+    #[Route('/suggestions/{idCategorie}', name: 'product_suggest', methods: "POST")]
+    public function findFourProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
-        $produits = $produitRepository->findAllProductsByIdCateg(1);
+        $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'));
         $produitArray = [];
         foreach($produits as $produit){
             $produitArray[] = [

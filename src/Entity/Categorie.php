@@ -24,6 +24,9 @@ class Categorie
     #[ORM\ManyToMany(targetEntity: Produit::class, inversedBy: 'categories')]
     private Collection $produits;
 
+    #[ORM\Column]
+    private ?string $pathImage = null;
+
     public function __construct()
     {
         $this->produits = new ArrayCollection();
@@ -57,6 +60,24 @@ class Categorie
 
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getPathImage(): ?string
+    {
+        return $this->pathImage;
+    }
+
+    /**
+     * @param string|null $pathImage
+     */
+    public function setPathImage(?string $pathImage): self
+    {
+        $this->pathImage = $pathImage;
+        return $this;
+    }
+
 
     /**
      * @return Collection<int, Produit>

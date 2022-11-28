@@ -121,15 +121,7 @@ class ProductController extends AbstractController
 
     #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}', name: 'app_filter_product', methods: "POST")]
     public function searchFilter(ProduitRepository $produitRepository,Request $request){
-        $orderBy = null;
-
-        if ($request->attributes->get("orderby")=="0"){
-            $orderBy = "ASC";
-        }else{
-            $orderBy ="DESC";
-        }
-
-        $produits = $produitRepository->findByFilter($orderBy,$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"));
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"));
         $produitArray = [];
         foreach($produits as $produit){
             $produitArray[] = [

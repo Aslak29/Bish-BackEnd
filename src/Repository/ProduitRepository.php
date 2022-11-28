@@ -45,30 +45,26 @@ class ProduitRepository extends ServiceEntityRepository
    public function findByFilter($orderby,$moyenne,$minprice,$maxprice): array
    {
     $entityManager = $this->getEntityManager();
-
-    $query = $entityManager->createQuery(
+    $querySQL =
         'SELECT p
         FROM App\Entity\Produit p
-        WHERE p.price BETWEEN :minprice AND :maxprice
-        ORDER BY p.price :orderby
-        '
-    )->setParameters([
+        WHERE p.price BETWEEN :minprice AND :maxprice';
+
+    if ($orderby == "0"){
+        $querySQL .= " order by p.price ASC";
+    }else if ($orderby == "1"){
+        $querySQL .= " order by p.price DESC";
+    }
+
+    $query = $this->getEntityManager()->createQuery($querySQL);
+
+    $query->setParameters([
         'minprice'=>$minprice,
-        'maxprice'=>$maxprice,
-        'orderby'=>$orderby
+        'maxprice'=>$maxprice
     ]);
 
-    // returns an array of Product objects
+
     return $query->getResult();
    }
 
-//    public function findOneBySomeField($value): ?Produit
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

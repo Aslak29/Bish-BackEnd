@@ -39,6 +39,24 @@ class ProduitRepository extends ServiceEntityRepository
         }
     }
 
+    // SELECT * FROM produit
+    // INNER JOIN categorie_produit ON produit.id = categorie_produit.produit_id
+    // INNER JOIN categorie ON categorie.id = categorie_produit.categorie_id
+    // WHERE categorie.id = 1;
+
+    public function findAllProductsByIdCateg($idCateg){
+
+        return $this->createQueryBuilder('p')
+            ->join('p.id', 'p')
+            ->where('p.id = :idCateg')
+            ->setParameters([
+                "idCateg" => $idCateg
+            ])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    
 //    /**
 //     * @return Produit[] Returns an array of Produit objects
 //     */

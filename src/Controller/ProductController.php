@@ -54,7 +54,6 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-
     #[Route('/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available}', name: 'app_add_product', methods: "POST")]
     public function addProduit(ProduitRepository $produitRepository, Request $request){
         $produit = new Produit();
@@ -69,5 +68,36 @@ class ProductController extends AbstractController
 
         return new JsonResponse(null,200);
 
+    }
+
+
+            /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+    #[Route('/suggestions', name: 'product_suggest', methods: "GET")]
+    public function findFourProductsByCat(ProduitRepository $produitRepository): JsonResponse
+    {
+        $produits = $produitRepository->findAllProductsByIdCateg(1);
+        $produitArray = [];
+        foreach($produits as $produit){
+            $produitArray[] = [
+                'id' => $produit->getId(),
+                'name' => $produit->getName(),
+                'description' => $produit->getDescription(),
+                'pathImage' => $produit->getPathImage(),
+                'price' => $produit->getPrice(),
+                'is_trend' => $produit->isIsTrend(),
+                'is_available' => $produit->isIsAvailable(),
+                'categorie' => $produit->getCategories()
+            ];
+        }
+        return new JsonResponse($produitArray);
     }
 }

@@ -63,7 +63,7 @@ class ProductController extends AbstractController
         if (!$produit){
             return new JsonResponse([
                 "errorCode" => "002",
-                "errorMessage" => "le produit n'éxiste pas !"
+                "errorMessage" => "le produit n'existe pas !"
             ],404);
         }
         $produitArray[] = [
@@ -104,5 +104,34 @@ class ProductController extends AbstractController
 
         return new JsonResponse(null,200);
 
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/isTrend', name: 'produit_is_trend', methods: ['GET'])]
+    public function searchProduitIsTrend(ProduitRepository $produitRepository): JsonResponse
+    {
+        $produits =  $produitRepository->getProduitIsTrend();
+        $arrayProduits = [];
+
+        foreach ($produits as $produit){
+            $arrayProduits[] = [
+                'id' => $produit->getId(),
+                'name' => $produit->getName(),
+                'description' => $produit->getDescription(),
+                'pathImage' => $produit->getPathImage(),
+                'price' => $produit->getPrice(),
+                'is_trend' => $produit->isIsTrend(),
+                'is_available' => $produit->isIsAvailable()
+            ];
+        }
+        return new JsonResponse($arrayProduits,200);
     }
 }

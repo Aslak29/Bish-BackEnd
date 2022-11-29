@@ -38,6 +38,14 @@ class CategorieRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    
+    public function getCategorieIsTrend()
+    {
+        return $this->createQueryBuilder('c')
+                    ->where("c.isTrend = 1")
+                    ->getQuery()
+                    ->getResult();
+    }
 
 //    /**
 //     * @return Categorie[] Returns an array of Categorie objects

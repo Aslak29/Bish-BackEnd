@@ -39,6 +39,14 @@ class ProduitRepository extends ServiceEntityRepository
         }
     }
 
+    public function getProduitIsTrend()
+    {
+        return $this->createQueryBuilder('p')
+                    ->where("p.isTrend = 1")
+                    ->getQuery()
+                    ->getResult();
+    }
+
 //    /**
 //     * @return Produit[] Returns an array of Produit objects
 //     */

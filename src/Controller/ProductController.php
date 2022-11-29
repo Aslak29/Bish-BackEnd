@@ -91,7 +91,6 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-
     #[Route('/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available}', name: 'app_add_product', methods: "POST")]
     public function addProduit(ProduitRepository $produitRepository, Request $request){
         $produit = new Produit();
@@ -132,6 +131,43 @@ class ProductController extends AbstractController
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable()
+            ];
+        }
+        return new JsonResponse($produitArray);
+    }
+
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/suggestions/{idCategorie}', name: 'product_suggest', methods: "POST")]
+    public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
+    {
+        $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'));
+        if (!$produits) {
+            return new JsonResponse([
+                "errorCode" => "003",
+                "errorMessage" => "La catégorie n'existe pas"
+            ], 404);
+        }
+        shuffle($produits);
+        $produitArray = [];
+        for($i=0; $i<4; $i++){
+            $produitArray[] = [
+                'id' => $produits[$i]->getId(),
+                'name' => $produits[$i]->getName(),
+                'description' => $produits[$i]->getDescription(),
+                'pathImage' => $produits[$i]->getPathImage(),
+                'price' => $produits[$i]->getPrice(),
+                'is_trend' => $produits[$i]->isIsTrend(),
+                'is_available' => $produits[$i]->isIsAvailable()
             ];
         }
         return new JsonResponse($produitArray);

@@ -123,7 +123,7 @@ class ProductController extends AbstractController
         if (!$produits) {
             return new JsonResponse([
                 "errorCode" => "003",
-                "errorMessage" > "La catégorie n'existe pas"
+                "errorMessage" => "La catégorie n'existe pas"
             ], 404);
         }
         shuffle($produits);

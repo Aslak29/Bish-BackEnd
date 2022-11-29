@@ -69,5 +69,32 @@ class ProduitRepository extends ServiceEntityRepository
            ->getResult()
            ;
    }
+   /**
+    * @return Produit[] Returns an array of Produit objects
+    */
+   public function findByFilter($orderby,$moyenne,$minprice,$maxprice): array
+   {
+    $entityManager = $this->getEntityManager();
+    $querySQL =
+        'SELECT p
+        FROM App\Entity\Produit p
+        WHERE p.price BETWEEN :minprice AND :maxprice';
+
+    if ($orderby == "ASC"){
+        $querySQL .= " order by p.price ASC";
+    }else if ($orderby == "DESC"){
+        $querySQL .= " order by p.price DESC";
+    }
+
+    $query = $this->getEntityManager()->createQuery($querySQL);
+
+    $query->setParameters([
+        'minprice'=>$minprice,
+        'maxprice'=>$maxprice
+    ]);
+
+
+    return $query->getResult();
+   }
 
 }

@@ -11,6 +11,8 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Produit;
+use Doctrine\ORM\Mapping\OrderBy;
+
 use function PHPUnit\Framework\isEmpty;
 
 // exporter vers AdminProductView ? - Flo
@@ -107,6 +109,35 @@ class ProductController extends AbstractController
 
         return new JsonResponse(null,200);
 
+    }
+
+     /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}', name: 'app_filter_product', methods: "POST")]
+    public function searchFilter(ProduitRepository $produitRepository,Request $request){
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"));
+        $produitArray = [];
+        foreach($produits as $produit){
+            $produitArray[] = [
+                'id' => $produit->getId(),
+                'name' => $produit->getName(),
+                'description' => $produit->getDescription(),
+                'pathImage' => $produit->getPathImage(),
+                'price' => $produit->getPrice(),
+                'is_trend' => $produit->isIsTrend(),
+                'is_available' => $produit->isIsAvailable()
+            ];
+        }
+        return new JsonResponse($produitArray);
     }
 
 

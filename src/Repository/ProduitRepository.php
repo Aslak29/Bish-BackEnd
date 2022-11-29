@@ -56,6 +56,19 @@ class ProduitRepository extends ServiceEntityRepository
         ;
     }
 
+   public function findOneById($idProduit)
+   {
+       return $this->createQueryBuilder('p')
+           ->leftJoin('p.categories', 'c')
+           ->addSelect('c')
+           ->where('p.id = :idProduit')
+           ->setParameters([
+               "idProduit" => $idProduit
+           ])
+           ->getQuery()
+           ->getResult()
+           ;
+   }
    /**
     * @return Produit[] Returns an array of Produit objects
     */

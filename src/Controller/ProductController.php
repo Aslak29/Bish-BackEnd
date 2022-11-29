@@ -42,7 +42,8 @@ class ProductController extends AbstractController
                 'pathImage' => $produit->getPathImage(),
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable()
+                'is_available' => $produit->isIsAvailable(),
+                'id_categorie' => $produit->getCategories()[0]->getId()
             ];
         }
         return new JsonResponse($produitArray);
@@ -61,12 +62,14 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'app_produit_by_id', methods:"GET")]
     public function findProductById(ProduitRepository $produitRepository,Request $request): JsonResponse
     {
-        $produit = $produitRepository->findOneBy(array('id' => $request->attributes->get('id')));
+        $produit = $produitRepository->findOneById($request->attributes->get('id'));
         if (!$produit){
             return new JsonResponse([
                 "errorCode" => "002",
                 "errorMessage" => "le produit n'éxiste pas !"
             ],404);
+        }else{
+            $produit = $produit[0];
         }
         $produitArray[] = [
             'id' => $produit->getId(),
@@ -75,7 +78,8 @@ class ProductController extends AbstractController
             'pathImage' => $produit->getPathImage(),
             'price' => $produit->getPrice(),
             'is_trend' => $produit->isIsTrend(),
-            'is_available' => $produit->isIsAvailable()
+            'is_available' => $produit->isIsAvailable(),
+            'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId()
         ];
 
         return new JsonResponse($produitArray);

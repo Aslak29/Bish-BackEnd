@@ -45,7 +45,6 @@ class ProduitRepository extends ServiceEntityRepository
     // WHERE categorie.id = 1;
 
     public function findAllProductsByIdCateg($idCateg){
-
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
@@ -56,7 +55,7 @@ class ProduitRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    
+
 //    /**
 //     * @return Produit[] Returns an array of Produit objects
 //     */

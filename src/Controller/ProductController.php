@@ -82,20 +82,26 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/suggestions/{idCategorie}', name: 'product_suggest', methods: "POST")]
-    public function findFourProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
+    public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'));
+        if (!$produits) {
+            return new JsonResponse([
+                "errorCode" => "003",
+                "errorMessage" > "La catégorie n'existe pas"
+            ], 404);
+        }
+        shuffle($produits);
         $produitArray = [];
-        foreach($produits as $produit){
+        for($i=0; $i<4; $i++){
             $produitArray[] = [
-                'id' => $produit->getId(),
-                'name' => $produit->getName(),
-                'description' => $produit->getDescription(),
-                'pathImage' => $produit->getPathImage(),
-                'price' => $produit->getPrice(),
-                'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable(),
-                'categorie' => $produit->getCategories()
+                'id' => $produits[$i]->getId(),
+                'name' => $produits[$i]->getName(),
+                'description' => $produits[$i]->getDescription(),
+                'pathImage' => $produits[$i]->getPathImage(),
+                'price' => $produits[$i]->getPrice(),
+                'is_trend' => $produits[$i]->isIsTrend(),
+                'is_available' => $produits[$i]->isIsAvailable()
             ];
         }
         return new JsonResponse($produitArray);

@@ -50,9 +50,9 @@ class ProduitRepository extends ServiceEntityRepository
         FROM App\Entity\Produit p
         WHERE p.price BETWEEN :minprice AND :maxprice';
 
-    if ($orderby == "0"){
+    if ($orderby == "ASC"){
         $querySQL .= " order by p.price ASC";
-    }else if ($orderby == "1"){
+    }else if ($orderby == "DESC"){
         $querySQL .= " order by p.price DESC";
     }
 

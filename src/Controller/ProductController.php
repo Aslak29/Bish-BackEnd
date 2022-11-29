@@ -91,7 +91,8 @@ class ProductController extends AbstractController
      */
 
     #[Route('/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available}', name: 'app_add_product', methods: "POST")]
-    public function addProduit(ProduitRepository $produitRepository, Request $request){
+    public function addProduit(ProduitRepository $produitRepository, Request $request): JsonResponse
+    {
         $produit = new Produit();
         $produit->setName($request->attributes->get('name'));
         $produit->setDescription($request->attributes->get('description'));

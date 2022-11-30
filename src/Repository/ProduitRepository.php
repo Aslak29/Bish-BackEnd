@@ -78,6 +78,8 @@ class ProduitRepository extends ServiceEntityRepository
    public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
    {
        $qb = $this->createQueryBuilder('p')
+            ->join('p.produitBySize', 'ps')
+            ->addSelect('ps')
             ->where('p.price between :minprice AND :maxprice');
 
        

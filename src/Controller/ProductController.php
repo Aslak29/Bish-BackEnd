@@ -50,13 +50,13 @@ class ProductController extends AbstractController
      * @param ProduitRepository $produitRepository
      * @param Request $request
      * @return JsonResponse
-     * @OA\Tag (name="ProduitById")
+     * @OA\Tag (name="Produit")
      * @OA\Response(
      *     response="200",
      *     description = "OK"
      * )
      */
-    #[Route('/{id}', name: 'app_produit_by_id', methods:"GET")]
+    #[Route('/find/{id}', name: 'app_produit_by_id', methods:"POST")]
     public function findProductById(ProduitRepository $produitRepository,Request $request): JsonResponse
     {
         $produit = $produitRepository->findOneBy(array('id' => $request->attributes->get('id')));
@@ -91,7 +91,8 @@ class ProductController extends AbstractController
      */
 
     #[Route('/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available}', name: 'app_add_product', methods: "POST")]
-    public function addProduit(ProduitRepository $produitRepository, Request $request){
+    public function addProduit(ProduitRepository $produitRepository, Request $request): JsonResponse
+    {
         $produit = new Produit();
         $produit->setName($request->attributes->get('name'));
         $produit->setDescription($request->attributes->get('description'));

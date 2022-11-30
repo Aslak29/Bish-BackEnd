@@ -5,13 +5,11 @@ namespace App\Controller;
 use App\Repository\ProduitRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Produit;
-use function PHPUnit\Framework\isEmpty;
+
 
 // exporter vers AdminProductView ? - Flo
 #[Route('api/produit')]
@@ -40,7 +38,8 @@ class ProductController extends AbstractController
                 'pathImage' => $produit->getPathImage(),
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable()
+                'is_available' => $produit->isIsAvailable(),
+                'id_categorie' => $produit->getCategories()[0]->getId()
             ];
         }
         return new JsonResponse($produitArray);
@@ -59,12 +58,14 @@ class ProductController extends AbstractController
     #[Route('/find/{id}', name: 'app_produit_by_id', methods:"POST")]
     public function findProductById(ProduitRepository $produitRepository,Request $request): JsonResponse
     {
-        $produit = $produitRepository->findOneBy(array('id' => $request->attributes->get('id')));
+        $produit = $produitRepository->findOneById($request->attributes->get('id'));
         if (!$produit){
             return new JsonResponse([
                 "errorCode" => "002",
                 "errorMessage" => "le produit n'existe pas !"
             ],404);
+        }else{
+            $produit = $produit[0];
         }
         $produitArray[] = [
             'id' => $produit->getId(),
@@ -73,7 +74,8 @@ class ProductController extends AbstractController
             'pathImage' => $produit->getPathImage(),
             'price' => $produit->getPrice(),
             'is_trend' => $produit->isIsTrend(),
-            'is_available' => $produit->isIsAvailable()
+            'is_available' => $produit->isIsAvailable(),
+            'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId()
         ];
 
         return new JsonResponse($produitArray);
@@ -89,9 +91,8 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-
     #[Route('/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available}', name: 'app_add_product', methods: "POST")]
-    public function addProduit(ProduitRepository $produitRepository, Request $request): JsonResponse
+    public function addProduit(ProduitRepository $produitRepository, Request $request):JsonResponse
     {
         $produit = new Produit();
         $produit->setName($request->attributes->get('name'));
@@ -105,6 +106,73 @@ class ProductController extends AbstractController
 
         return new JsonResponse(null,200);
 
+    }
+
+     /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}', name: 'app_filter_product', methods: "POST")]
+    public function searchFilter(ProduitRepository $produitRepository,Request $request):JsonResponse
+    {
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"));
+        $produitArray = [];
+        foreach($produits as $produit){
+            $produitArray[] = [
+                'id' => $produit->getId(),
+                'name' => $produit->getName(),
+                'description' => $produit->getDescription(),
+                'pathImage' => $produit->getPathImage(),
+                'price' => $produit->getPrice(),
+                'is_trend' => $produit->isIsTrend(),
+                'is_available' => $produit->isIsAvailable()
+            ];
+        }
+        return new JsonResponse($produitArray);
+    }
+
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/suggestions/{idCategorie}/{id}', name: 'product_suggest', methods: "POST")]
+    public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
+    {
+        $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
+        if (!$produits) {
+            return new JsonResponse([
+                "errorCode" => "003",
+                "errorMessage" => "La catégorie n'existe pas"
+            ], 404);
+        }
+        shuffle($produits);
+        $produitArray = [];
+        for($i=0; $i<4; $i++){
+            $produitArray[] = [
+                'id' => $produits[$i]->getId(),
+                'name' => $produits[$i]->getName(),
+                'description' => $produits[$i]->getDescription(),
+                'pathImage' => $produits[$i]->getPathImage(),
+                'price' => $produits[$i]->getPrice(),
+                'is_trend' => $produits[$i]->isIsTrend(),
+                'is_available' => $produits[$i]->isIsAvailable()
+            ];
+        }
+        return new JsonResponse($produitArray);
     }
 
     /**

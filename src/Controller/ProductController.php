@@ -149,10 +149,10 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/suggestions/{idCategorie}', name: 'product_suggest', methods: "POST")]
+    #[Route('/suggestions/{idCategorie}/{id}', name: 'product_suggest', methods: "POST")]
     public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
-        $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'));
+        $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
         if (!$produits) {
             return new JsonResponse([
                 "errorCode" => "003",

@@ -75,21 +75,33 @@ class ProduitRepository extends ServiceEntityRepository
    public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
    {
        $qb = $this->createQueryBuilder('p')
-            ->leftJoin('p.categories','c')
-            ->where('p.price between :minprice AND :maxprice')
-            ->andWhere('c.id = :idCategorie');
+            ->where('p.price between :minprice AND :maxprice');
 
+       
+    if ($idCategorie !== "-1"){
+        $qb->leftJoin('p.categories','c');
+        $qb->andWhere('c.id = :idCategorie');
+    }
+       
     if ($orderby == "ASC"){
         $qb->orderBy('p.price','ASC');
     }else if ($orderby == "DESC"){
         $qb->orderBy('p.price','DESC');
     }
 
-    $qb->setParameters([
-        'minprice'=>$minprice,
-        'maxprice'=>$maxprice,
-        'idCategorie'=>$idCategorie
-    ]);
+    if ($idCategorie !== "-1"){
+        $qb->setParameters([
+            'minprice'=>$minprice,
+            'maxprice'=>$maxprice,
+            'idCategorie' => $idCategorie
+        ]);
+    }else{
+        $qb->setParameters([
+            'minprice'=>$minprice,
+            'maxprice'=>$maxprice,
+        ]);
+    }
+
 
 
     return $qb->getQuery()->getResult();

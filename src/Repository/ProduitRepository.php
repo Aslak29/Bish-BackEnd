@@ -42,14 +42,17 @@ class ProduitRepository extends ServiceEntityRepository
     // SELECT * FROM produit
     // INNER JOIN categorie_produit ON produit.id = categorie_produit.produit_id
     // INNER JOIN categorie ON categorie.id = categorie_produit.categorie_id
-    // WHERE categorie.id = 1;
+    // WHERE categorie.id = 3
+    // AND produit.id = 2;
 
-    public function findAllProductsByIdCateg($idCateg){
+    public function findAllProductsByIdCateg($idCateg, $id){
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
+            ->andWhere('p.id != :id')
             ->setParameters([
-                "idCateg" => $idCateg
+                "idCateg" => $idCateg,
+                "id" => $id
             ])
             ->getQuery()
             ->getResult()

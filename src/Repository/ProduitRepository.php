@@ -75,29 +75,39 @@ class ProduitRepository extends ServiceEntityRepository
    /**
     * @return Produit[] Returns an array of Produit objects
     */
-   public function findByFilter($orderby,$moyenne,$minprice,$maxprice): array
+   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
    {
-    $entityManager = $this->getEntityManager();
-    $querySQL =
-        'SELECT p
-        FROM App\Entity\Produit p
-        WHERE p.price BETWEEN :minprice AND :maxprice';
+       $qb = $this->createQueryBuilder('p')
+            ->where('p.price between :minprice AND :maxprice');
 
+       
+    if ($idCategorie !== "-1"){
+        $qb->leftJoin('p.categories','c');
+        $qb->andWhere('c.id = :idCategorie');
+    }
+       
     if ($orderby == "ASC"){
-        $querySQL .= " order by p.price ASC";
+        $qb->orderBy('p.price','ASC');
     }else if ($orderby == "DESC"){
-        $querySQL .= " order by p.price DESC";
+        $qb->orderBy('p.price','DESC');
     }
 
-    $query = $this->getEntityManager()->createQuery($querySQL);
+    if ($idCategorie !== "-1"){
+        $qb->setParameters([
+            'minprice'=>$minprice,
+            'maxprice'=>$maxprice,
+            'idCategorie' => $idCategorie
+        ]);
+    }else{
+        $qb->setParameters([
+            'minprice'=>$minprice,
+            'maxprice'=>$maxprice,
+        ]);
+    }
 
-    $query->setParameters([
-        'minprice'=>$minprice,
-        'maxprice'=>$maxprice
-    ]);
 
 
-    return $query->getResult();
+    return $qb->getQuery()->getResult();
    }
 
 }

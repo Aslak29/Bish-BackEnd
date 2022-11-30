@@ -119,10 +119,10 @@ class ProductController extends AbstractController
      * )
      */
 
-    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}', name: 'app_filter_product', methods: "POST")]
+    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}', name: 'app_filter_product', methods: "POST")]
     public function searchFilter(ProduitRepository $produitRepository,Request $request):JsonResponse
     {
-        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"));
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"));
         $produitArray = [];
         foreach($produits as $produit){
             $produitArray[] = [

@@ -115,7 +115,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/isTrend', name: 'produit_is_trend', methods: ['GET'])]
+    #[Route('/isTrend', name: 'produit_is_trend', methods: ['POST'])]
     public function searchProduitIsTrend(ProduitRepository $produitRepository): JsonResponse
     {
         $produits =  $produitRepository->getProduitIsTrend();

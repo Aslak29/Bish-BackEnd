@@ -49,6 +49,10 @@ class ProduitRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
+            ->join('p.produitBySize', 'ps')
+            ->addSelect('ps')
+            ->join('ps.taille','t')
+            ->addSelect('t')
             ->andWhere('p.id != :id')
             ->setParameters([
                 "idCateg" => $idCateg,
@@ -114,14 +118,4 @@ class ProduitRepository extends ServiceEntityRepository
     return $qb->getQuery()->getResult();
    }
 
-//SELECT * from produit join promotions p on p.id = produit.promotions_id
-    public function findProductPromo(){
-        return $this->createQueryBuilder('p')
-            ->join('p.categories', 'c')
-            ->join('p.promotions', 'pp')
-            ->addSelect('c,pp')
-            ->getQuery()
-            ->getResult()
-            ;
-    }
 }

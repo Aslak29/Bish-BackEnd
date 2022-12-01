@@ -114,4 +114,14 @@ class ProduitRepository extends ServiceEntityRepository
     return $qb->getQuery()->getResult();
    }
 
+//SELECT * from produit join promotions p on p.id = produit.promotions_id
+    public function findProductPromo(){
+        return $this->createQueryBuilder('p')
+            ->join('p.categories', 'c')
+            ->join('p.promotions', 'pp')
+            ->addSelect('c,pp')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

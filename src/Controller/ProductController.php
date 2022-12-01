@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ProduitRepository;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -129,10 +130,11 @@ class ProductController extends AbstractController
      * )
      */
 
-    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}', name: 'app_filter_product', methods: "POST")]
+    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}/{limit}/{offset}', name: 'app_filter_product', methods: "POST")]
     public function searchFilter(ProduitRepository $produitRepository,Request $request):JsonResponse
     {
-        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"));
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('limit'),$request->attributes->get("offset"));
+        $countProduits = $produitRepository->countByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"));
         $produitArray = [];
         foreach($produits as $produit){
             $jsonProduct = [
@@ -164,7 +166,13 @@ class ProductController extends AbstractController
             }
             $produitArray[] = $jsonProduct;
         }
-        return new JsonResponse($produitArray);
+
+        $resultArray = [];
+        $resultArray[] = $produitArray;
+        $resultArray[] = [
+            "count" => $countProduits
+        ];
+        return new JsonResponse($resultArray);
     }
 
 
@@ -263,5 +271,22 @@ class ProductController extends AbstractController
             ];
         }
         return new JsonResponse($produitArray);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/count', name: 'product_count', methods: "GET")]
+    public function countProduct(ProduitRepository $produitRepository):JsonResponse{
+
+        $countProduit = $produitRepository->countProduit();
+        return new JsonResponse($countProduit[0]);
+
     }
 }

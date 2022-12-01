@@ -79,43 +79,89 @@ class ProduitRepository extends ServiceEntityRepository
    /**
     * @return Produit[] Returns an array of Produit objects
     */
-   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
+   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$limit,$offset): array
    {
        $qb = $this->createQueryBuilder('p')
-            ->join('p.produitBySize', 'ps')
-            ->addSelect('ps')
-           ->join('ps.taille','t')
+           ->leftJoin('p.produitBySize', 'ps')
+           ->addSelect('ps')
+           ->leftJoin('ps.taille', 't')
            ->addSelect('t')
-            ->where('p.price between :minprice AND :maxprice');
-
-       
-    if ($idCategorie !== "-1"){
-        $qb->leftJoin('p.categories','c');
-        $qb->andWhere('c.id = :idCategorie');
-    }
-       
-    if ($orderby == "ASC"){
-        $qb->orderBy('p.price','ASC');
-    }else if ($orderby == "DESC"){
-        $qb->orderBy('p.price','DESC');
-    }
-
-    if ($idCategorie !== "-1"){
-        $qb->setParameters([
-            'minprice'=>$minprice,
-            'maxprice'=>$maxprice,
-            'idCategorie' => $idCategorie
-        ]);
-    }else{
-        $qb->setParameters([
-            'minprice'=>$minprice,
-            'maxprice'=>$maxprice,
-        ]);
-    }
+           ->where('p.price between :minprice AND :maxprice');
 
 
+       if ($idCategorie !== "-1") {
+           $qb->leftJoin('p.categories', 'c');
+           $qb->andWhere('c.id = :idCategorie');
+       }
+
+       if ($orderby == "ASC") {
+           $qb->orderBy('p.price', 'ASC');
+       } else if ($orderby == "DESC") {
+           $qb->orderBy('p.price', 'DESC');
+       }
+
+       $qb->setMaxResults($limit);
+       $qb->setFirstResult($offset);
+
+       if ($idCategorie !== "-1") {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+               'idCategorie' => $idCategorie
+           ]);
+       } else {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+           ]);
+       }
+       return $qb->getQuery()->getResult();
+   }
+
+       /**
+        * @return Produit[] Returns an array of Produit objects
+        */
+       public function countByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
+   {
+       $qb = $this->createQueryBuilder('p')
+           ->select('count(p)')
+           ->where('p.price between :minprice AND :maxprice');
+
+       if ($idCategorie !== "-1") {
+           $qb->leftJoin('p.categories', 'c');
+           $qb->andWhere('c.id = :idCategorie');
+       }
+
+       if ($orderby == "ASC") {
+           $qb->orderBy('p.price', 'ASC');
+       } else if ($orderby == "DESC") {
+           $qb->orderBy('p.price', 'DESC');
+       }
+
+       if ($idCategorie !== "-1") {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+               'idCategorie' => $idCategorie
+           ]);
+       } else {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+           ]);
+       }
 
     return $qb->getQuery()->getResult();
    }
+
+    public function findProductPromo(){
+        return $this->createQueryBuilder('p')
+            ->join('p.categories', 'c')
+            ->join('p.promotions', 'pp')
+            ->addSelect('c,pp')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
 }

@@ -75,7 +75,17 @@ class ProductController extends AbstractController
             'price' => $produit->getPrice(),
             'is_trend' => $produit->isIsTrend(),
             'is_available' => $produit->isIsAvailable(),
-            'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId()
+            'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+            'promotion' =>
+                $produit->getPromotions() !== null ? [
+                    'id' => $produit->getPromotions()->getId(),
+                    'remise' => $produit->getPromotions()->getRemise(),
+                    'price_remise' => round($produit->getPrice() - (($produit->getPrice() * $produit->getPromotions()->getRemise())/ 100), 2),
+                    'date_start' => $produit->getPromotions()->getDateStart()->format("d-m-Y"),
+                    'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
+                    'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
+                    'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
+                ] : [],
         ];
 
         return new JsonResponse($produitArray);
@@ -132,7 +142,18 @@ class ProductController extends AbstractController
                 'pathImage' => $produit->getPathImage(),
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable()
+                'is_available' => $produit->isIsAvailable(),
+                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+                'promotion' =>
+                    $produit->getPromotions() !== null ? [
+                        'id' => $produit->getPromotions()->getId(),
+                        'remise' => $produit->getPromotions()->getRemise(),
+                        'price_remise' => round($produit->getPrice() - (($produit->getPrice() * $produit->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $produit->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
+                    ] : [],
             ];
         }
         return new JsonResponse($produitArray);
@@ -169,7 +190,58 @@ class ProductController extends AbstractController
                 'pathImage' => $produits[$i]->getPathImage(),
                 'price' => $produits[$i]->getPrice(),
                 'is_trend' => $produits[$i]->isIsTrend(),
-                'is_available' => $produits[$i]->isIsAvailable()
+                'is_available' => $produits[$i]->isIsAvailable(),
+                'id_categorie' => $produits[$i]->getCategories()[0] === null ? "-" : $produits[$i]->getCategories()[0]->getId(),
+                'promotion' =>
+                    $produits[$i]->getPromotions() !== null ? [
+                        'id' => $produits[$i]->getPromotions()->getId(),
+                        'remise' => $produits[$i]->getPromotions()->getRemise(),
+                        'price_remise' => round($produits[$i]->getPrice() - (($produits[$i]->getPrice() * $produits[$i]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $produits[$i]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $produits[$i]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $produits[$i]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $produits[$i]->getPromotions()->getDateEnd()->format("H:i:s"),
+                    ] : [],
+            ];
+        }
+        return new JsonResponse($produitArray);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/promotions', name: 'app_produit_promotion', methods:"GET")]
+    public function PromoProduct(ProduitRepository $produitRepository): JsonResponse
+    {
+        $produits = $produitRepository->findProductPromo();
+        shuffle($produits);
+        $produitArray = [];
+        for($i=0; $i<4; $i++){
+            $produitArray[] = [
+                'id' => $produits[$i]->getId(),
+                'name' => $produits[$i]->getName(),
+                'description' => $produits[$i]->getDescription(),
+                'pathImage' => $produits[$i]->getPathImage(),
+                'price' => $produits[$i]->getPrice(),
+                'is_trend' => $produits[$i]->isIsTrend(),
+                'is_available' => $produits[$i]->isIsAvailable(),
+                'id_categorie' => $produits[$i]->getCategories()[0] === null ? "-" : $produits[$i]->getCategories()[0]->getId(),
+                'promotion' =>
+                    $produits[$i]->getPromotions() !== null ? [
+                        'id' => $produits[$i]->getPromotions()->getId(),
+                        'remise' => $produits[$i]->getPromotions()->getRemise(),
+                        'price_remise' => round($produits[$i]->getPrice() - (($produits[$i]->getPrice() * $produits[$i]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $produits[$i]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $produits[$i]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $produits[$i]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $produits[$i]->getPromotions()->getDateEnd()->format("H:i:s"),
+                        ] : [],
             ];
         }
         return new JsonResponse($produitArray);

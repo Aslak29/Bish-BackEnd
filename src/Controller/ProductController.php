@@ -133,10 +133,10 @@ class ProductController extends AbstractController
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
-                "StockBySize" => array()
+                "stockBySize" => array()
             ];
             foreach ($produit->getProduitBySize() as $size){
-                $jsonProduct['StockBySize'][] = [
+                $jsonProduct['stockBySize'][] = [
                     "taille" =>$size->getTaille()->getTaille(),
                     "stock" =>$size->getStock()
                 ];

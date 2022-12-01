@@ -154,4 +154,14 @@ class ProduitRepository extends ServiceEntityRepository
     return $qb->getQuery()->getResult();
    }
 
+    public function findProductPromo(){
+        return $this->createQueryBuilder('p')
+            ->join('p.categories', 'c')
+            ->join('p.promotions', 'pp')
+            ->addSelect('c,pp')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 }

@@ -49,6 +49,10 @@ class ProduitRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
+            ->join('p.produitBySize', 'ps')
+            ->addSelect('ps')
+            ->join('ps.taille','t')
+            ->addSelect('t')
             ->andWhere('p.id != :id')
             ->setParameters([
                 "idCateg" => $idCateg,
@@ -78,6 +82,10 @@ class ProduitRepository extends ServiceEntityRepository
    public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$limit,$offset): array
    {
        $qb = $this->createQueryBuilder('p')
+            ->join('p.produitBySize', 'ps')
+            ->addSelect('ps')
+           ->join('ps.taille','t')
+           ->addSelect('t')
             ->where('p.price between :minprice AND :maxprice');
 
 

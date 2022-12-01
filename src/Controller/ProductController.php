@@ -188,6 +188,7 @@ class ProductController extends AbstractController
                 "errorMessage" => "La catégorie n'existe pas"
             ], 404);
         }
+        
         shuffle($product);
         $produitSuggestion = array_slice($product, 0, 4);
 

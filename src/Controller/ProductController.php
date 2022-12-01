@@ -135,7 +135,7 @@ class ProductController extends AbstractController
         $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"));
         $produitArray = [];
         foreach($produits as $produit){
-            $produitArray[] = [
+            $jsonProduct = [
                 'id' => $produit->getId(),
                 'name' => $produit->getName(),
                 'description' => $produit->getDescription(),
@@ -143,6 +143,7 @@ class ProductController extends AbstractController
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
+                "stockBySize" => array(),
                 'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
                 'promotion' =>
                     $produit->getPromotions() !== null ? [
@@ -155,6 +156,13 @@ class ProductController extends AbstractController
                         'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
                     ] : [],
             ];
+            foreach ($produit->getProduitBySize() as $size){
+                $jsonProduct['stockBySize'][] = [
+                    "taille" =>$size->getTaille()->getTaille(),
+                    "stock" =>$size->getStock()
+                ];
+            }
+            $produitArray[] = $jsonProduct;
         }
         return new JsonResponse($produitArray);
     }

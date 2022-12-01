@@ -75,12 +75,12 @@ class ProduitRepository extends ServiceEntityRepository
    /**
     * @return Produit[] Returns an array of Produit objects
     */
-   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
+   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$limit,$offset): array
    {
        $qb = $this->createQueryBuilder('p')
             ->where('p.price between :minprice AND :maxprice');
 
-       
+
     if ($idCategorie !== "-1"){
         $qb->leftJoin('p.categories','c');
         $qb->andWhere('c.id = :idCategorie');
@@ -91,6 +91,9 @@ class ProduitRepository extends ServiceEntityRepository
     }else if ($orderby == "DESC"){
         $qb->orderBy('p.price','DESC');
     }
+
+    $qb->setMaxResults($limit);
+    $qb->setFirstResult($offset);
 
     if ($idCategorie !== "-1"){
         $qb->setParameters([

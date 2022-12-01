@@ -140,7 +140,7 @@ class ProductController extends AbstractController
                 'name' => $produit->getName(),
                 'description' => $produit->getDescription(),
                 'pathImage' => $produit->getPathImage(),
-                'price' => $produit->getPrice(),
+                'price' => round($produit->getPrice(), 2),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
                 "stockBySize" => array(),
@@ -188,7 +188,6 @@ class ProductController extends AbstractController
                 "errorMessage" => "La catégorie n'existe pas"
             ], 404);
         }
-        
         shuffle($product);
         $produitSuggestion = array_slice($product, 0, 4);
 
@@ -199,7 +198,7 @@ class ProductController extends AbstractController
                 'name' => $product->getName(),
                 'description' => $product->getDescription(),
                 'pathImage' => $product->getPathImage(),
-                'price' => $product->getPrice(),
+                'price' => round($product->getPrice(), 2),
                 'is_trend' => $product->isIsTrend(),
                 'is_available' => $product->isIsAvailable(),
                 'stockBySize' => array(),

@@ -125,15 +125,23 @@ class ProductController extends AbstractController
         $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"));
         $produitArray = [];
         foreach($produits as $produit){
-            $produitArray[] = [
+            $jsonProduct = [
                 'id' => $produit->getId(),
                 'name' => $produit->getName(),
                 'description' => $produit->getDescription(),
                 'pathImage' => $produit->getPathImage(),
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable()
+                'is_available' => $produit->isIsAvailable(),
+                "StockBySize" => array()
             ];
+            foreach ($produit->getProduitBySize() as $size){
+                $jsonProduct['StockBySize'][] = [
+                    "taille" =>$size->getTaille()->getTaille(),
+                    "stock" =>$size->getStock()
+                ];
+            }
+            $produitArray[] = $jsonProduct;
         }
         return new JsonResponse($produitArray);
     }

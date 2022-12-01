@@ -80,6 +80,8 @@ class ProduitRepository extends ServiceEntityRepository
        $qb = $this->createQueryBuilder('p')
             ->join('p.produitBySize', 'ps')
             ->addSelect('ps')
+           ->join('ps.taille','t')
+           ->addSelect('t')
             ->where('p.price between :minprice AND :maxprice');
 
        

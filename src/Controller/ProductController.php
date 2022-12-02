@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Produit;
-
+use App\Repository\NoteRepository;
 
 // exporter vers AdminProductView ? - Flo
 #[Route('api/produit')]
@@ -153,6 +153,7 @@ class ProductController extends AbstractController
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
                 "stockBySize" => array(),
+                'note' => array(),
                 'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
                 'promotion' =>
                     $produit->getPromotions() !== null ? [
@@ -171,6 +172,13 @@ class ProductController extends AbstractController
                     "stock" =>$size->getStock()
                 ];
             }
+            foreach ($produit->getNote() as $note){
+                $jsonProduct['note'][] = [
+                    
+                    "note" =>$note->getNote(),
+                ];
+            }
+
             $produitArray[] = $jsonProduct;
         }
 
@@ -232,7 +240,7 @@ class ProductController extends AbstractController
             foreach ($product->getProduitBySize() as $size){
                 $jsonProduct['stockBySize'][] = [
                     "taille" =>$size->getTaille()->getTaille(),
-                    "stock" =>$size->getStock()
+                    "stock" =>$size->getStock(),
                 ];
             }
             $produitArray[] = $jsonProduct;
@@ -295,5 +303,28 @@ class ProductController extends AbstractController
         $countProduit = $produitRepository->countProduit();
         return new JsonResponse($countProduit[0]);
 
+    }
+
+            /**
+     * @param NoteRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/note', name: 'note_produit', methods:"GET")]
+    public function productNotation(NoteRepository $notesRepository): JsonResponse
+    {
+        $notes = $notesRepository->findAll();
+        $noteArray = [];
+        foreach($notes as $note){
+            $noteArray[] = [
+                'produit_id' => $note->getProduit(),
+                // 'name' => $note->getName(),
+            ];
+        }
+        return new JsonResponse($noteArray);
     }
 }

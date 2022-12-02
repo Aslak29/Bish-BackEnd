@@ -84,10 +84,12 @@ class ProduitRepository extends ServiceEntityRepository
        $qb = $this->createQueryBuilder('p')
            ->leftJoin('p.produitBySize', 'ps')
            ->addSelect('ps')
+           ->leftJoin('p.Note', 'pn')
+            ->addSelect('AVG(pn.note)')
            ->leftJoin('ps.taille', 't')
            ->addSelect('t')
            ->where('p.price between :minprice AND :maxprice');
-
+            
 
        if ($idCategorie !== "-1") {
            $qb->leftJoin('p.categories', 'c');

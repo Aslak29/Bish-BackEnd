@@ -40,7 +40,7 @@ class ProductController extends AbstractController
                 'price' => $produit->getPrice(),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
-                'id_categorie' => $produit->getCategories()[0]->getId()
+                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
             ];
         }
         return new JsonResponse($produitArray);
@@ -69,27 +69,28 @@ class ProductController extends AbstractController
             $produit = $produit[0];
         }
         $produitArray = [
-            'id' => $produit->getId(),
-            'name' => $produit->getName(),
-            'description' => $produit->getDescription(),
-            'pathImage' => $produit->getPathImage(),
-            'price' => $produit->getPrice(),
-            'is_trend' => $produit->isIsTrend(),
-            'is_available' => $produit->isIsAvailable(),
+            'id' => $produit[0]->getId(),
+            'name' => $produit[0]->getName(),
+            'description' => $produit[0]->getDescription(),
+            'pathImage' => $produit[0]->getPathImage(),
+            'price' => $produit[0]->getPrice(),
+            'is_trend' => $produit[0]->isIsTrend(),
+            'is_available' => $produit[0]->isIsAvailable(),
             "stockBySize" => array(),
-            'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+            'noteAverage' => $produit[1] !== null ? round($produit[1],1) : $produit[1],
+            'id_categorie' => $produit[0]->getCategories()[0] === null ? "-" : $produit[0]->getCategories()[0]->getId(),
             'promotion' =>
-                $produit->getPromotions() !== null ? [
-                    'id' => $produit->getPromotions()->getId(),
-                    'remise' => $produit->getPromotions()->getRemise(),
-                    'price_remise' => round($produit->getPrice() - (($produit->getPrice() * $produit->getPromotions()->getRemise())/ 100), 2),
-                    'date_start' => $produit->getPromotions()->getDateStart()->format("d-m-Y"),
-                    'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
-                    'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
-                    'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
+                $produit[0]->getPromotions() !== null ? [
+                    'id' => $produit[0]->getPromotions()->getId(),
+                    'remise' => $produit[0]->getPromotions()->getRemise(),
+                    'price_remise' => round($produit[0]->getPrice() - (($produit[0]->getPrice() * $produit[0]->getPromotions()->getRemise())/ 100), 2),
+                    'date_start' => $produit[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                    'heure_start' => $produit[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                    'date_end' => $produit[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                    'heure_end' => $produit[0]->getPromotions()->getDateEnd()->format("H:i:s"),
                 ] : [],     
         ];
-        foreach ($produit->getProduitBySize() as $size){
+        foreach ($produit[0]->getProduitBySize() as $size){
             $produitArray['stockBySize'][] = [
                 "taille" =>$size->getTaille()->getTaille(),
                 "stock" =>$size->getStock()
@@ -145,40 +146,33 @@ class ProductController extends AbstractController
         $produitArray = [];
         foreach($produits as $produit){
             $jsonProduct = [
-                'id' => $produit->getId(),
-                'name' => $produit->getName(),
-                'description' => $produit->getDescription(),
-                'pathImage' => $produit->getPathImage(),
-                'price' => round($produit->getPrice(), 2),
-                'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable(),
+                'id' => $produit[0]->getId(),
+                'name' => $produit[0]->getName(),
+                'description' => $produit[0]->getDescription(),
+                'pathImage' => $produit[0]->getPathImage(),
+                'price' => round($produit[0]->getPrice(), 2),
+                'is_trend' => $produit[0]->isIsTrend(),
+                'is_available' => $produit[0]->isIsAvailable(),
                 "stockBySize" => array(),
-                'note' => array(),
-                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+                'noteAverage' => $produit[1] !== null ? round($produit[1],1) : $produit[1],
+                'id_categorie' => $produit[0]->getCategories()[0] === null ? "-" : $produit[0]->getCategories()[0]->getId(),
                 'promotion' =>
-                    $produit->getPromotions() !== null ? [
-                        'id' => $produit->getPromotions()->getId(),
-                        'remise' => $produit->getPromotions()->getRemise(),
-                        'price_remise' => round($produit->getPrice() - (($produit->getPrice() * $produit->getPromotions()->getRemise())/ 100), 2),
-                        'date_start' => $produit->getPromotions()->getDateStart()->format("d-m-Y"),
-                        'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
-                        'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
-                        'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
+                    $produit[0]->getPromotions() !== null ? [
+                        'id' => $produit[0]->getPromotions()->getId(),
+                        'remise' => $produit[0]->getPromotions()->getRemise(),
+                        'price_remise' => round($produit[0]->getPrice() - (($produit[0]->getPrice() * $produit[0]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $produit[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $produit[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $produit[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $produit[0]->getPromotions()->getDateEnd()->format("H:i:s"),
                     ] : [],
             ];
-            foreach ($produit->getProduitBySize() as $size){
+            foreach ($produit[0]->getProduitBySize() as $size){
                 $jsonProduct['stockBySize'][] = [
                     "taille" =>$size->getTaille()->getTaille(),
                     "stock" =>$size->getStock()
                 ];
             }
-            foreach ($produit->getNote() as $note){
-                $jsonProduct['note'][] = [
-                    
-                    "note" =>$note->getNote(),
-                ];
-            }
-
             $produitArray[] = $jsonProduct;
         }
 
@@ -217,27 +211,28 @@ class ProductController extends AbstractController
         $produitArray = [];
         foreach ($produitSuggestion as $product){
             $jsonProduct = [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'description' => $product->getDescription(),
-                'pathImage' => $product->getPathImage(),
-                'price' => round($product->getPrice(), 2),
-                'is_trend' => $product->isIsTrend(),
-                'is_available' => $product->isIsAvailable(),
+                'id' => $product[0]->getId(),
+                'name' => $product[0]->getName(),
+                'description' => $product[0]->getDescription(),
+                'pathImage' => $product[0]->getPathImage(),
+                'price' => round($product[0]->getPrice(), 2),
+                'is_trend' => $product[0]->isIsTrend(),
+                'is_available' => $product[0]->isIsAvailable(),
                 'stockBySize' => array(),
-                'id_categorie' => $product->getCategories()[0] === null ? "-" : $product->getCategories()[0]->getId(),
+                'noteAverage' => $product[1] !== null ? round($product[1],1) : $product[1],
+                'id_categorie' => $product[0]->getCategories()[0] === null ? "-" : $product[0]->getCategories()[0]->getId(),
                 'promotion' =>
-                    $product->getPromotions() !== null ? [
-                        'id' => $product->getPromotions()->getId(),
-                        'remise' => $product->getPromotions()->getRemise(),
-                        'price_remise' => round($product->getPrice() - (($product->getPrice() * $product->getPromotions()->getRemise())/ 100), 2),
-                        'date_start' => $product->getPromotions()->getDateStart()->format("d-m-Y"),
-                        'heure_start' => $product->getPromotions()->getDateStart()->format("H:i:s"),
-                        'date_end' => $product->getPromotions()->getDateEnd()->format("d-m-Y"),
-                        'heure_end' => $product->getPromotions()->getDateEnd()->format("H:i:s"),
+                    $product[0]->getPromotions() !== null ? [
+                        'id' => $product[0]->getPromotions()->getId(),
+                        'remise' => $product[0]->getPromotions()->getRemise(),
+                        'price_remise' => round($product[0]->getPrice() - (($product[0]->getPrice() * $product[0]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $product[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $product[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $product[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $product[0]->getPromotions()->getDateEnd()->format("H:i:s"),
                     ] : [],
             ];
-            foreach ($product->getProduitBySize() as $size){
+            foreach ($product[0]->getProduitBySize() as $size){
                 $jsonProduct['stockBySize'][] = [
                     "taille" =>$size->getTaille()->getTaille(),
                     "stock" =>$size->getStock(),
@@ -286,45 +281,5 @@ class ProductController extends AbstractController
             ];
         }
         return new JsonResponse($produitArray);
-    }
-
-    /**
-     * @param ProduitRepository $produitRepository
-     * @return JsonResponse
-     * @OA\Tag (name="Produit")
-     * @OA\Response(
-     *     response="200",
-     *     description = "OK"
-     * )
-     */
-    #[Route('/count', name: 'product_count', methods: "GET")]
-    public function countProduct(ProduitRepository $produitRepository):JsonResponse{
-
-        $countProduit = $produitRepository->countProduit();
-        return new JsonResponse($countProduit[0]);
-
-    }
-
-            /**
-     * @param NoteRepository $produitRepository
-     * @return JsonResponse
-     * @OA\Tag (name="Produit")
-     * @OA\Response(
-     *     response="200",
-     *     description = "OK"
-     * )
-     */
-    #[Route('/note', name: 'note_produit', methods:"GET")]
-    public function productNotation(NoteRepository $notesRepository): JsonResponse
-    {
-        $notes = $notesRepository->findAll();
-        $noteArray = [];
-        foreach($notes as $note){
-            $noteArray[] = [
-                'produit_id' => $note->getProduit(),
-                // 'name' => $note->getName(),
-            ];
-        }
-        return new JsonResponse($noteArray);
     }
 }

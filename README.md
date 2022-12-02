@@ -121,3 +121,7 @@ php bin/console messenger:consume -vv
 |    001     | L'adresse email est déjà inscrite dans la base de donnée |     409     |   [2](#request2)   | 
 |    013     |                 This contact don't exist                 |     409     |   [7](#request7)   | 
 
+
+## Variable SQL
+Remove value "ONLY_FULL_GROUP_BY" in var = sql_mod
+![img.png](img.png)

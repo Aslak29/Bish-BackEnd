@@ -68,7 +68,7 @@ class ProductController extends AbstractController
         }else{
             $produit = $produit[0];
         }
-        $produitArray[] = [
+        $produitArray = [
             'id' => $produit->getId(),
             'name' => $produit->getName(),
             'description' => $produit->getDescription(),
@@ -76,6 +76,7 @@ class ProductController extends AbstractController
             'price' => $produit->getPrice(),
             'is_trend' => $produit->isIsTrend(),
             'is_available' => $produit->isIsAvailable(),
+            "stockBySize" => array(),
             'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
             'promotion' =>
                 $produit->getPromotions() !== null ? [
@@ -86,8 +87,14 @@ class ProductController extends AbstractController
                     'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
                     'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
                     'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
-                ] : [],
+                ] : [],     
         ];
+        foreach ($produit->getProduitBySize() as $size){
+            $produitArray['stockBySize'][] = [
+                "taille" =>$size->getTaille()->getTaille(),
+                "stock" =>$size->getStock()
+            ];
+        }
 
         return new JsonResponse($produitArray);
     }

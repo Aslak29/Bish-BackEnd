@@ -157,11 +157,11 @@ class ProductController extends AbstractController
      * )
      */
 
-    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}/{limit}/{offset}', name: 'app_filter_product', methods: "POST")]
+    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}/{size}/{limit}/{offset}', name: 'app_filter_product', methods: "POST")]
     public function searchFilter(ProduitRepository $produitRepository,Request $request):JsonResponse
     {
-        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('limit'),$request->attributes->get("offset"));
-        $countProduits = $produitRepository->countByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"));
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('size'),$request->attributes->get('limit'),$request->attributes->get("offset"));
+        $countProduits = $produitRepository->countByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('size'));
         $produitArray = [];
         foreach($produits as $produit){
             $jsonProduct = [

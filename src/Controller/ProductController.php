@@ -10,7 +10,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Produit;
-
+use App\Entity\ProduitBySize;
+use App\Repository\NoteRepository;
+use App\Repository\ProduitBySizeRepository;
 
 // exporter vers AdminProductView ? - Flo
 #[Route('api/produit')]
@@ -145,6 +147,50 @@ class ProductController extends AbstractController
         return new JsonResponse(null,200);
 
     }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/remove/{id}', name: 'app_add_product', methods: "DELETE")]
+    public function removeProduit(ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository, NoteRepository $noteRepository):JsonResponse
+    {
+        $produit = new Produit();
+        $produit = $produitRepository->findOneById($request->attributes->get('id'));
+        if (!$produit){
+            return new JsonResponse([
+                "errorCode" => "002",
+                "errorMessage" => "le produit n'éxiste pas !"
+            ],404);
+        }else{
+           $produit = $produit[0];
+        }
+
+        if ($produit ->getProduitInCommande()[0] === null){
+        foreach ($produit->getProduitBySize() as $size ){
+            $produitBySizeRepository-> remove($size, true);
+        }
+        foreach ($produit->getNote() as $note){
+            $noteRepository-> remove($note, true);
+        }
+        $produitRepository->remove($produit, true);
+    }else{
+        return new JsonResponse([
+            "errorCode" => "A définir",
+            "errorMessage" => "le produit est en commande"
+        ],404);
+    }
+
+        return new JsonResponse(null,200);
+
+    }
+
 
      /**
      * @param ProduitRepository $produitRepository

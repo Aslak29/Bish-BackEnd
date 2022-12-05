@@ -42,7 +42,7 @@ class ProductController extends AbstractController
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
                 "stockBySize" => array(),
-                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
                 'name_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
                 'promotion' =>
                 $produit->getPromotions() !== null ? [
@@ -53,7 +53,7 @@ class ProductController extends AbstractController
                     'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
                     'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
                     'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
-                ] : [],,
+                ] : [],
             ];
             foreach ($produit->getProduitBySize() as $size){
                 $jsonProduct['stockBySize'][] = [

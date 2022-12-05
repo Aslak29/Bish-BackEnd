@@ -32,16 +32,36 @@ class ProductController extends AbstractController
         $produits = $produitRepository->findAll();
         $produitArray = [];
         foreach($produits as $produit){
-            $produitArray[] = [
+            $jsonProduct = [
                 'id' => $produit->getId(),
                 'name' => $produit->getName(),
                 'description' => $produit->getDescription(),
                 'pathImage' => $produit->getPathImage(),
                 'price' => $produit->getPrice(),
+                'created_at' => $produit->getCreatedAt(),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
-                'id_categorie' => $produit->getCategories()[0]->getId()
+                "stockBySize" => array(),
+                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+                'name_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
+                'promotion' =>
+                $produit->getPromotions() !== null ? [
+                    'id' => $produit->getPromotions()->getId(),
+                    'remise' => $produit->getPromotions()->getRemise(),
+                    'price_remise' => round($produit->getPrice() - (($produit->getPrice() * $produit->getPromotions()->getRemise())/ 100), 2),
+                    'date_start' => $produit->getPromotions()->getDateStart()->format("d-m-Y"),
+                    'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
+                    'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
+                    'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
+                ] : [],
             ];
+            foreach ($produit->getProduitBySize() as $size){
+                $jsonProduct['stockBySize'][] = [
+                    "taille" =>$size->getTaille()->getTaille(),
+                    "stock" =>$size->getStock()
+                ];
+            }
+            $produitArray[] = $jsonProduct;
         }
         return new JsonResponse($produitArray);
     }

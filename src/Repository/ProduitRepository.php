@@ -85,7 +85,7 @@ class ProduitRepository extends ServiceEntityRepository
    /**
     * @return Produit[] Returns an array of Produit objects
     */
-   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$limit,$offset): array
+   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size,$limit,$offset): array
    {
        $qb = $this->createQueryBuilder('p')
            ->leftJoin('p.Note', 'pn')
@@ -102,6 +102,10 @@ class ProduitRepository extends ServiceEntityRepository
            $qb->andWhere('c.id = :idCategorie');
        }
 
+       if ($size !== "none"){
+           $qb->andWhere('t.taille = :size');
+       }
+
        if ($orderby == "ASC") {
            $qb->orderBy('p.price', 'ASC');
        } else if ($orderby == "DESC") {
@@ -115,13 +119,19 @@ class ProduitRepository extends ServiceEntityRepository
            $qb->setParameters([
                'minprice' => $minprice,
                'maxprice' => $maxprice,
-               'idCategorie' => $idCategorie
+               'idCategorie' => $idCategorie,
            ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
        } else {
            $qb->setParameters([
                'minprice' => $minprice,
                'maxprice' => $maxprice,
            ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
        }
        $qb->groupBy('p.id');
        return $qb->getQuery()->getResult();
@@ -130,15 +140,20 @@ class ProduitRepository extends ServiceEntityRepository
        /**
         * @return Produit[] Returns an array of Produit objects
         */
-       public function countByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie): array
+       public function countByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size): array
    {
        $qb = $this->createQueryBuilder('p')
            ->select('count(p)')
-           ->where('p.price between :minprice AND :maxprice');
+           ->where('p.price between :minprice AND :maxprice')
+           ->leftJoin('p.produitBySize', 'ps')
+           ->leftJoin('ps.taille', 't');
 
        if ($idCategorie !== "-1") {
            $qb->leftJoin('p.categories', 'c');
            $qb->andWhere('c.id = :idCategorie');
+       }
+       if ($size !== "none"){
+           $qb->andWhere('t.taille = :size');
        }
 
        if ($orderby == "ASC") {
@@ -153,11 +168,17 @@ class ProduitRepository extends ServiceEntityRepository
                'maxprice' => $maxprice,
                'idCategorie' => $idCategorie
            ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
        } else {
            $qb->setParameters([
                'minprice' => $minprice,
                'maxprice' => $maxprice,
            ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
        }
 
     return $qb->getQuery()->getResult();

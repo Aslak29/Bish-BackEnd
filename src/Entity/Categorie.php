@@ -27,6 +27,9 @@ class Categorie
     #[ORM\Column]
     private ?string $pathImage = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $path_image_trend = null;
+
     public function __construct()
     {
         $this->produits = new ArrayCollection();
@@ -99,6 +102,18 @@ class Categorie
     public function removeProduit(Produit $produit): self
     {
         $this->produits->removeElement($produit);
+
+        return $this;
+    }
+
+    public function getPathImageTrend(): ?string
+    {
+        return $this->path_image_trend;
+    }
+
+    public function setPathImageTrend(?string $path_image_trend): self
+    {
+        $this->path_image_trend = $path_image_trend;
 
         return $this;
     }

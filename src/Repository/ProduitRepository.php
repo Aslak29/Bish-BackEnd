@@ -136,6 +136,38 @@ class ProduitRepository extends ServiceEntityRepository
        $qb->groupBy('p.id');
        return $qb->getQuery()->getResult();
    }
+    public function getProduitIsTrend()
+    {
+        return $this->createQueryBuilder('p')
+                    ->where("p.isTrend = 1")
+                    ->getQuery()
+                    ->getResult();
+    }
+    public function findByBestPromo()
+    {
+        return $this->createQueryBuilder('p')
+                    ->join('p.promotions', 'promo')
+                    ->where("p.promotions= promo.id")
+                    ->orderBy("promo.remise", "DESC")
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getResult();
+    }
+
+//    /**
+//     * @return Produit[] Returns an array of Produit objects
+//     */
+//    public function findByExampleField($value): array
+//    {
+//        return $this->createQueryBuilder('p')
+//            ->andWhere('p.exampleField = :val')
+//            ->setParameter('val', $value)
+//            ->orderBy('p.id', 'ASC')
+//            ->setMaxResults(10)
+//            ->getQuery()
+//            ->getResult()
+//        ;
+//    }
 
        /**
         * @return Produit[] Returns an array of Produit objects

@@ -53,11 +53,14 @@ class ProduitRepository extends ServiceEntityRepository
             ->addSelect('ps')
             ->join('ps.taille','t')
             ->addSelect('t')
+            ->leftJoin('p.Note', 'pn')
+            ->addSelect('avg(pn.note)')
             ->andWhere('p.id != :id')
             ->setParameters([
                 "idCateg" => $idCateg,
                 "id" => $id
             ])
+            ->groupBy('p.id')
             ->getQuery()
             ->getResult()
         ;
@@ -68,10 +71,13 @@ class ProduitRepository extends ServiceEntityRepository
        return $this->createQueryBuilder('p')
            ->leftJoin('p.categories', 'c')
            ->addSelect('c')
+           ->leftJoin('p.Note', 'pn')
+           ->addSelect('avg(pn.note)')
            ->where('p.id = :idProduit')
            ->setParameters([
                "idProduit" => $idProduit
            ])
+           ->groupBy('p.id')
            ->getQuery()
            ->getResult()
            ;
@@ -82,12 +88,14 @@ class ProduitRepository extends ServiceEntityRepository
    public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size,$limit,$offset): array
    {
        $qb = $this->createQueryBuilder('p')
+           ->leftJoin('p.Note', 'pn')
+           ->addSelect('avg(pn.note)')
            ->leftJoin('p.produitBySize', 'ps')
            ->addSelect('ps')
            ->leftJoin('ps.taille', 't')
            ->addSelect('t')
            ->where('p.price between :minprice AND :maxprice');
-
+            
 
        if ($idCategorie !== "-1") {
            $qb->leftJoin('p.categories', 'c');
@@ -125,6 +133,7 @@ class ProduitRepository extends ServiceEntityRepository
                $qb->setParameter('size',$size);
            }
        }
+       $qb->groupBy('p.id');
        return $qb->getQuery()->getResult();
    }
 

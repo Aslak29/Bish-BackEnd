@@ -53,15 +53,16 @@ class CategorieController extends AbstractController
     public function searchIsTrend(CategorieRepository $categorieRepository): JsonResponse
     {
         $categories =  $categorieRepository->getCategorieIsTrend();
+        shuffle($categories);
         $arrayCategories = [];
 
-        foreach ($categories as $categorie){
+        for($i=0; $i<1; $i++){
             $arrayCategories[] = [
-                'id' => $categorie->getId(),
-                'name' => $categorie->getName(),
-                'pathImage' => $categorie->getPathImage(),
-                'isTrend' => $categorie->isIsTrend(),
-                'pathImageTrend' => $categorie->getPathImageTrend()
+                'id' => $categories[$i]->getId(),
+                'name' => $categories[$i]->getName(),
+                'pathImage' => $categories[$i]->getPathImage(),
+                'isTrend' => $categories[$i]->isIsTrend(),
+                'pathImageTrend' => $categories[$i]->getPathImageTrend()
             ];
         }
         return new JsonResponse($arrayCategories,200);

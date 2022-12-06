@@ -39,6 +39,15 @@ class BlogRepository extends ServiceEntityRepository
         }
     }
 
+    public function findLastArticle()
+    {
+        return $this->createQueryBuilder("b")
+                    ->orderBy('b.date', 'DESC')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getResult();
+    }
+
 //    /**
 //     * @return Blog[] Returns an array of Blog objects
 //     */

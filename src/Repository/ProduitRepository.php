@@ -106,6 +106,16 @@ class ProduitRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getResult();
     }
+    public function findByBestPromo()
+    {
+        return $this->createQueryBuilder('p')
+                    ->join('p.promotions', 'promo')
+                    ->where("p.promotions= promo.id")
+                    ->orderBy("promo.remise", "DESC")
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getResult();
+    }
 
 //    /**
 //     * @return Produit[] Returns an array of Produit objects

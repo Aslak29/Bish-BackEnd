@@ -49,11 +49,18 @@ class ProduitRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
+            ->join('p.produitBySize', 'ps')
+            ->addSelect('ps')
+            ->join('ps.taille','t')
+            ->addSelect('t')
+            ->leftJoin('p.Note', 'pn')
+            ->addSelect('avg(pn.note)')
             ->andWhere('p.id != :id')
             ->setParameters([
                 "idCateg" => $idCateg,
                 "id" => $id
             ])
+            ->groupBy('p.id')
             ->getQuery()
             ->getResult()
         ;
@@ -64,10 +71,13 @@ class ProduitRepository extends ServiceEntityRepository
        return $this->createQueryBuilder('p')
            ->leftJoin('p.categories', 'c')
            ->addSelect('c')
+           ->leftJoin('p.Note', 'pn')
+           ->addSelect('avg(pn.note)')
            ->where('p.id = :idProduit')
            ->setParameters([
                "idProduit" => $idProduit
            ])
+           ->groupBy('p.id')
            ->getQuery()
            ->getResult()
            ;
@@ -75,29 +85,56 @@ class ProduitRepository extends ServiceEntityRepository
    /**
     * @return Produit[] Returns an array of Produit objects
     */
-   public function findByFilter($orderby,$moyenne,$minprice,$maxprice): array
+   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size,$limit,$offset): array
    {
-    $entityManager = $this->getEntityManager();
-    $querySQL =
-        'SELECT p
-        FROM App\Entity\Produit p
-        WHERE p.price BETWEEN :minprice AND :maxprice';
+       $qb = $this->createQueryBuilder('p')
+           ->leftJoin('p.Note', 'pn')
+           ->addSelect('avg(pn.note)')
+           ->leftJoin('p.produitBySize', 'ps')
+           ->addSelect('ps')
+           ->leftJoin('ps.taille', 't')
+           ->addSelect('t')
+           ->where('p.price between :minprice AND :maxprice');
+            
 
-    if ($orderby == "ASC"){
-        $querySQL .= " order by p.price ASC";
-    }else if ($orderby == "DESC"){
-        $querySQL .= " order by p.price DESC";
-    }
+       if ($idCategorie !== "-1") {
+           $qb->leftJoin('p.categories', 'c');
+           $qb->andWhere('c.id = :idCategorie');
+       }
 
-    $query = $this->getEntityManager()->createQuery($querySQL);
+       if ($size !== "none"){
+           $qb->andWhere('t.taille = :size');
+       }
 
-    $query->setParameters([
-        'minprice'=>$minprice,
-        'maxprice'=>$maxprice
-    ]);
+       if ($orderby == "ASC") {
+           $qb->orderBy('p.price', 'ASC');
+       } else if ($orderby == "DESC") {
+           $qb->orderBy('p.price', 'DESC');
+       }
 
+       $qb->setMaxResults($limit);
+       $qb->setFirstResult($offset);
 
-    return $query->getResult();
+       if ($idCategorie !== "-1") {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+               'idCategorie' => $idCategorie,
+           ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
+       } else {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+           ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
+       }
+       $qb->groupBy('p.id');
+       return $qb->getQuery()->getResult();
    }
     public function getProduitIsTrend()
     {
@@ -131,5 +168,62 @@ class ProduitRepository extends ServiceEntityRepository
 //            ->getResult()
 //        ;
 //    }
+
+       /**
+        * @return Produit[] Returns an array of Produit objects
+        */
+       public function countByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size): array
+   {
+       $qb = $this->createQueryBuilder('p')
+           ->select('count(p)')
+           ->where('p.price between :minprice AND :maxprice')
+           ->leftJoin('p.produitBySize', 'ps')
+           ->leftJoin('ps.taille', 't');
+
+       if ($idCategorie !== "-1") {
+           $qb->leftJoin('p.categories', 'c');
+           $qb->andWhere('c.id = :idCategorie');
+       }
+       if ($size !== "none"){
+           $qb->andWhere('t.taille = :size');
+       }
+
+       if ($orderby == "ASC") {
+           $qb->orderBy('p.price', 'ASC');
+       } else if ($orderby == "DESC") {
+           $qb->orderBy('p.price', 'DESC');
+       }
+
+       if ($idCategorie !== "-1") {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+               'idCategorie' => $idCategorie
+           ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
+       } else {
+           $qb->setParameters([
+               'minprice' => $minprice,
+               'maxprice' => $maxprice,
+           ]);
+           if ($size !== "none"){
+               $qb->setParameter('size',$size);
+           }
+       }
+
+    return $qb->getQuery()->getResult();
+   }
+
+    public function findProductPromo(){
+        return $this->createQueryBuilder('p')
+            ->join('p.categories', 'c')
+            ->join('p.promotions', 'pp')
+            ->addSelect('c,pp')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 
 }

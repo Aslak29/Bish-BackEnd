@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Repository\ProduitRepository;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Produit;
-
+use App\Repository\NoteRepository;
 
 // exporter vers AdminProductView ? - Flo
 #[Route('api/produit')]
@@ -31,16 +32,36 @@ class ProductController extends AbstractController
         $produits = $produitRepository->findAll();
         $produitArray = [];
         foreach($produits as $produit){
-            $produitArray[] = [
+            $jsonProduct = [
                 'id' => $produit->getId(),
                 'name' => $produit->getName(),
                 'description' => $produit->getDescription(),
                 'pathImage' => $produit->getPathImage(),
                 'price' => $produit->getPrice(),
+                'created_at' => $produit->getCreatedAt(),
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
-                'id_categorie' => $produit->getCategories()[0]->getId()
+                "stockBySize" => array(),
+                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+                'name_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
+                'promotion' =>
+                $produit->getPromotions() !== null ? [
+                    'id' => $produit->getPromotions()->getId(),
+                    'remise' => $produit->getPromotions()->getRemise(),
+                    'price_remise' => round($produit->getPrice() - (($produit->getPrice() * $produit->getPromotions()->getRemise())/ 100), 2),
+                    'date_start' => $produit->getPromotions()->getDateStart()->format("d-m-Y"),
+                    'heure_start' => $produit->getPromotions()->getDateStart()->format("H:i:s"),
+                    'date_end' => $produit->getPromotions()->getDateEnd()->format("d-m-Y"),
+                    'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
+                ] : [],
             ];
+            foreach ($produit->getProduitBySize() as $size){
+                $jsonProduct['stockBySize'][] = [
+                    "taille" =>$size->getTaille()->getTaille(),
+                    "stock" =>$size->getStock()
+                ];
+            }
+            $produitArray[] = $jsonProduct;
         }
         return new JsonResponse($produitArray);
     }
@@ -67,16 +88,34 @@ class ProductController extends AbstractController
         }else{
             $produit = $produit[0];
         }
-        $produitArray[] = [
-            'id' => $produit->getId(),
-            'name' => $produit->getName(),
-            'description' => $produit->getDescription(),
-            'pathImage' => $produit->getPathImage(),
-            'price' => $produit->getPrice(),
-            'is_trend' => $produit->isIsTrend(),
-            'is_available' => $produit->isIsAvailable(),
-            'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId()
-        ];
+        $produitArray = [
+            'id' => $produit[0]->getId(),
+            'name' => $produit[0]->getName(),
+            'description' => $produit[0]->getDescription(),
+            'pathImage' => $produit[0]->getPathImage(),
+            'price' => $produit[0]->getPrice(),
+            'is_trend' => $produit[0]->isIsTrend(),
+            'is_available' => $produit[0]->isIsAvailable(),
+            "stockBySize" => array(),
+            'noteAverage' => $produit[1] !== null ? round($produit[1],1) : $produit[1],
+            'id_categorie' => $produit[0]->getCategories()[0] === null ? "-" : $produit[0]->getCategories()[0]->getId(),
+            'promotion' =>
+                $produit[0]->getPromotions() !== null ? [
+                    'id' => $produit[0]->getPromotions()->getId(),
+                    'remise' => $produit[0]->getPromotions()->getRemise(),
+                    'price_remise' => round($produit[0]->getPrice() - (($produit[0]->getPrice() * $produit[0]->getPromotions()->getRemise())/ 100), 2),
+                    'date_start' => $produit[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                    'heure_start' => $produit[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                    'date_end' => $produit[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                    'heure_end' => $produit[0]->getPromotions()->getDateEnd()->format("H:i:s"),
+                ] : [],     
+                ];
+        foreach ($produit[0]->getProduitBySize() as $size){
+            $produitArray['stockBySize'][] = [
+                "taille" =>$size->getTaille()->getTaille(),
+                "stock" =>$size->getStock()
+            ];
+        }
 
         return new JsonResponse($produitArray);
     }
@@ -119,23 +158,50 @@ class ProductController extends AbstractController
      * )
      */
 
-    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}', name: 'app_filter_product', methods: "POST")]
+    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}/{size}/{limit}/{offset}', name: 'app_filter_product', methods: "POST")]
     public function searchFilter(ProduitRepository $produitRepository,Request $request):JsonResponse
     {
-        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"));
+        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('size'),$request->attributes->get('limit'),$request->attributes->get("offset"));
+        $countProduits = $produitRepository->countByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('size'));
         $produitArray = [];
         foreach($produits as $produit){
-            $produitArray[] = [
-                'id' => $produit->getId(),
-                'name' => $produit->getName(),
-                'description' => $produit->getDescription(),
-                'pathImage' => $produit->getPathImage(),
-                'price' => $produit->getPrice(),
-                'is_trend' => $produit->isIsTrend(),
-                'is_available' => $produit->isIsAvailable()
+            $jsonProduct = [
+                'id' => $produit[0]->getId(),
+                'name' => $produit[0]->getName(),
+                'description' => $produit[0]->getDescription(),
+                'pathImage' => $produit[0]->getPathImage(),
+                'price' => round($produit[0]->getPrice(), 2),
+                'is_trend' => $produit[0]->isIsTrend(),
+                'is_available' => $produit[0]->isIsAvailable(),
+                "stockBySize" => array(),
+                'noteAverage' => $produit[1] !== null ? round($produit[1],1) : $produit[1],
+                'id_categorie' => $produit[0]->getCategories()[0] === null ? "-" : $produit[0]->getCategories()[0]->getId(),
+                'promotion' =>
+                    $produit[0]->getPromotions() !== null ? [
+                        'id' => $produit[0]->getPromotions()->getId(),
+                        'remise' => $produit[0]->getPromotions()->getRemise(),
+                        'price_remise' => round($produit[0]->getPrice() - (($produit[0]->getPrice() * $produit[0]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $produit[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $produit[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $produit[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $produit[0]->getPromotions()->getDateEnd()->format("H:i:s"),
+                    ] : [],
             ];
+            foreach ($produit[0]->getProduitBySize() as $size){
+                $jsonProduct['stockBySize'][] = [
+                    "taille" =>$size->getTaille()->getTaille(),
+                    "stock" =>$size->getStock()
+                ];
+            }
+            $produitArray[] = $jsonProduct;
         }
-        return new JsonResponse($produitArray);
+
+        $resultArray = [];
+        $resultArray[] = $produitArray;
+        $resultArray[] = [
+            "count" => $countProduits
+        ];
+        return new JsonResponse($resultArray);
     }
 
 
@@ -152,13 +218,64 @@ class ProductController extends AbstractController
     #[Route('/suggestions/{idCategorie}/{id}', name: 'product_suggest', methods: "POST")]
     public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
-        $produits = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
-        if (!$produits) {
+        $product = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
+        if (!$product) {
             return new JsonResponse([
                 "errorCode" => "003",
                 "errorMessage" => "La catégorie n'existe pas"
             ], 404);
         }
+        shuffle($product);
+        $produitSuggestion = array_slice($product, 0, 4);
+
+        $produitArray = [];
+        foreach ($produitSuggestion as $product){
+            $jsonProduct = [
+                'id' => $product[0]->getId(),
+                'name' => $product[0]->getName(),
+                'description' => $product[0]->getDescription(),
+                'pathImage' => $product[0]->getPathImage(),
+                'price' => round($product[0]->getPrice(), 2),
+                'is_trend' => $product[0]->isIsTrend(),
+                'is_available' => $product[0]->isIsAvailable(),
+                'stockBySize' => array(),
+                'noteAverage' => $product[1] !== null ? round($product[1],1) : $product[1],
+                'id_categorie' => $product[0]->getCategories()[0] === null ? "-" : $product[0]->getCategories()[0]->getId(),
+                'promotion' =>
+                    $product[0]->getPromotions() !== null ? [
+                        'id' => $product[0]->getPromotions()->getId(),
+                        'remise' => $product[0]->getPromotions()->getRemise(),
+                        'price_remise' => round($product[0]->getPrice() - (($product[0]->getPrice() * $product[0]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $product[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $product[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $product[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $product[0]->getPromotions()->getDateEnd()->format("H:i:s"),
+                    ] : [],
+            ];
+            foreach ($product[0]->getProduitBySize() as $size){
+                $jsonProduct['stockBySize'][] = [
+                    "taille" =>$size->getTaille()->getTaille(),
+                    "stock" =>$size->getStock(),
+                ];
+            }
+            $produitArray[] = $jsonProduct;
+        }
+        return new JsonResponse($produitArray);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/promotions', name: 'app_produit_promotion', methods:"GET")]
+    public function PromoProduct(ProduitRepository $produitRepository): JsonResponse
+    {
+        $produits = $produitRepository->findProductPromo();
         shuffle($produits);
         $produitArray = [];
         for($i=0; $i<4; $i++){
@@ -169,7 +286,18 @@ class ProductController extends AbstractController
                 'pathImage' => $produits[$i]->getPathImage(),
                 'price' => $produits[$i]->getPrice(),
                 'is_trend' => $produits[$i]->isIsTrend(),
-                'is_available' => $produits[$i]->isIsAvailable()
+                'is_available' => $produits[$i]->isIsAvailable(),
+                'id_categorie' => $produits[$i]->getCategories()[0] === null ? "-" : $produits[$i]->getCategories()[0]->getId(),
+                'promotion' =>
+                    $produits[$i]->getPromotions() !== null ? [
+                        'id' => $produits[$i]->getPromotions()->getId(),
+                        'remise' => $produits[$i]->getPromotions()->getRemise(),
+                        'price_remise' => round($produits[$i]->getPrice() - (($produits[$i]->getPrice() * $produits[$i]->getPromotions()->getRemise())/ 100), 2),
+                        'date_start' => $produits[$i]->getPromotions()->getDateStart()->format("d-m-Y"),
+                        'heure_start' => $produits[$i]->getPromotions()->getDateStart()->format("H:i:s"),
+                        'date_end' => $produits[$i]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                        'heure_end' => $produits[$i]->getPromotions()->getDateEnd()->format("H:i:s"),
+                        ] : [],
             ];
         }
         return new JsonResponse($produitArray);
@@ -231,5 +359,22 @@ class ProductController extends AbstractController
             "is_available"=>$produit[0]->isIsAvailable(),
         ];
         return new JsonResponse($arrayProduits,200);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/count', name: 'product_count', methods: "GET")]
+    public function countProduct(ProduitRepository $produitRepository):JsonResponse{
+
+        $countProduit = $produitRepository->countProduit();
+        return new JsonResponse($countProduit[0]);
+
     }
 }

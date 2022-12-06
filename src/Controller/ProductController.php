@@ -109,7 +109,7 @@ class ProductController extends AbstractController
                     'date_end' => $produit[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
                     'heure_end' => $produit[0]->getPromotions()->getDateEnd()->format("H:i:s"),
                 ] : [],     
-        ];
+                ];
         foreach ($produit[0]->getProduitBySize() as $size){
             $produitArray['stockBySize'][] = [
                 "taille" =>$size->getTaille()->getTaille(),
@@ -301,5 +301,22 @@ class ProductController extends AbstractController
             ];
         }
         return new JsonResponse($produitArray);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/count', name: 'product_count', methods: "GET")]
+    public function countProduct(ProduitRepository $produitRepository):JsonResponse{
+
+        $countProduit = $produitRepository->countProduit();
+        return new JsonResponse($countProduit[0]);
+
     }
 }

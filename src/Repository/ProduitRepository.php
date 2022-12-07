@@ -50,9 +50,7 @@ class ProduitRepository extends ServiceEntityRepository
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
             ->join('p.produitBySize', 'ps')
-            ->addSelect('ps')
             ->join('ps.taille','t')
-            ->addSelect('t')
             ->leftJoin('p.Note', 'pn')
             ->addSelect('avg(pn.note)')
             ->andWhere('p.id != :id')
@@ -91,9 +89,7 @@ class ProduitRepository extends ServiceEntityRepository
            ->leftJoin('p.Note', 'pn')
            ->addSelect('avg(pn.note)')
            ->leftJoin('p.produitBySize', 'ps')
-           ->addSelect('ps')
            ->leftJoin('ps.taille', 't')
-           ->addSelect('t')
            ->where('p.price between :minprice AND :maxprice');
             
 
@@ -103,7 +99,7 @@ class ProduitRepository extends ServiceEntityRepository
        }
 
        if ($size !== "none"){
-           $qb->andWhere('t.taille = :size');
+           $qb->andWhere('t.taille = :size AND ps.stock > 0');
        }
 
        if ($orderby == "ASC") {
@@ -153,29 +149,13 @@ class ProduitRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getResult();
     }
-
-//    /**
-//     * @return Produit[] Returns an array of Produit objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
        /**
         * @return Produit[] Returns an array of Produit objects
         */
        public function countByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size): array
    {
        $qb = $this->createQueryBuilder('p')
-           ->select('count(p)')
+           ->select('count(DISTINCT p.id)')
            ->where('p.price between :minprice AND :maxprice')
            ->leftJoin('p.produitBySize', 'ps')
            ->leftJoin('ps.taille', 't');
@@ -185,7 +165,7 @@ class ProduitRepository extends ServiceEntityRepository
            $qb->andWhere('c.id = :idCategorie');
        }
        if ($size !== "none"){
-           $qb->andWhere('t.taille = :size');
+           $qb->andWhere('t.taille = :size AND ps.stock > 0');
        }
 
        if ($orderby == "ASC") {

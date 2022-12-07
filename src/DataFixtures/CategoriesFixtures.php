@@ -27,7 +27,7 @@ class CategoriesFixtures extends Fixture
 
         $categorieFille = (new Categorie())
             ->setName("Fille")
-            ->setIsTrend(rand(0, 1))
+            ->setIsTrend(1)
             ->setPathImage("fille.png");
         $this->addReference('fille', $categorieFille);
 

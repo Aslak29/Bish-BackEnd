@@ -10,8 +10,8 @@ class TailleFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $tabTaille = array('s','m','l','xl');
-        for ($i = 0; $i < 4; $i++) {
+        $tabTaille = array('xs','s','m','l','xl');
+        for ($i = 0; $i < 5; $i++) {
             $taille = (new Taille())
                 ->setTaille($tabTaille[$i])
             ;

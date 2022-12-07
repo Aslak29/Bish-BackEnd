@@ -53,19 +53,25 @@ class CategorieController extends AbstractController
     public function searchIsTrend(CategorieRepository $categorieRepository): JsonResponse
     {
         $categories =  $categorieRepository->getCategorieIsTrend();
-        shuffle($categories);
-        $arrayCategories = [];
-
-        for($i=0; $i<1; $i++){
-            $arrayCategories[] = [
-                'id' => $categories[$i]->getId(),
-                'name' => $categories[$i]->getName(),
-                'pathImage' => $categories[$i]->getPathImage(),
-                'isTrend' => $categories[$i]->isIsTrend(),
-                'pathImageTrend' => $categories[$i]->getPathImageTrend()
-            ];
+        if (sizeof($categories) !== 0){
+            $arrayCategories = [];
+            foreach ($categories as $category){
+                $arrayCategories[] = [
+                    'id' => $category->getId(),
+                    'name' => $category->getName(),
+                    'pathImage' => $category->getPathImage(),
+                    'isTrend' => $category->isIsTrend(),
+                    'pathImageTrend' => $category->getPathImageTrend()
+                ];
+            }
+            return new JsonResponse($arrayCategories,200);
+        }else{
+            return new JsonResponse([
+                "errorCode" => "A définir",
+                "errorMessage" => "Aucune catégorie est en tendance"
+            ],409);
         }
-        return new JsonResponse($arrayCategories,200);
+
     }
 
 

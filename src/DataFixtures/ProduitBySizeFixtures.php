@@ -15,7 +15,7 @@ class ProduitBySizeFixtures extends Fixture implements DependentFixtureInterface
         for ($j = 0; $j <= 4; $j++ ){
             $taille[] = $this->getReference('taille_'.$j);
         };
-        for ($i = 1; $i < 99; $i++) {
+        for ($i = 1; $i < 250; $i++) {
             for ($j = 0; $j < 5; $j++) {
                 $produitBy = new ProduitBySize();
                 $produitBy->setProduit($this->getReference('produit_'.$i));

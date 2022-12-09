@@ -39,6 +39,19 @@ class CategorieRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOneById($idCategorie)
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c')
+            ->where('c.id = :idCategorie')
+            ->setParameters([
+                "idCategorie" => $idCategorie
+            ])
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
 //    /**
 //     * @return Categorie[] Returns an array of Categorie objects
 //     */

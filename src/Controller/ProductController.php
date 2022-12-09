@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
+use App\Repository\TailleRepository;
 use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -123,6 +125,9 @@ class ProductController extends AbstractController
 
     /**
      * @param ProduitRepository $produitRepository
+     * @param ProduitBySizeRepository $produitBySizeRepo
+     * @param TailleRepository $tailleRepository
+     * @param CategorieRepository $categorieRepository
      * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Produit")
@@ -131,26 +136,83 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{name}/{description}/{pathImage}/{price}/{is_trend}/{is_available}', name: 'app_add_product', methods: "POST")]
-    public function addProduit(ProduitRepository $produitRepository, Request $request):JsonResponse
+    #[Route('/add/{name}/{description}/{pathImage}/{idCategorie}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
+        name: 'app_add_product', methods: "POST")]
+    public function addProduit(
+        ProduitRepository $produitRepository,ProduitBySizeRepository $produitBySizeRepo,
+        TailleRepository $tailleRepository,CategorieRepository $categorieRepository, Request $request
+    ):JsonResponse
     {
         $produit = new Produit();
+        /* Récupération de toutes les tailles en bdd */
+        $tailles = $tailleRepository->findAll();
+        /* Récupération de la catégorie demandée par rapport à son id en bdd */
+        $categorie = $categorieRepository->findOneById($request->attributes->get('idCategorie'));
+        /* Donnation des valeurs aux attributs du produit */
         $produit->setName($request->attributes->get('name'));
         $produit->setDescription($request->attributes->get('description'));
         $produit->setPathImage($request->attributes->get('pathImage'));
-        $produit->setPrice(floatval( $request->attributes->get('price'))); 
-        $produit->setIsTrend($request->attributes->get('is_trend'));
-        $produit->setIsAvailable($request->attributes->get('is_available'));
+        $produit->setPrice(floatval( $request->attributes->get('price')));
 
+        /* Vérifier si is_trend est bien un boolean */
+        if ($request->attributes->get('is_trend') === "true"){
+            $produit->setIsTrend(true);
+        }elseif ($request->attributes->get('is_trend') === "false"){
+            $produit->setIsTrend(false);
+        }else {
+            return new JsonResponse([
+                "errorCode" => "004",
+                "errorMessage" => "is_trend is not boolean !"
+            ],406);
+        }
+        /* Vérifier si is_available est bien un boolean */
+        if ($request->attributes->get('is_available') === "true"){
+            $produit->setIsAvailable(true);
+        }elseif ($request->attributes->get('is_available') === "false"){
+            $produit->setIsAvailable(false);
+        }else {
+            return new JsonResponse([
+                "errorCode" => "005",
+                "errorMessage" => "is_available is not boolean !"
+            ],406);
+        }
+        /* Vérifier si la catégorie existe bien en bdd pour faire la relation */
+        if (!$categorie){
+            return new JsonResponse([
+                "errorCode" => "003",
+                "errorMessage" => "la catégorie n'éxiste pas !"
+            ],404);
+        }else {
+            $produit->addCategory($categorie[0]);
+        }
+        /* Première insertion en bdd pour le produit */
         $produitRepository->save($produit,true);
 
-        return new JsonResponse(null,200);
+        foreach ($tailles as $taille){
+            $produitBySize = new ProduitBySize();
+            $produitBySize->setTaille($taille);
+            $produitBySize->setStock(floatval($request->attributes->get($taille->getTaille())));
+            $produitBySize->setProduit($produit);
+            $produit->addProduitBySize($produitBySize);
+            $produitBySizeRepo->save($produitBySize, true);
+        }
+        /* Deuxième insertion en bdd pour effectuer la relation des tailles pour le produit crée */
+        $produitRepository->save($produit,true);
 
+        $produitArray = [
+            "id" => $produit->getId(),
+            "name" => $produit->getName()
+        ];
+
+        return new JsonResponse($produitArray);
     }
+
 
     /**
      * @param ProduitRepository $produitRepository
      * @param Request $request
+     * @param ProduitBySizeRepository $produitBySizeRepository
+     * @param NoteRepository $noteRepository
      * @return JsonResponse
      * @OA\Tag (name="Produit")
      * @OA\Response(
@@ -158,10 +220,9 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/remove/{id}', name: 'app_add_product', methods: "DELETE")]
+    #[Route('/remove/{id}', name: 'app_delete_product', methods: "DELETE")]
     public function removeProduit(ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository, NoteRepository $noteRepository):JsonResponse
     {
-        $produit = new Produit();
         $produit = $produitRepository->findOneById($request->attributes->get('id'));
         if (!$produit){
             return new JsonResponse([
@@ -180,12 +241,12 @@ class ProductController extends AbstractController
             $noteRepository-> remove($note, true);
         }
         $produitRepository->remove($produit, true);
-    }else{
-        return new JsonResponse([
-            "errorCode" => "A définir",
-            "errorMessage" => "le produit est en commande"
-        ],404);
-    }
+        }else{
+            return new JsonResponse([
+                "errorCode" => "006",
+                "errorMessage" => "le produit est en commande"
+            ],404);
+        }
 
         return new JsonResponse(null,200);
 

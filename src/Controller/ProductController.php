@@ -258,7 +258,7 @@ class ProductController extends AbstractController
         } else {
             return new JsonResponse([
                 "errorCode" => "006",
-                "errorMessage" => "le produit est en commande"
+                "errorMessage" => "Le produit est en cours de commande !"
             ],404);
         }
 

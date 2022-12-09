@@ -11,7 +11,7 @@ class NotationFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        for ($i = 1; $i < 10; $i++) {
+        for ($i = 1; $i < 250; $i++) {
             $note = (new Notation())
                 ->setNote(rand(1,5))
                 ->setProduit($this->getReference('produit_'.$i))

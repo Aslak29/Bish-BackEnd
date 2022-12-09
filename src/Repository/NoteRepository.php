@@ -39,6 +39,14 @@ class NoteRepository extends ServiceEntityRepository
         }
     }
 
+        public function findNote(Notation $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->find($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 //    /**
 //     * @return Notation[] Returns an array of Notation objects
 //     */

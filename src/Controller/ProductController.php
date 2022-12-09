@@ -231,18 +231,18 @@ class ProductController extends AbstractController
                 "errorMessage" => "le produit n'éxiste pas !"
             ],404);
         }else{
-           $produit = $produit[0];
+           $produit = $produit[0][0];
         }
 
-        if ($produit ->getProduitInCommande()[0] === null){
-        foreach ($produit->getProduitBySize() as $size ){
-            $produitBySizeRepository-> remove($size, true);
-        }
-        foreach ($produit->getNote() as $note){
-            $noteRepository-> remove($note, true);
-        }
-        $produitRepository->remove($produit, true);
-        }else{
+        if ($produit->getProduitInCommande()[0] === null){
+            foreach ($produit->getProduitBySize() as $size ){
+                $produitBySizeRepository-> remove($size, true);
+            }
+            foreach ($produit->getNote() as $note){
+                $noteRepository-> remove($note, true);
+            }
+            $produitRepository->remove($produit, true);
+        } else {
             return new JsonResponse([
                 "errorCode" => "006",
                 "errorMessage" => "le produit est en commande"

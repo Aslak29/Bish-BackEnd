@@ -124,6 +124,7 @@ php bin/console messenger:consume -vv
 |    004     |                is_trend is not boolean !                 |     409     |   [2](#request2)   | 
 |    005     |              is_available is not boolean !               |     409     |   [2](#request2)   | 
 |    006     |               le produit est en commande !               |     409     |   [2](#request2)   | 
+|    007     |               la promotion n'existe pas !                |     409     |   [2](#request2)   | 
 |    013     |                 This contact don't exist                 |     409     |   [7](#request7)   | 
 
 

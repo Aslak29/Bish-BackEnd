@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
+use App\Repository\PromotionsRepository;
 use App\Repository\TailleRepository;
 use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -129,6 +130,7 @@ class ProductController extends AbstractController
      * @param ProduitBySizeRepository $produitBySizeRepo
      * @param TailleRepository $tailleRepository
      * @param CategorieRepository $categorieRepository
+     * @param PromotionsRepository $promotionsRepository
      * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Produit")
@@ -137,11 +139,12 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{name}/{description}/{pathImage}/{idCategorie}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
+    #[Route('/add/{name}/{description}/{pathImage}/{idCategorie}/{promotion}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
         name: 'app_add_product', methods: "POST")]
     public function addProduit(
         ProduitRepository $produitRepository,ProduitBySizeRepository $produitBySizeRepo,
-        TailleRepository $tailleRepository,CategorieRepository $categorieRepository, Request $request
+        TailleRepository $tailleRepository,CategorieRepository $categorieRepository,
+        PromotionsRepository $promotionsRepository, Request $request
     ):JsonResponse
     {
         $produit = new Produit();
@@ -149,11 +152,12 @@ class ProductController extends AbstractController
         $tailles = $tailleRepository->findAll();
         /* Récupération de la catégorie demandée par rapport à son id en bdd */
         $categorie = $categorieRepository->findOneById($request->attributes->get('idCategorie'));
+        $promo = $promotionsRepository->find($request->attributes->get('promotion'));
         /* Donnation des valeurs aux attributs du produit */
         $produit->setName($request->attributes->get('name'));
         $produit->setDescription($request->attributes->get('description'));
         $produit->setPathImage($request->attributes->get('pathImage'));
-        $produit->setPrice(floatval( $request->attributes->get('price')));
+        $produit->setPrice(floatval($request->attributes->get('price')));
 
         /* Vérifier si is_trend est bien un boolean */
         if ($request->attributes->get('is_trend') === "true"){
@@ -185,6 +189,15 @@ class ProductController extends AbstractController
             ],404);
         }else {
             $produit->addCategory($categorie[0]);
+        }
+        /* Vérifier si la promotion existe bien en bdd pour faire la relation */
+        if (!$promo){
+            return new JsonResponse([
+                "errorCode" => "007",
+                "errorMessage" => "la promotion n'existe pas !"
+            ],404);
+        }else {
+            $produit->setPromotions($promo);
         }
         /* Première insertion en bdd pour le produit */
         $produitRepository->save($produit,true);
@@ -250,7 +263,6 @@ class ProductController extends AbstractController
         }
 
         return new JsonResponse(null,200);
-
     }
 
      /**

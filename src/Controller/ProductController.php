@@ -191,11 +191,8 @@ class ProductController extends AbstractController
             $produit->addCategory($categorie[0]);
         }
         /* Vérifier si la promotion existe bien en bdd pour faire la relation */
-        if (!$promo){
-            return new JsonResponse([
-                "errorCode" => "007",
-                "errorMessage" => "la promotion n'existe pas !"
-            ],404);
+        if ($promo == '-'){
+            $produit->setPromotions(null);
         }else {
             $produit->setPromotions($promo);
         }

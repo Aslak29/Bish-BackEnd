@@ -256,7 +256,7 @@ class ProductController extends AbstractController
         if (!$produit){
             return new JsonResponse([
                 "errorCode" => "002",
-                "errorMessage" => "le produit n'éxiste pas !"
+                "errorMessage" => "Le produit n'existe pas !"
             ],404);
         }
 
@@ -291,7 +291,7 @@ class ProductController extends AbstractController
         if (!$categorie && ($request->attributes->get('idCategorie') !== '-')){
             return new JsonResponse([
                 "errorCode" => "003",
-                "errorMessage" => "la catégorie n'éxiste pas !"
+                "errorMessage" => "La catégorie n'existe pas !"
             ],404);
         }else {
             foreach ($produit->getCategories() as $cat){
@@ -306,7 +306,7 @@ class ProductController extends AbstractController
         }elseif (!$promotion){
             return new JsonResponse([
                 "errorCode" => "007",
-                "errorMessage" => "la promotion n'existe pas !"
+                "errorMessage" => "La promotion n'existe pas !"
             ],404);
         }else {
             $produit->setPromotions($promotion);
@@ -319,6 +319,94 @@ class ProductController extends AbstractController
             $ps->setStock(floatval($request->attributes->get($ps->getTaille()->getTaille())));
             $produitBySizeRepo->save($ps,true);
         }
+        $produitRepository->save($produit,true);
+
+        $produitArray = [
+            "id" => $produit->getId(),
+            "name" => $produit->getName()
+        ];
+
+        return new JsonResponse($produitArray,200);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/trend/{id}/{trendBool}/',
+        name: 'app_update_product_trend', methods: "POST")]
+    public function updateTrendProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
+    {
+        $produit = $produitRepository->find($request->attributes->get('id'));
+
+        if (!$produit){
+            return new JsonResponse([
+                "errorCode" => "002",
+                "errorMessage" => "Le produit n'existe pas !"
+            ],404);
+        }
+
+        if ($request->attributes->get('trendBool') === "true"){
+            $produit->setIsTrend(true);
+        }elseif ($request->attributes->get('trendBool') === "false"){
+            $produit->setIsTrend(false);
+        }else {
+            return new JsonResponse([
+                "errorCode" => "004",
+                "errorMessage" => "trendBool is not boolean !"
+            ],406);
+        }
+
+        $produitRepository->save($produit,true);
+
+        $produitArray = [
+            "id" => $produit->getId(),
+            "name" => $produit->getName()
+        ];
+
+        return new JsonResponse($produitArray,200);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/available/{id}/{availableBool}/',
+        name: 'app_update_product_available', methods: "POST")]
+    public function updateAvailableProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
+    {
+        $produit = $produitRepository->find($request->attributes->get('id'));
+
+        if (!$produit){
+            return new JsonResponse([
+                "errorCode" => "002",
+                "errorMessage" => "Le produit n'existe pas !"
+            ],404);
+        }
+
+        if ($request->attributes->get('availableBool') === "true"){
+            $produit->setIsAvailable(true);
+        }elseif ($request->attributes->get('availableBool') === "false"){
+            $produit->setIsAvailable(false);
+        }else {
+            return new JsonResponse([
+                "errorCode" => "005",
+                "errorMessage" => "availableBool is not boolean !"
+            ],406);
+        }
+
         $produitRepository->save($produit,true);
 
         $produitArray = [

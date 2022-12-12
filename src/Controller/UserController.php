@@ -106,7 +106,7 @@ class UserController extends AbstractController
      */
 
      #[Route('/', name: 'user_all', methods:"GET")]
-     public function findProduct(UserRepository $userRepository): JsonResponse
+     public function findUser(UserRepository $userRepository): JsonResponse
      {
          $users = $userRepository->findAll();
          $userArray = [];
@@ -188,4 +188,29 @@ class UserController extends AbstractController
         return new JsonResponse(null,200);
     }
 
+        /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/delete/{id}', name: 'user_delete', methods:"DELETE")]
+    public function deleteUser(UserRepository $userRepository, Request $request): JsonResponse
+    {
+        $user = $userRepository->findOneById($request->attributes->get('id'));
+        if (!$user){
+            return new JsonResponse([
+                "errorCode" => "009",
+                "errorMessage" => "L'utilisateur n'existe pas"
+            ],404);
+        }else{
+           $userRepository -> remove($user,true);
+        }
+        return new JsonResponse(null,200);
+    }
+   
 }

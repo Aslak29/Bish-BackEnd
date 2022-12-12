@@ -17,7 +17,7 @@ class ProduitInCommandeFixture extends Fixture implements DependentFixtureInterf
         for ($i = 1 ; $i < 100 ; $i++){
             $produits[] = $this->getReference('produit_'.$i);
         }
-
+        
         $commandes = array();
         for ($i = 1 ; $i < 10 ; $i++){
             $commandes[] = $this->getReference('commande_'.$i);

@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\CommandeRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
@@ -26,7 +28,7 @@ class Commande
 
     #[ORM\OneToMany(mappedBy: 'commandes',targetEntity: ProduitInCommande::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?ProduitInCommande $ProduitInCommande = null;
+    private ?Collection $ProduitInCommande;
 
     /**
      * @param DateTimeImmutable $dateFacture
@@ -36,6 +38,7 @@ class Commande
         $dt = new \Monolog\DateTimeImmutable(0);
         $dt->format('Y-m-d H:i:s');
         $this->dateFacture = $dt;
+        $this->ProduitInCommande = new ArrayCollection();
     }
 
 
@@ -111,16 +114,22 @@ class Commande
         return $this;
     }
 
-    public function getProduitInCommande(): ?ProduitInCommande
+    /**
+     * @return Collection|null
+     */
+    public function getProduitInCommande(): ?Collection
     {
         return $this->ProduitInCommande;
     }
 
-    public function setProduitInCommande(?ProduitInCommande $ProduitInCommande): self
+    /**
+     * @param Collection|null $ProduitInCommande
+     */
+    public function setProduitInCommande(?Collection $ProduitInCommande): void
     {
         $this->ProduitInCommande = $ProduitInCommande;
-
-        return $this;
     }
+
+
 }
 

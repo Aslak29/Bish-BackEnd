@@ -22,15 +22,16 @@ class ProduitInCommandeController extends AbstractController{
     #[Route('/produitInCommande/{idCommande}', name: 'produit_in_commande', methods:"POST")]
     public function ProduitInCommande(ProduitInCommandeRepository $produitInCommandeRepository, Request $request): JsonResponse
     {
-        $loadCommande = $produitInCommandeRepository->findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
+        $produitInCommandes = $produitInCommandeRepository->findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
         
         $produitInCommandeArray = [];
-        foreach($loadCommande as $commande){
+        foreach($produitInCommandes as $produitInCommande){
             $produitInCommandeArray[] = [
-            'id' => $commande->getId(),
-            'quantite' => $commande->getQuantite(),
-            'prixUnitaire' => $commande->getPrice(),
-            'total' => $commande->getQuantite() * $commande->getPrice() 
+                'id' => $produitInCommande->getId(),
+                'quantite' => $produitInCommande->getQuantite(),
+                'prixUnitaire' => $produitInCommande->getPrice(),
+                'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
+                'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y")
             ];
         }
         return new JsonResponse($produitInCommandeArray);

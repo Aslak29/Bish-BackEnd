@@ -42,13 +42,12 @@ class ProduitInCommandeRepository extends ServiceEntityRepository
     public function findOneOrderbyIdCommandes($idCommande)
     {
         return $this->createQueryBuilder('pc')
-        ->leftJoin( 'pc.commandes', 'commande')
-        ->where('pc.commandes = :idCommande')
-        ->setParameters([
-            "idCommande" => $idCommande
-        ])
-        ->getQuery()
-        ->getResult()
-        ;
+            ->leftJoin( 'pc.commandes', 'c')
+            ->where('c.id = :idCommande')
+            ->setParameters([
+                "idCommande" => $idCommande
+            ])
+            ->getQuery()
+            ->getResult();
     }
 }

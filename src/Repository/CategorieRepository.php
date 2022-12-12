@@ -60,28 +60,16 @@ class CategorieRepository extends ServiceEntityRepository
             ;
     }
 
-//    /**
-//     * @return Categorie[] Returns an array of Categorie objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Categorie
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findAllCategorieByIdProduit($idProduit)
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.produits', 'p')
+            ->where('p.id = :idProduit')
+            ->setParameters([
+                "idProduit" => $idProduit
+            ])
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

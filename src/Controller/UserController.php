@@ -259,7 +259,13 @@ class UserController extends AbstractController
 
         $userRepository->save($user,true);
 
-        return new JsonResponse($user,200);
+        $userArray = [
+            "id" => $user->getId(),
+            "name" => $user->getName(),
+            "surname" => $user->getSurname()
+        ];
+
+        return new JsonResponse($userArray,200);
 
     }
    

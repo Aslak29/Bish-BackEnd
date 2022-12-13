@@ -44,6 +44,7 @@ class ProduitInCommandeRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('pc')
             ->leftJoin( 'pc.commandes', 'c')
             ->where('c.id = :idCommande')
+            -> leftJoin('pc.produits', 'p')
             ->setParameters([
                 "idCommande" => $idCommande
             ])

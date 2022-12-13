@@ -30,8 +30,14 @@ class ProduitInCommandeController extends AbstractController{
                 'id' => $produitInCommande->getId(),
                 'quantite' => $produitInCommande->getQuantite(),
                 'prixUnitaire' => $produitInCommande->getPrice(),
+                'nomProduit' => $produitInCommande->getProduit()->getName(),
+                'remise' => $produitInCommande->getPrice() * $produitInCommande->getProduit()->getPromotions()->getRemise()/100,
+                'remise en %' => $produitInCommande->getProduit()->getPromotions()->getRemise(),
                 'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
-                'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y")
+                'numeroCommande' => $produitInCommande->getCommande()->getId(),
+                'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y"),
+                'Etat' => $produitInCommande->getCommande()->getEtatCommande(),
+                'Nom User' => $produitInCommande->getCommande()->getUser()->getAdresse()->getRue()
             ];
         }
         return new JsonResponse($produitInCommandeArray);

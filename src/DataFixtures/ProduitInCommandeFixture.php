@@ -30,7 +30,7 @@ class ProduitInCommandeFixture extends Fixture implements DependentFixtureInterf
             $produitInCommande->setProduit($produits[rand(0,98)]);
             $produitInCommande->setCommande($commandes[rand(0,8)]);
             $produitInCommande->setQuantite(rand(1,10));
-            $produitInCommande->setPrice($produitInCommande->getProduit()->getPrice() * $produitInCommande->getQuantite());
+            $produitInCommande->setPrice($produitInCommande->getProduit()->getPrice());
 
             $manager->persist($produitInCommande);
         }

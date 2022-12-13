@@ -158,10 +158,7 @@ class UserController extends AbstractController
         }else{
             $user->setRoles(array($role));
         }
-        
-
-
-        
+         
         /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
@@ -211,6 +208,59 @@ class UserController extends AbstractController
            $userRepository -> remove($user,true);
         }
         return new JsonResponse(null,200);
+    }
+
+          /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/{id}/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}', name: 'user_update', methods:"POST")]
+    public function updateUser(UserRepository $userRepository, Request $request,  ValidatorInterface $validator): JsonResponse
+    {
+        $role = $request->attributes->get('roles');
+        $user = $userRepository->find($request->attributes->get('id'));
+        $user->setName($request->attributes->get('name'));
+        $user->setSurname($request->attributes->get('surname'));
+        $user->setEmail($request->attributes->get('email'));
+        $user->setPhone($request->attributes->get('phone'));
+
+        $password = $request->attributes->get('password');
+        $passwordConfirm = $request->attributes->get('passwordConfirm');
+        $user->setPassword($password);
+
+
+        if($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN'){
+            return new JsonResponse([
+                "errorCode" => "008",
+                "errorMessage" => "Le Role n'existe pas"
+                ],409);
+        }else{
+            $user->setRoles(array($role));
+        }
+
+        /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            $errorsString = (string) $errors;
+            return new JsonResponse($errorsString,400);
+        }
+
+        if ($password === $passwordConfirm) {
+            $user->setPassword($this->encoder->hashPassword($user, $user->getPassword()));
+        }else {
+            return new JsonResponse(["error" => "les mots de passe ne sont pas idendiques"],400);
+        }
+
+        $userRepository->save($user,true);
+
+        return new JsonResponse($user,200);
+
     }
    
 }

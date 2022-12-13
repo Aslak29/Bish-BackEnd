@@ -27,6 +27,12 @@ class ProduitInCommande
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ProduitInCommande')]
     private Commande $commandes;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $remise = null;
+
+    #[ORM\Column(length: 10)]
+    private ?string $taille = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +92,30 @@ class ProduitInCommande
     public function setCommande(Commande $commandes): void
     {
         $this->commandes = $commandes;
+    }
+
+    public function getRemise(): ?float
+    {
+        return $this->remise;
+    }
+
+    public function setRemise(?float $remise): self
+    {
+        $this->remise = $remise;
+
+        return $this;
+    }
+
+    public function getTaille(): ?string
+    {
+        return $this->taille;
+    }
+
+    public function setTaille(string $taille): self
+    {
+        $this->taille = $taille;
+
+        return $this;
     }
 
 

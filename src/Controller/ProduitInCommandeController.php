@@ -31,15 +31,25 @@ class ProduitInCommandeController extends AbstractController{
                 'quantite' => $produitInCommande->getQuantite(),
                 'prixUnitaire' => $produitInCommande->getPrice(),
                 'nomProduit' => $produitInCommande->getProduit()->getName(),
-                'remise' => $produitInCommande->getPrice() * $produitInCommande->getProduit()->getPromotions()->getRemise()/100,
-                'remise en %' => $produitInCommande->getProduit()->getPromotions()->getRemise(),
+                'remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
+                'remise en %' => $produitInCommande->getRemise(),
                 'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
-                'numeroCommande' => $produitInCommande->getCommande()->getId(),
-                'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y"),
-                'Etat' => $produitInCommande->getCommande()->getEtatCommande(),
-                'Nom User' => $produitInCommande->getCommande()->getUser()->getAdresse()->getRue()
+                'Taille' => $produitInCommande->getTaille(),
             ];
+            if(end($produitInCommandes)=== $produitInCommande){
+            $infosCommandes[] = [
+                'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y"),
+                'numeroCommande' => $produitInCommande->getCommande()->getId(),
+                'Etat' => $produitInCommande->getCommande()->getEtatCommande(),
+                'Adresse' => [
+                    'ville' => $produitInCommande->getVille(),
+                    'rue' => $produitInCommande->getRue(),
+                    'Code Postal' => $produitInCommande->getCodePostal()
+                ]
+            ];
+            array_push($produitInCommandeArray, $infosCommandes);
         }
+    }
         return new JsonResponse($produitInCommandeArray);
     }
 }

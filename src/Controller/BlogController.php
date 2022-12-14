@@ -50,7 +50,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/{limit}/{offset}', name: 'app_blog', methods: "POST")]
+    #[Route('/{limit}/{offset}', name: 'app_blog_pagination', methods: "POST")]
     public function blogPagination(BlogRepository $blogRepository, Request $request): JsonResponse
     {
         $blogs = $blogRepository->findArticlesLimit($request->attributes->get("limit"), $request->attributes->get("offset"));

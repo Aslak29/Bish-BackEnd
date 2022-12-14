@@ -206,4 +206,14 @@ class ProduitRepository extends ServiceEntityRepository
             ;
     }
 
+    public function findProductByIdPromo($idPromo){
+           return $this->createQueryBuilder('p')
+               ->where('p.promotions = :idPromotion')
+               ->setParameters([
+                   "idPromotion" => $idPromo
+               ])
+               ->getQuery()
+               ->getResult();
+    }
+
 }

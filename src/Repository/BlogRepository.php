@@ -38,12 +38,35 @@ class BlogRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function findArticlesLimit($limit, $offset)
+    {
+        return $this->createQueryBuilder("b")
+                    ->orderBy('b.date', 'DESC')
+                    ->setMaxResults($limit)
+                    ->setFirstResult($offset)
+                    ->getQuery()
+                    ->getResult();
+    }
+    public function countBlog()
+    {
+        return $this->createQueryBuilder("b")
+                    ->select('count(DISTINCT b.id)')
+                    ->getQuery()
+                    ->getSingleResult();
+    }
 
     public function findLastArticle()
     {
         return $this->createQueryBuilder("b")
                     ->orderBy('b.date', 'DESC')
                     ->setMaxResults(1)
+                    ->getQuery()
+                    ->getResult();
+    }
+    public function findOneById()
+    {
+        return $this->createQueryBuilder("b")
+                    ->where('b.id = :articleID')
                     ->getQuery()
                     ->getResult();
     }

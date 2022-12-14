@@ -27,6 +27,21 @@ class ProduitInCommande
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ProduitInCommande')]
     private Commande $commandes;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $remise = null;
+
+    #[ORM\Column(length: 10)]
+    private ?string $taille = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $rue = null;
+
+    #[ORM\Column]
+    private ?int $codePostal = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +101,66 @@ class ProduitInCommande
     public function setCommande(Commande $commandes): void
     {
         $this->commandes = $commandes;
+    }
+
+    public function getRemise(): ?float
+    {
+        return $this->remise;
+    }
+
+    public function setRemise(?float $remise): self
+    {
+        $this->remise = $remise;
+
+        return $this;
+    }
+
+    public function getTaille(): ?string
+    {
+        return $this->taille;
+    }
+
+    public function setTaille(string $taille): self
+    {
+        $this->taille = $taille;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->Ville;
+    }
+
+    public function setVille(string $Ville): self
+    {
+        $this->Ville = $Ville;
+
+        return $this;
+    }
+
+    public function getRue(): ?string
+    {
+        return $this->rue;
+    }
+
+    public function setRue(string $rue): self
+    {
+        $this->rue = $rue;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?int
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(int $codePostal): self
+    {
+        $this->codePostal = $codePostal;
+
+        return $this;
     }
 
 

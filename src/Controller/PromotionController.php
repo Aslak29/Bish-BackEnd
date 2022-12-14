@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Promotions;
@@ -115,6 +114,45 @@ class PromotionController extends AbstractController
             $promotionsRepository->remove($promotion, true);
             return new JsonResponse([
                 "This promotion has been remove"
+            ]);
+        }
+    }
+
+    /**
+     * @param PromotionsRepository $promotionsRepository
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Promotion")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/{id}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['POST'])]
+    public function updatePromotion(PromotionsRepository $promotionsRepository, Request $request): JsonResponse {
+
+        $promotionUpdate = $promotionsRepository->find($request->attributes->get('id'));
+
+        if ($promotionUpdate === null){
+            return new JsonResponse([
+                "errorCode" => "A définir",
+                "errorMessage" => "This promotions dont exist"
+            ]);
+        } else {
+            if ($request->attributes->get('remise') !== "-"){
+                $promotionUpdate->setRemise($request->attributes->get('remise'));
+            }
+            if ($request->attributes->get('datestart') !== "-"){
+                $promotionUpdate->setDateStart(new \DateTime($request->attributes->get('datestart')));
+            }
+            if ($request->attributes->get('dateend') !== "-"){
+                $promotionUpdate->setDateEnd(new \DateTime($request->attributes->get('dateend')));
+            }
+            $promotionsRepository->save($promotionUpdate,true);
+            return new JsonResponse([
+                "sucessCode" => "A définir",
+                "sucessMessage" => "This promotions has been update"
             ]);
         }
     }

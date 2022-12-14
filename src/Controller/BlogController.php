@@ -14,6 +14,33 @@ use Symfony\Component\HttpFoundation\Request;
 #[Route('api/blog')]
 class BlogController extends AbstractController
 {
+/**
+     * @param BlogRepository $blogRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Blog")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/', name: 'app_blog', methods: "GET")]
+    public function index(BlogRepository $blogRepository): JsonResponse
+    {
+        $blogs = $blogRepository->findAll();
+        $blogArray = [];
+
+        foreach ($blogs as $blog ){
+            $blogArray[] = [
+                'id' => $blog->getId(),
+                'title' => $blog->getTitle(),
+                'description' => $blog->getDescription(),
+                'date' => $blog->getDate(),
+                'pathImage' => $blog->getPathImage()
+            ];
+        }
+        return new JsonResponse($blogArray);
+    }
+
     /**
      * @param BlogRepository $blogRepository
      * @return JsonResponse
@@ -24,7 +51,7 @@ class BlogController extends AbstractController
      * )
      */
     #[Route('/{limit}/{offset}', name: 'app_blog', methods: "POST")]
-    public function index(BlogRepository $blogRepository, Request $request): JsonResponse
+    public function blogPagination(BlogRepository $blogRepository, Request $request): JsonResponse
     {
         $blogs = $blogRepository->findArticlesLimit($request->attributes->get("limit"), $request->attributes->get("offset"));
         $count= $blogRepository->countBlog();

@@ -34,7 +34,9 @@ class PromotionController extends AbstractController
         foreach ($promotions as $promotion) {
             $promoArray[] = [
                 'id' => $promotion->getId(),
-                'remise' => $promotion->getRemise()
+                'remise' => $promotion->getRemise(),
+                'start_date' => $promotion->getDateStart()->format("d-m-Y H:i:s"),
+                'end_date' => $promotion->getDateEnd()->format("d-m-Y H:i:s")
             ];
         }
         return new JsonResponse($promoArray, 200);
@@ -51,7 +53,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{remise}/{startdate}/{enddate}', name: 'app_promotion', methods: ['POST'])]
+    #[Route('/add/{remise}/{startdate}/{enddate}', name: 'app_promotion_add', methods: ['POST'])]
     public function addPromotion(PromotionsRepository $promotionsRepository, Request $request, ValidatorInterface $validator): JsonResponse
     {
 

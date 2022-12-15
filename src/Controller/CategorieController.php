@@ -1,8 +1,9 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Categorie;
+use App\GlobalFunction;
+use App\GlobalFunction\FunctionErrors;
 use App\Repository\CategorieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,7 +14,6 @@ use OpenApi\Annotations as OA;
 #[Route('/api/categorie')]
 class CategorieController extends AbstractController
 {
-
     /**
      * @param CategorieRepository $categorieRepository
      * @return JsonResponse
@@ -44,6 +44,7 @@ class CategorieController extends AbstractController
     /**
      * @param CategorieRepository $categorieRepository
      * @param Request $request
+     * @param FunctionErrors $errorCode
      * @return JsonResponse
      * @OA\Tag (name="Categorie")
      * @OA\Response(
@@ -52,7 +53,9 @@ class CategorieController extends AbstractController
      * )
      */
     #[Route('/create/{name}/{trend}/{pathImage}', name: 'app_create_categorie', methods: ['POST'])]
-    public function create(CategorieRepository $categorieRepository, Request $request): JsonResponse
+    public function create(
+        CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
+    ): JsonResponse
     {
         $categorie = new Categorie();
 
@@ -63,10 +66,7 @@ class CategorieController extends AbstractController
         } elseif ($request->attributes->get('trend') === "false") {
             $categorie->setIsTrend(false);
         } else {
-            return new JsonResponse([
-                "errorCode" => "004",
-                "errorMessage" => "is_trend is not boolean !"
-            ], 406);
+            return $errorCode->generateCodeError004();
         }
 
         $categorie->setPathImage($request->attributes->get('pathImage'));
@@ -85,6 +85,7 @@ class CategorieController extends AbstractController
     /**
      * @param CategorieRepository $categorieRepository
      * @param Request $request
+     * @param FunctionErrors $errorCode
      * @return JsonResponse
      * @OA\Tag (name="Categorie")
      * @OA\Response(
@@ -93,7 +94,9 @@ class CategorieController extends AbstractController
      * )
      */
     #[Route('/update/{id}/{name}/{trend}/{pathImage}', name: 'app_update_categorie', methods: ['POST'])]
-    public function update(CategorieRepository $categorieRepository, Request $request): JsonResponse
+    public function update(
+        CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
+    ): JsonResponse
     {
         $categorie = $categorieRepository->find($request->attributes->get('id'));
 
@@ -104,13 +107,77 @@ class CategorieController extends AbstractController
         } elseif ($request->attributes->get('trend') === "false") {
             $categorie->setIsTrend(false);
         } else {
-            return new JsonResponse([
-                "errorCode" => "004",
-                "errorMessage" => "is_trend is not boolean !"
-            ], 406);
+            return $errorCode->generateCodeError004();
         }
 
         $categorie->setPathImage($request->attributes->get('pathImage'));
+
+        $categorieRepository->save($categorie, true);
+
+        $categorieArray = [
+            "id" => $categorie->getId(),
+            "name" => $categorie->getName()
+        ];
+
+        return new JsonResponse($categorieArray, 200);
+    }
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @param FunctionErrors $errorCode
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     * @author
+     */
+    #[Route('/delete/{id}', name: 'app_delete_categorie', methods: ['DELETE'])]
+    public function removeCategory(
+        CategorieRepository $categorieRepository, GlobalFunction\FunctionErrors $errorCode, Request $request
+    ): JsonResponse
+    {
+        $categorie = $categorieRepository->find($request->attributes->get('id'));
+        $categorieRepository->remove($categorie, true);
+
+        return new JsonResponse(null, 200);
+    }
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @param Request $request
+     * @param FunctionErrors $errorCode
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/updateIsTrend/{id}/{isTrend}/',
+        name: 'app_update_category_trend', methods: "POST")]
+    public function updateTrendCategory(
+        CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
+    ): JsonResponse
+    {
+        $categorie = $categorieRepository->find($request->attributes->get('id'));
+
+        if (!$categorie) {
+            return new JsonResponse([
+                "errorCode" => "002",
+                "errorMessage" => "Le produit n'existe pas !"
+            ], 404);
+        }
+
+        if ($request->attributes->get('isTrend') === "true") {
+            $categorie->setIsTrend(true);
+        }elseif ($request->attributes->get('isTrend') === "false") {
+            $categorie->setIsTrend(false);
+        }else {
+            return $errorCode->generateCodeError004();
+        }
 
         $categorieRepository->save($categorie, true);
 
@@ -156,6 +223,4 @@ class CategorieController extends AbstractController
         }
 
     }
-
-
 }

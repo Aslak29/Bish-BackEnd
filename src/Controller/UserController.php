@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use ContainerCiO9nmx\getAdresseRepositoryService;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -177,12 +178,18 @@ class UserController extends AbstractController
                 "errorCode" => "001",
                 "errorMessage" => "L'adresse email est déjà inscrite dans la base de données"
                 ],409);
-        } ;
+        };
 
         $userRepository->save($user,true);
 
+        $userArray = [
+            "id" => $user->getId(),
+            "name" => $user->getName(),
+            "surname" => $user->getSurname()
+        ];
 
-        return new JsonResponse(null,200);
+
+        return new JsonResponse($userArray,200);
     }
 
         /**
@@ -195,19 +202,33 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/delete/{id}', name: 'user_delete', methods:"DELETE")]
+    #[Route('/delete/{id}', name: 'user_delete', methods:"POST")]
     public function deleteUser(UserRepository $userRepository, Request $request): JsonResponse
     {
         $user = $userRepository->findOneById($request->attributes->get('id'));
+        $user->setName("Anonymous");
+        $user->setSurname("Anonymous");
+        $user->setEmail("Anonymous".$request->attributes->get('id'));
+        $user->setPhone("Anonymous");
+        foreach ($user->getAdresse() as $userAdresse){
+                    $userAdresse->setRue("Anonymous");
+        }
+
         if (!$user){
             return new JsonResponse([
                 "errorCode" => "009",
                 "errorMessage" => "L'utilisateur n'existe pas"
             ],404);
         }else{
-           $userRepository -> remove($user,true);
+           $userRepository -> save($user,true);
         }
-        return new JsonResponse(null,200);
+        
+        $userArray = [
+            "id" => $user->getId(),
+            "name" => $user->getName(),
+            "surname" => $user->getSurname()
+        ];
+        return new JsonResponse($userArray,200);
     }
 
           /**

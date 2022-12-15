@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Blog;
 
 #[Route('api/blog')]
 class BlogController extends AbstractController
@@ -117,4 +118,107 @@ class BlogController extends AbstractController
         ];
         return new JsonResponse($blogArray);
     }
+
+// Ajouter un article de blog
+/**
+     * @param BlogRepository $blogRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Blog")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/add/{title}/{description}/{pathImage}', name: 'app_add_blog', methods: "POST")]
+    public function addBlog(BlogRepository $blogRepository, Request $request):JsonResponse
+    {
+        $blog = new Blog();        
+        /* Donnation des valeurs aux attributs de l'article */
+        $blog->setTitle($request->attributes->get('title'));
+        $blog->setDescription($request->attributes->get('description'));
+        $blog->setPathImage($request->attributes->get('pathImage'));
+
+
+        /* Insertion en bdd pour l'article de blog */
+        $blogRepository->save($blog,true);
+
+        $blogArray = [
+            "id" => $blog->getId(),
+            "title" => $blog->getTitle(),
+            "description" => $blog->getDescription(),
+            "date" => $blog->getDate(),
+            "pathImage" => $blog->getPathImage()
+        ];
+
+        return new JsonResponse($blogArray, 200);
+    }
+
+// Update un article de blog
+
+/**
+     * @param BlogRepository $blogRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Blog")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/{id}/{title}/{description}/{pathImage}',
+        name: 'app_update_blog', methods: "POST", requirements: ["description" => ".+"])]
+    public function updateBlog(BlogRepository $blogRepository, Request $request):JsonResponse
+    {
+        $blog = $blogRepository->find($request->attributes->get('id'));
+        $blogRequest= [
+            "title" => $blog->setTitle($request->attributes->get('title')),
+            "description" => $blog->setDescription($request->getContent('description')),
+            "pathImage" => $blog->setPathImage($request->attributes->get('pathImage'))
+        ];
+        echo $blogRequest;
+        $blogRepository->save($blog, true);
+
+        $blogArray = [
+            "id" => $blog->getId(),
+            "title" => $blog->getTitle(),
+            "description" => $blog->getDescription(),
+            "date" => $blog->getDate(),
+            "pathImage" => $blog->getPathImage(),
+        ];
+
+        return new JsonResponse($blogArray, 200);
+    }
+// Supprimer un article de blog
+
+/**
+     * @param BlogRepository $blogRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Blog")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/remove/{id}', name: 'app_delete_blog', methods: ['DELETE'])]
+    public function deleteBlog(BlogRepository $blogRepository, Request $request):JsonResponse
+    {
+        $deleteBlog = $blogRepository->find($request->attributes->get('id'));
+        if($deleteBlog != null){
+            $blogRepository->remove($deleteBlog,true);
+        }else{
+            return new JsonResponse([
+                'errorCode' => "013",
+                'errorMessage' => "Cet article de blog n'existe pas"
+            ],409);
+        }
+        return new JsonResponse([
+            'successCode' => "004",
+            'successMessage' => "Cet article de blog  été supprimé"
+        ],200);
+    }
+
+
+
 }

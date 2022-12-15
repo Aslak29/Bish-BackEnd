@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\PromotionsRepository;
 use DateTime;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -24,6 +25,11 @@ class Promotions
     private ?\DateTimeInterface $date_end = null;
 
     #[ORM\Column]
+    #[Assert\Range(
+        notInRangeMessage: 'You must be between {{ min }}€ and {{ max }}€ to add promotion',
+        min: 0,
+        max: 100,
+    )]
     private ?float $remise = null;
 
     #[ORM\OneToMany(mappedBy: 'promotions', targetEntity: Produit::class)]

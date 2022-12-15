@@ -19,8 +19,8 @@ class ProduitInCommandeController extends AbstractController{
      *     description = "OK"
      * )
      */
-    #[Route('/produitInCommande/{idCommande}', name: 'produit_in_commande', methods:"POST")]
-    public function ProduitInCommande(ProduitInCommandeRepository $produitInCommandeRepository, Request $request): JsonResponse
+    #[Route('/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
+    public function singleOrder(ProduitInCommandeRepository $produitInCommandeRepository, Request $request): JsonResponse
     {
         $produitInCommandes = $produitInCommandeRepository->findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
         

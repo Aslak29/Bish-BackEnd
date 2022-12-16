@@ -130,14 +130,16 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{title}/{description}/{pathImage}', name: 'app_add_blog', methods: "POST")]
+    #[Route('/add', name: 'app_add_blog', methods: "POST")]
     public function addBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $blog = new Blog();        
+        $data = json_decode($request->getContent(), true);
+
         /* Donnation des valeurs aux attributs de l'article */
-        $blog->setTitle($request->attributes->get('title'));
-        $blog->setDescription($request->attributes->get('description'));
-        $blog->setPathImage($request->attributes->get('pathImage'));
+        $blog->setTitle($data['title']);
+        $blog->setDescription($data['description']);
+        $blog->setPathImage($data['pathImage']);
 
 
         /* Insertion en bdd pour l'article de blog */
@@ -151,7 +153,7 @@ class BlogController extends AbstractController
             "pathImage" => $blog->getPathImage()
         ];
 
-        return new JsonResponse($blogArray, 200);
+        return new JsonResponse($data, 200);
     }
 
 // Update un article de blog
@@ -166,17 +168,18 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{title}/{description}/{pathImage}',
-        name: 'app_update_blog', methods: "POST", requirements: ["description" => ".+"])]
+    #[Route('/update',
+        name: 'app_update_blog', methods: "POST")]
     public function updateBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
-        $blog = $blogRepository->find($request->attributes->get('id'));
-        $blogRequest= [
-            "title" => $blog->setTitle($request->attributes->get('title')),
-            "description" => $blog->setDescription($request->getContent('description')),
-            "pathImage" => $blog->setPathImage($request->attributes->get('pathImage'))
-        ];
-        echo $blogRequest;
+        $data = json_decode($request->getContent(), true);
+
+        $blog = $blogRepository->find($data['id']);
+
+        $blog->setTitle($data['title']);
+        $blog->setDescription($data['description']);
+        $blog->setPathImage($data['pathImage']);
+
         $blogRepository->save($blog, true);
 
         $blogArray = [

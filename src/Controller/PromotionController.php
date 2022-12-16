@@ -34,8 +34,8 @@ class PromotionController extends AbstractController
             $promoArray[] = [
                 'id' => $promotion->getId(),
                 'remise' => $promotion->getRemise(),
-                'start_date' => $promotion->getDateStart()->format("d-m-Y H:i:s"),
-                'end_date' => $promotion->getDateEnd()->format("d-m-Y H:i:s")
+                'start_date' => $promotion->getDateStart()->format("Y-m-d H:i:s"),
+                'end_date' => $promotion->getDateEnd()->format("Y-m-d H:i:s")
             ];
         }
         return new JsonResponse($promoArray, 200);
@@ -80,7 +80,8 @@ class PromotionController extends AbstractController
 
         return new JsonResponse([
             "successCode" => "A définir",
-            "successMessage" => "This promotion has been add"
+            "successMessage" => "This promotion has been add",
+            "id" => $newPromotion->getId()
         ]);
     }
 
@@ -152,7 +153,8 @@ class PromotionController extends AbstractController
             $promotionsRepository->save($promotionUpdate,true);
             return new JsonResponse([
                 "sucessCode" => "A définir",
-                "sucessMessage" => "This promotions has been update"
+                "sucessMessage" => "This promotions has been update",
+                "id" => $promotionUpdate->getId()
             ]);
         }
     }

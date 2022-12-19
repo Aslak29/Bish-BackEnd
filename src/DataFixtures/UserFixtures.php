@@ -34,7 +34,7 @@ class UserFixtures extends Fixture
             ->setPhone(0671201001)
             ->setCreatedAt($dt)
         ;
-        $user->setPassword($this->encoder->hashPassword($user, 'admin'));
+        $user->setPassword($this->encoder->hashPassword($user, 'Admin1234'));
         $manager->persist($user);
 
         for ($i = 1; $i < 250; $i++ ){
@@ -47,7 +47,7 @@ class UserFixtures extends Fixture
                 ->setPhone(0671201001)
                 ->setCreatedAt($dt)
             ;
-            $user->setPassword($this->encoder->hashPassword($user, 'pass'));
+            $user->setPassword($this->encoder->hashPassword($user, 'Pass1234'));
             $this->addReference('user_'.$i, $user);
             $manager->persist($user);
         }

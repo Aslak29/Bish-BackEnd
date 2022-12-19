@@ -17,7 +17,7 @@ class Contact
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: false)]
-    #[Assert\Length(min: 50, minMessage: "le message doit contenir minimum 50 caratères !")]
+    #[Assert\Length(min: 20, minMessage: "le message doit contenir minimum 20 caratères !")]
     private ?string $message = null;
 
     #[ORM\Column(length: 255, nullable: false)]

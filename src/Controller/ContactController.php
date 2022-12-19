@@ -58,16 +58,25 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{name}/{surname}/{email}/{message}/{phone}',name : 'app_contact_add' , methods: ['POST'])]
+    #[Route('/add',name : 'app_contact_add' , methods: ['POST'])]
     public function addContact(ContactRepository $contactRepository ,UserRepository $userRepository, Request $request, ValidatorInterface $validator):JsonResponse{
 
-        $contact = new Contact();
-        $contact->setName($request->attributes->get('name'));
-        $contact->setSurname($request->attributes->get('surname'));
-        $contact->setEmail($request->attributes->get('email'));
-        $contact->setMessage($request->attributes->get('message'));
-        $contact->setPhone($request->attributes->get("phone"));
+        $data = json_decode($request->getContent(), true);
 
+        $contact = new Contact();
+        $contact->setName($data['name']);
+        $contact->setSurname($data['surname']);
+        $contact->setEmail($data['email']);
+        $contact->setMessage($data['message']);
+        $contact->setPhone($data['phone']);
+
+        
+        if($data['userId']) {
+            $user = $userRepository->find($data['userId']);
+            if ($user) {
+                $contact->setUser($user);
+            };
+        }
 
         $errors = $validator->validate($contact);
         if (count($errors) > 0) {

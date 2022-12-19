@@ -147,7 +147,6 @@ class ProduitInCommande
     public function setRue(string $rue): self
     {
         $this->rue = $rue;
-
         return $this;
     }
 
@@ -159,10 +158,6 @@ class ProduitInCommande
     public function setCodePostal(int $codePostal): self
     {
         $this->codePostal = $codePostal;
-
         return $this;
     }
-
-
-
 }

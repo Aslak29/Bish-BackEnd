@@ -19,8 +19,8 @@ class ProduitInCommandeController extends AbstractController{
      *     description = "OK"
      * )
      */
-    #[Route('/produitInCommande/{idCommande}', name: 'produit_in_commande', methods:"POST")]
-    public function ProduitInCommande(ProduitInCommandeRepository $produitInCommandeRepository, Request $request): JsonResponse
+    #[Route('/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
+    public function singleOrder(ProduitInCommandeRepository $produitInCommandeRepository, Request $request): JsonResponse
     {
         $produitInCommandes = $produitInCommandeRepository->findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
         
@@ -35,6 +35,7 @@ class ProduitInCommandeController extends AbstractController{
                 'remise en %' => $produitInCommande->getRemise(),
                 'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
                 'Taille' => $produitInCommande->getTaille(),
+                'image' => $produitInCommande->getProduit()->getPathImage(),
             ];
             if(end($produitInCommandes)=== $produitInCommande){
             $infosCommandes[] = [
@@ -44,7 +45,7 @@ class ProduitInCommandeController extends AbstractController{
                 'Adresse' => [
                     'ville' => $produitInCommande->getVille(),
                     'rue' => $produitInCommande->getRue(),
-                    'Code Postal' => $produitInCommande->getCodePostal()
+                    'Code_Postal' => $produitInCommande->getCodePostal()
                 ]
             ];
             array_push($produitInCommandeArray, $infosCommandes);

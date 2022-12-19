@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,9 +10,11 @@ use App\Repository\ProduitInCommandeRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 #[Route('api/produitInCommande')]
-class ProduitInCommandeController extends AbstractController{
-        /**
-     * @param ProduitInCommandeRepository $ProduitInCommandeRepository
+class ProduitInCommandeController extends AbstractController {
+
+    /**
+     * @param ProduitInCommandeRepository $produitInCommandeRepository
+     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="ProduitInCommande")
      * @OA\Response(
@@ -20,12 +23,16 @@ class ProduitInCommandeController extends AbstractController{
      * )
      */
     #[Route('/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
-    public function singleOrder(ProduitInCommandeRepository $produitInCommandeRepository, Request $request): JsonResponse
+    public function singleOrder(
+        ProduitInCommandeRepository $produitInCommandeRepository,
+        Request $request
+    ): JsonResponse
     {
-        $produitInCommandes = $produitInCommandeRepository->findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
+        $produitInCommandes = $produitInCommandeRepository->
+        findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
         
         $produitInCommandeArray = [];
-        foreach($produitInCommandes as $produitInCommande){
+        foreach ($produitInCommandes as $produitInCommande) {
             $produitInCommandeArray[] = [
                 'id' => $produitInCommande->getId(),
                 'quantite' => $produitInCommande->getQuantite(),
@@ -37,18 +44,18 @@ class ProduitInCommandeController extends AbstractController{
                 'Taille' => $produitInCommande->getTaille(),
                 'image' => $produitInCommande->getProduit()->getPathImage(),
             ];
-            if(end($produitInCommandes)=== $produitInCommande){
+            if (end($produitInCommandes)=== $produitInCommande) {
             $infosCommandes[] = [
                 'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y"),
                 'numeroCommande' => $produitInCommande->getCommande()->getId(),
                 'Etat' => $produitInCommande->getCommande()->getEtatCommande(),
                 'Adresse' => [
-                    'ville' => $produitInCommande->getVille(),
-                    'rue' => $produitInCommande->getRue(),
-                    'Code_Postal' => $produitInCommande->getCodePostal()
+                    'ville' => $produitInCommande->getCommande()->getVille(),
+                    'rue' => $produitInCommande->getCommande()->getRue(),
+                    'Code_Postal' => $produitInCommande->getCommande()->getCodePostal()
                 ]
             ];
-            array_push($produitInCommandeArray, $infosCommandes);
+            $produitInCommandeArray[] = $infosCommandes;
         }
     }
         return new JsonResponse($produitInCommandeArray);

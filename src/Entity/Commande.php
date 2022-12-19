@@ -30,6 +30,21 @@ class Commande
     #[ORM\JoinColumn(nullable: false)]
     private ?Collection $ProduitInCommande;
 
+    #[ORM\Column(length: 255)]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $rue = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $codePostal = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $numRue = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $complementAdresse = null;
+
     /**
      * @param DateTimeImmutable $dateFacture
      */
@@ -128,6 +143,66 @@ class Commande
     public function setProduitInCommande(?Collection $ProduitInCommande): void
     {
         $this->ProduitInCommande = $ProduitInCommande;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): self
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getRue(): ?string
+    {
+        return $this->rue;
+    }
+
+    public function setRue(?string $rue): self
+    {
+        $this->rue = $rue;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(string $codePostal): self
+    {
+        $this->codePostal = $codePostal;
+
+        return $this;
+    }
+
+    public function getNumRue(): ?string
+    {
+        return $this->numRue;
+    }
+
+    public function setNumRue(string $numRue): self
+    {
+        $this->numRue = $numRue;
+
+        return $this;
+    }
+
+    public function getComplementAdresse(): ?string
+    {
+        return $this->complementAdresse;
+    }
+
+    public function setComplementAdresse(?string $complementAdresse): self
+    {
+        $this->complementAdresse = $complementAdresse;
+
+        return $this;
     }
 
 

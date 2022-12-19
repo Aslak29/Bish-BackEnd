@@ -18,6 +18,10 @@ class CommandeFixture extends Fixture implements DependentFixtureInterface
             $commande = (new Commande())
                 ->setEtatCommande("En Cours")
                 ->setUser($this->getReference('user_'.$i))
+                ->setNumRue("10")
+                ->setRue("rue du moulin")
+                ->setVille("lille")
+                ->setCodePostal("59000")
             ;
             $this->addReference('commande_'.$i, $commande);
             $manager->persist($commande);

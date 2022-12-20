@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitInCommandeRepository;
 use OpenApi\Annotations as OA;
+use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api/commande')]
 class CommandeController extends AbstractController
@@ -83,4 +85,46 @@ class CommandeController extends AbstractController
         }
         return new JsonResponse($commandeArray);
     }
+     /**
+     * @param CommandeRepository $commandeRepository
+     * @param ProduitInCommandeRepository $produitInCommandeRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}', name: 'app_update_commande', methods:"GET")]
+    public function updateOrder(
+        CommandeRepository $commandeRepository,
+        ProduitInCommandeRepository $produitInCommandeRepository,
+        Request $request
+    ): JsonResponse
+    {
+        $order = $commandeRepository->find($request->attributes->get('orderId'));
+
+        $order->setRue($request->attributes->get('rue'));
+        $order->setNumRue($request->attributes->get('num_rue'));
+        if($request->attributes->get('complement_adresse' )!= 'null'){
+            $order->setComplementAdresse($request->attributes->get('complement_adresse'));    
+        }else{
+            $order->setComplementAdresse(null);
+        };
+        
+        $order->setCodePostal($request->attributes->get('code_postal'));
+        $order->setEtatCommande($request->attributes->get('etat_commande'));
+        
+        $commandeRepository->save($order, true);
+        $orderArray = [
+            "rue" => $order->getRue(),
+            "num_rue" => $order->getNumRue(),
+            "complement_adresse" => $order->getComplementAdresse(),
+            "code_postal" => $order->getCodePostal(),
+            "etat_commande" => $order->getEtatCommande()
+        ];
+
+        return new JsonResponse($orderArray);
+    }
+
 }

@@ -71,42 +71,24 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('/single_order/update{idCommande}', name: 'produit_in_commande', methods:"POST")]
+    #[Route('/single_order/update/{id}/{taille}/{quantite}/{prix}', name: 'update_produit_in_commande', methods:"POST")]
     public function updateSingleOrder(
         ProduitInCommandeRepository $produitInCommandeRepository,
         Request $request
     ): JsonResponse
     {
-        $produitInCommandes = $produitInCommandeRepository->
-        findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
-        
-        $produitInCommandeArray = [];
-        foreach ($produitInCommandes as $produitInCommande) {
-            $produitInCommandeArray[] = [
-                'id' => $produitInCommande->getId(),
-                'quantite' => $produitInCommande->getQuantite(),
-                'prixUnitaire' => $produitInCommande->getPrice(),
-                'nomProduit' => $produitInCommande->getProduit()->getName(),
-                'remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
-                'remise en %' => $produitInCommande->getRemise(),
-                'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
-                'Taille' => $produitInCommande->getTaille(),
-                'image' => $produitInCommande->getProduit()->getPathImage(),
-            ];
-            if (end($produitInCommandes)=== $produitInCommande) {
-            $infosCommandes[] = [
-                'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y"),
-                'numeroCommande' => $produitInCommande->getCommande()->getId(),
-                'Etat' => $produitInCommande->getCommande()->getEtatCommande(),
-                'Adresse' => [
-                    'ville' => $produitInCommande->getCommande()->getVille(),
-                    'rue' => $produitInCommande->getCommande()->getRue(),
-                    'Code_Postal' => $produitInCommande->getCommande()->getCodePostal()
-                ]
-            ];
-            $produitInCommandeArray[] = $infosCommandes;
-        }
-    }
-        return new JsonResponse($produitInCommandeArray);
+        $produitInCommande = $produitInCommandeRepository->find($request->attributes->get('id'));
+        $produitInCommande->setTaille($request->attributes->get('taille'));
+        $produitInCommande->setQuantite($request->attributes->get('quantite'));
+        $produitInCommande->setPrice($request->attributes->get('prix'));
+        $produitInCommandeRepository->save($produitInCommande, true);
+        $produitArray = [
+            "taille" => $produitInCommande->getTaille(),
+            "quantite" => $produitInCommande->getQuantite(),
+            "prix" => $produitInCommande->getPrice(),
+
+        ];
+    
+    return new JsonResponse($produitArray);
     }
 }

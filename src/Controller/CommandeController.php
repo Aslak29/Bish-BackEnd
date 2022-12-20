@@ -8,6 +8,7 @@ use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/api/commande')]
 class CommandeController extends AbstractController
@@ -81,4 +82,52 @@ class CommandeController extends AbstractController
         }
         return new JsonResponse($commandeArray);
     }
+    // RECUPERATION DES COMMANDES D UN UTILISATEUR
+        /**
+     * @param CommandesUserRepository $commandeRepository
+     * @param commandesUserRepository $produitInCommandeRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+        #[Route('/byUser/{id}', name: 'app_commandes_by_user', methods:"POST")]
+    public function findAllCommandesByUser(
+        CommandeRepository $commandeRepository, Request $request
+    ): JsonResponse
+    {
+        $commandesUser = $commandeRepository->findByUserId($request->attributes->get("id"));
+        if (!$commandesUser) {
+                return new JsonResponse([
+                    "errorCode" => "002",
+                    "errorMessage" => "Aucune commande n'existe !"
+                ], 404);
+        }else {
+            $commandesByUserArray = [];
+            foreach ($commandesUser as $oneCommande) {
+                $total = 0;
+                $jsonCommande = [
+                    'id' => $oneCommande->getId(),
+                    'user' => [
+                        'user_id' => $oneCommande->getUser()->getId(),
+                    ],
+
+                    'date_facture' => $oneCommande->getDateFacture()->format("d-m-Y"),
+                    'heure_facture' => $oneCommande->getDateFacture()->format('H:i:s'),
+                    'etatCommande' => $oneCommande->getEtatCommande(),
+                    'montant' => $total
+                ];
+                foreach($oneCommande->getProduitInCommande() as $pc){
+                    $total += $pc->getPrice();
+                }
+                $jsonCommande["montant"]=$total;
+
+                $commandesByUserArray[] = $jsonCommande;
+            }
+        }
+        return new JsonResponse($commandesByUserArray);
+    }
+
 }

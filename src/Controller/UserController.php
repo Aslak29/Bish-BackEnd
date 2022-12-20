@@ -159,7 +159,7 @@ class UserController extends AbstractController
         }else{
             $user->setRoles(array($role));
         }
-         
+        
         /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
@@ -188,7 +188,6 @@ class UserController extends AbstractController
             "surname" => $user->getSurname()
         ];
 
-
         return new JsonResponse($userArray,200);
     }
 
@@ -211,7 +210,7 @@ class UserController extends AbstractController
         $user->setEmail("Anonymous".$request->attributes->get('id'));
         $user->setPhone("Anonymous");
         foreach ($user->getAdresse() as $userAdresse){
-                    $userAdresse->setRue("Anonymous");
+            $userAdresse->setRue("Anonymous");
         }
 
         if (!$user){
@@ -220,7 +219,7 @@ class UserController extends AbstractController
                 "errorMessage" => "L'utilisateur n'existe pas"
             ],404);
         }else{
-           $userRepository -> save($user,true);
+            $userRepository -> save($user,true);
         }
         
         $userArray = [
@@ -231,7 +230,7 @@ class UserController extends AbstractController
         return new JsonResponse($userArray,200);
     }
 
-          /**
+        /**
      * @param UserRepository $userRepository
      * @param Request $request
      * @return JsonResponse
@@ -250,11 +249,9 @@ class UserController extends AbstractController
         $user->setSurname($request->attributes->get('surname'));
         $user->setEmail($request->attributes->get('email'));
         $user->setPhone($request->attributes->get('phone'));
-
         $password = $request->attributes->get('password');
         $passwordConfirm = $request->attributes->get('passwordConfirm');
         $user->setPassword($password);
-
 
         if($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN'){
             return new JsonResponse([
@@ -285,9 +282,6 @@ class UserController extends AbstractController
             "name" => $user->getName(),
             "surname" => $user->getSurname()
         ];
-
         return new JsonResponse($userArray,200);
-
     }
-   
 }

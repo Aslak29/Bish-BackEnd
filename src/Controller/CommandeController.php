@@ -68,12 +68,12 @@ class CommandeController extends AbstractController
                     $jsonCommande['produitInCommande'][] = [
                         "id" =>$produitInCommande->getId(),
                         'quantite' => $produitInCommande->getQuantite(),
-                        'prixUnitaire' => $produitInCommande->getPrice(),
-                        'nomProduit' => $produitInCommande->getProduit()->getName(),
-                        'remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
-                        'remise en %' => $produitInCommande->getRemise(),
+                        'price' => $produitInCommande->getPrice(),
+                        'name' => $produitInCommande->getProduit()->getName(),
+                        'prix_remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
+                        'remise' => $produitInCommande->getRemise(),
                         'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
-                        'Taille' => $produitInCommande->getTaille(),
+                        'taille' => $produitInCommande->getTaille(),
                         'image' => $produitInCommande->getProduit()->getPathImage(),
                     ];
                 }

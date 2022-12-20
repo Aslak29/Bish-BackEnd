@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitInCommandeRepository;
+use App\Repository\ProduitRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,7 +27,7 @@ class CommandeController extends AbstractController
     #[Route('/', name: 'app_commande', methods:"GET")]
     public function findAll(
         CommandeRepository $commandeRepository,
-        ProduitInCommandeRepository $produitInCommandeRepository
+        ProduitInCommandeRepository $produitInCommandeRepository,
     ): JsonResponse
     {
         $commandes = $commandeRepository->findAll();
@@ -60,13 +61,18 @@ class CommandeController extends AbstractController
                     'produitInCommande' => array(),
                     'totalCommande' => null
                 ];
-
+                $i = 0;
                 $produitsInCommande = $produitInCommandeRepository->findOneOrderbyIdCommandes($commande->getId());
                 $totalCommande=0;
                 foreach ($produitsInCommande as $produitInCommande) {
+
                     $totalCommande += $produitInCommande->getQuantite() * $produitInCommande->getPrice();
+
                     $jsonCommande['produitInCommande'][] = [
                         "id" =>$produitInCommande->getId(),
+                        "produit_id" => $produitInCommande->getProduit()->getId(),
+                        "taillesBySyze" => array(),
+                        "taille_produit" => array(),
                         'quantite' => $produitInCommande->getQuantite(),
                         'price' => $produitInCommande->getPrice(),
                         'name' => $produitInCommande->getProduit()->getName(),
@@ -76,8 +82,15 @@ class CommandeController extends AbstractController
                         'taille' => $produitInCommande->getTaille(),
                         'image' => $produitInCommande->getProduit()->getPathImage(),
                     ];
+                    foreach ($produitInCommande->getProduit()->getProduitBySize() as $size) {
+                        $jsonCommande['produitInCommande'][$i]["taille_produit"][] = [
+                            "taille" =>$size->getTaille()->getTaille(),
+                            "stock" =>$size->getStock(),
+                        ];
+                    }
+                    $i++;
                 }
-                $jsonCommande ['totalCommande'] = $totalCommande; 
+                $jsonCommande ['totalCommande'][] = $totalCommande;
                 $commandeArray[] = $jsonCommande;
             }
         }

@@ -95,7 +95,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}', name: 'app_update_commande', methods:"GET")]
+    #[Route('/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}', name: 'app_update_commande', methods:"POST")]
     public function updateOrder(
         CommandeRepository $commandeRepository,
         ProduitInCommandeRepository $produitInCommandeRepository,

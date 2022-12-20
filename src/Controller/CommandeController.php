@@ -140,4 +140,30 @@ class CommandeController extends AbstractController
         return new JsonResponse($orderArray);
     }
 
+      /**
+     * @param CommandeRepository $commandeRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/cancel/{id}', name: 'app_cancel_commande', methods:"POST")]
+    public function cancelOrder(
+        CommandeRepository $commandeRepository,
+        Request $request
+    ): JsonResponse
+    {
+        $order = $commandeRepository->find($request->attributes->get('id'));
+        $order->setEtatCommande("Annulée");
+        
+        $commandeRepository->save($order, true);
+        $orderArray = [
+            "id" => $order->getId()
+        ];
+
+        return new JsonResponse($orderArray);
+    }
+
 }

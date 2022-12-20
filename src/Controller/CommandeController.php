@@ -58,11 +58,13 @@ class CommandeController extends AbstractController
                     'heure_facture' => $commande->getDateFacture()->format('H:i:s'),
                     'etatCommande' => $commande->getEtatCommande(),
                     'produitInCommande' => array(),
+                    'totalCommande' => null
                 ];
 
                 $produitsInCommande = $produitInCommandeRepository->findOneOrderbyIdCommandes($commande->getId());
-
+                $totalCommande=0;
                 foreach ($produitsInCommande as $produitInCommande) {
+                    $totalCommande += $produitInCommande->getQuantite() * $produitInCommande->getPrice();
                     $jsonCommande['produitInCommande'][] = [
                         "id" =>$produitInCommande->getId(),
                         'quantite' => $produitInCommande->getQuantite(),
@@ -75,7 +77,7 @@ class CommandeController extends AbstractController
                         'image' => $produitInCommande->getProduit()->getPathImage(),
                     ];
                 }
-
+                $jsonCommande ['totalCommande'] = $totalCommande; 
                 $commandeArray[] = $jsonCommande;
             }
         }

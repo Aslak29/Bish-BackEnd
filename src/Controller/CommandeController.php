@@ -119,6 +119,7 @@ class CommandeController extends AbstractController
 
         $order->setRue($request->attributes->get('rue'));
         $order->setNumRue($request->attributes->get('num_rue'));
+        $order->setVille($request->attributes->get('ville'));
         if($request->attributes->get('complement_adresse' )!= 'null'){
             $order->setComplementAdresse($request->attributes->get('complement_adresse'));    
         }else{

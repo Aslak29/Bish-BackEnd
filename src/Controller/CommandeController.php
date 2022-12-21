@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitInCommandeRepository;
-use App\Repository\ProduitRepository;
 use OpenApi\Annotations as OA;
-use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -207,8 +205,8 @@ class CommandeController extends AbstractController
                     'etatCommande' => $oneCommande->getEtatCommande(),
                     'montant' => $total
                 ];
-                foreach($oneCommande->getProduitInCommande() as $pc){
-                    $total += $pc->getPrice();
+                foreach ($oneCommande->getProduitInCommande() as $pc) {
+                    $total += $pc->getPrice() * $pc->getQuantite();
                 }
                 $jsonCommande["montant"]=$total;
 

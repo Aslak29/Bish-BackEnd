@@ -30,7 +30,7 @@ class ProduitInCommandeController extends AbstractController {
     {
         $produitInCommandes = $produitInCommandeRepository->
         findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
-        
+
         $produitInCommandeArray = [];
         foreach ($produitInCommandes as $produitInCommande) {
             $produitInCommandeArray[] = [
@@ -71,7 +71,9 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('/single_order/update/{id}/{taille}/{quantite}/{prix}', name: 'update_produit_in_commande', methods:"POST")]
+    #[Route('/single_order/update/{id}/{taille}/{quantite}/{prix}/{idTaille}',
+        name: 'update_produit_in_commande', methods:"POST"
+    )]
     public function updateSingleOrder(
         ProduitInCommandeRepository $produitInCommandeRepository,
         Request $request

@@ -71,7 +71,7 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('/single_order/update/{id}/{taille}/{quantite}/{prix}/{idTaille}',
+    #[Route('/single_order/update/{id}/{taille}/{quantite}/{prix}',
         name: 'update_produit_in_commande', methods:"POST"
     )]
     public function updateSingleOrder(
@@ -104,7 +104,7 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('/single_order/delete/{id}', name: 'delete_produit_in_commande', methods:"POST")]
+    #[Route('/single_order/delete/{id}', name: 'delete_produit_in_commande', methods:"DELETE")]
     public function deleteOneProduct(
         ProduitInCommandeRepository $produitInCommandeRepository,
         Request $request

@@ -51,4 +51,5 @@ class ProduitInCommandeRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
 }

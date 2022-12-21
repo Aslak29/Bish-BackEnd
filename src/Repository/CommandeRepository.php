@@ -38,7 +38,13 @@ class CommandeRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
+    public function findOneById()
+    {
+        return $this->createQueryBuilder("c")
+                    ->where('c.id = :orderID')
+                    ->getQuery()
+                    ->getResult();
+    }
 //    /**
 //     * @return Commande[] Returns an array of Commande objects
 //     */

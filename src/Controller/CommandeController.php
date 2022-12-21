@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitInCommandeRepository;
+use App\Repository\ProduitRepository;
 use OpenApi\Annotations as OA;
+use phpDocumentor\Reflection\Types\Null_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,7 +29,7 @@ class CommandeController extends AbstractController
     #[Route('/', name: 'app_commande', methods:"GET")]
     public function findAll(
         CommandeRepository $commandeRepository,
-        ProduitInCommandeRepository $produitInCommandeRepository
+        ProduitInCommandeRepository $produitInCommandeRepository,
     ): JsonResponse
     {
         $commandes = $commandeRepository->findAll();
@@ -59,33 +61,49 @@ class CommandeController extends AbstractController
                     'heure_facture' => $commande->getDateFacture()->format('H:i:s'),
                     'etatCommande' => $commande->getEtatCommande(),
                     'produitInCommande' => array(),
+                    'totalCommande' => null
                 ];
-
+                $i = 0;
                 $produitsInCommande = $produitInCommandeRepository->findOneOrderbyIdCommandes($commande->getId());
-
+                $totalCommande=0;
                 foreach ($produitsInCommande as $produitInCommande) {
+
+                    $totalCommande += $produitInCommande->getQuantite() * $produitInCommande->getPrice();
+
                     $jsonCommande['produitInCommande'][] = [
                         "id" =>$produitInCommande->getId(),
+                        "produit_id" => $produitInCommande->getProduit()->getId(),
+                        "taillesBySyze" => array(),
+                        "taille_produit" => array(),
                         'quantite' => $produitInCommande->getQuantite(),
-                        'prixUnitaire' => $produitInCommande->getPrice(),
-                        'nomProduit' => $produitInCommande->getProduit()->getName(),
-                        'remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
-                        'remise en %' => $produitInCommande->getRemise(),
+                        'price' => $produitInCommande->getPrice(),
+                        'name' => $produitInCommande->getProduit()->getName(),
+                        'prix_remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
+                        'remise' => $produitInCommande->getRemise(),
                         'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
-                        'Taille' => $produitInCommande->getTaille(),
+                        'taille' => $produitInCommande->getTaille(),
                         'image' => $produitInCommande->getProduit()->getPathImage(),
                     ];
+                    foreach ($produitInCommande->getProduit()->getProduitBySize() as $size) {
+                        $jsonCommande['produitInCommande'][$i]["taille_produit"][] = [
+                            "taille_id" => $size->getTaille()->getId(),
+                            "taille" => $size->getTaille()->getTaille(),
+                            "stock" => $size->getStock(),
+                        ];
+                    }
+                    $i++;
                 }
-
+                $jsonCommande ['totalCommande'][] = $totalCommande;
                 $commandeArray[] = $jsonCommande;
             }
         }
         return new JsonResponse($commandeArray);
     }
-    // RECUPERATION DES COMMANDES D UN UTILISATEUR
-        /**
-     * @param CommandesUserRepository $commandeRepository
-     * @param commandesUserRepository $produitInCommandeRepository
+
+    /**
+     * @param CommandeRepository $commandeRepository
+     * @param ProduitInCommandeRepository $produitInCommandeRepository
+     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Commande")
      * @OA\Response(
@@ -93,17 +111,87 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-        #[Route('/byUser/{id}', name: 'app_commandes_by_user', methods:"POST")]
+    #[Route('/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}',
+        name: 'app_update_commande', methods:"POST")]
+    public function updateOrder(
+        CommandeRepository $commandeRepository,
+        ProduitInCommandeRepository $produitInCommandeRepository,
+        Request $request
+    ): JsonResponse
+    {
+        $order = $commandeRepository->find($request->attributes->get('orderId'));
+
+        $order->setRue($request->attributes->get('rue'));
+        $order->setNumRue($request->attributes->get('num_rue'));
+        $order->setVille($request->attributes->get('ville'));
+        if ($request->attributes->get('complement_adresse' ) != 'null') {
+            $order->setComplementAdresse($request->attributes->get('complement_adresse'));
+        } else {
+            $order->setComplementAdresse(null);
+        }
+        
+        $order->setCodePostal($request->attributes->get('code_postal'));
+        $order->setEtatCommande($request->attributes->get('etat_commande'));
+        
+        $commandeRepository->save($order, true);
+        $orderArray = [
+            "rue" => $order->getRue(),
+            "num_rue" => $order->getNumRue(),
+            "complement_adresse" => $order->getComplementAdresse(),
+            "code_postal" => $order->getCodePostal(),
+            "etat_commande" => $order->getEtatCommande()
+        ];
+
+        return new JsonResponse($orderArray);
+    }
+
+    /**
+     * @param CommandeRepository $commandeRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/cancel/{id}', name: 'app_cancel_commande', methods:"POST")]
+    public function cancelOrder(
+        CommandeRepository $commandeRepository,
+        Request $request
+    ): JsonResponse
+    {
+        $order = $commandeRepository->find($request->attributes->get('id'));
+        $order->setEtatCommande("Annulée");
+        
+        $commandeRepository->save($order, true);
+        $orderArray = [
+            "id" => $order->getId()
+        ];
+
+        return new JsonResponse($orderArray);
+    }
+
+    /**
+     * @param CommandeRepository $commandeRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/byUser/{id}', name: 'app_commandes_by_user', methods:"POST")]
     public function findAllCommandesByUser(
         CommandeRepository $commandeRepository, Request $request
     ): JsonResponse
     {
         $commandesUser = $commandeRepository->findByUserId($request->attributes->get("id"));
         if (!$commandesUser) {
-                return new JsonResponse([
-                    "errorCode" => "002",
-                    "errorMessage" => "Aucune commande n'existe !"
-                ], 404);
+            return new JsonResponse([
+                "errorCode" => "002",
+                "errorMessage" => "Aucune commande n'existe !"
+            ], 404);
         }else {
             $commandesByUserArray = [];
             foreach ($commandesUser as $oneCommande) {

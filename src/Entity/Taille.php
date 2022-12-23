@@ -21,6 +21,10 @@ class Taille
     #[ORM\OneToMany(mappedBy: 'taille', targetEntity: ProduitBySize::class)]
     private Collection $produitBySize;
 
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+
     public function __construct()
     {
         $this->produitBySize = new ArrayCollection();
@@ -72,4 +76,11 @@ class Taille
 
         return $this;
     }
+    //get tailles 
+    public function getType():string{
+        return $this->type;
+    }
+    public function setType(string $newType){
+        $this->type=$newType;
+    } 
 }

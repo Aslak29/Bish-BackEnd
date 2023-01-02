@@ -42,7 +42,7 @@ class ProduitInCommandeController extends AbstractController {
                 'nomProduit' => $produitInCommande->getProduit()->getName(),
                 'remise' => $produitInCommande->getRemise(),
                 'total' => $produitInCommande->getRemise() ? $produitInCommande->getQuantite() * (
-                        $produitInCommande->getPrice() * $produitInCommande->getRemise()/100)
+                    $produitInCommande->getPrice() - $produitInCommande->getPrice() * $produitInCommande->getRemise()/100)
                         : $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
                 'Taille' => $produitInCommande->getTaille(),
                 'image' => $produitInCommande->getProduit()->getPathImage(),

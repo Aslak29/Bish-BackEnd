@@ -29,7 +29,7 @@ class ContactController extends AbstractController
     #[Route('/', name: 'app_contact', methods: ['GET'])]
     public function index(ContactRepository $contactRepository): JsonResponse
     {
-        $contacts =  $contactRepository->findAll();
+        $contacts =  $contactRepository->findAllOrderBy();
         $arrayContacts = [];
 
         foreach ($contacts as $contact){

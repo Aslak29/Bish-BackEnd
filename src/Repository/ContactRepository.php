@@ -38,6 +38,13 @@ class ContactRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function findAllOrderBy()
+    {
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.date','DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
 //    /**
 //     * @return Contact[] Returns an array of Contact objects

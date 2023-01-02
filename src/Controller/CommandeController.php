@@ -206,7 +206,9 @@ class CommandeController extends AbstractController
                     'montant' => $total
                 ];
                 foreach ($oneCommande->getProduitInCommande() as $pc) {
-                    $total += $pc->getPrice() * $pc->getQuantite();
+                    $total += $pc->getRemise() ? $pc->getQuantite() * (
+                              $pc->getPrice() - $pc->getPrice() * $pc->getRemise()/100)
+                            : $pc->getQuantite() * $pc->getPrice();
                 }
                 $jsonCommande["montant"]=$total;
 

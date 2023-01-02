@@ -60,6 +60,14 @@ class CategorieRepository extends ServiceEntityRepository
             ;
     }
 
+    public function getCategorieAvailable()
+    {
+        return $this->createQueryBuilder('c')
+            ->where("c.available = 1")
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findAllCategorieByIdProduit($idProduit)
     {
         return $this->createQueryBuilder('c')

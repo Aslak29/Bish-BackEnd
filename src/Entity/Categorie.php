@@ -30,6 +30,9 @@ class Categorie
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $path_image_trend = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $available = null;
+
     public function __construct()
     {
         $this->produits = new ArrayCollection();
@@ -114,6 +117,18 @@ class Categorie
     public function setPathImageTrend(?string $path_image_trend): self
     {
         $this->path_image_trend = $path_image_trend;
+
+        return $this;
+    }
+
+    public function isAvailable(): ?bool
+    {
+        return $this->available;
+    }
+
+    public function setAvailable(?bool $available): self
+    {
+        $this->available = $available;
 
         return $this;
     }

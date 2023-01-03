@@ -64,38 +64,6 @@ class ProduitInCommandeController extends AbstractController {
         return new JsonResponse($produitInCommandeArray);
     }
 
-    /**
-     * @param ProduitInCommandeRepository $produitInCommandeRepository
-     * @param Request $request
-     * @return JsonResponse
-     * @OA\Tag (name="ProduitInCommande")
-     * @OA\Response(
-     *     response="200",
-     *     description = "OK"
-     * )
-     */
-    #[Route('/single_order/update/{id}/{taille}/{quantite}/{prix}',
-        name: 'update_produit_in_commande', methods:"POST"
-    )]
-    public function updateSingleOrder(
-        ProduitInCommandeRepository $produitInCommandeRepository,
-        Request $request
-    ): JsonResponse
-    {
-        $produitInCommande = $produitInCommandeRepository->find($request->attributes->get('id'));
-        $produitInCommande->setTaille($request->attributes->get('taille'));
-        $produitInCommande->setQuantite($request->attributes->get('quantite'));
-        $produitInCommande->setPrice($request->attributes->get('prix'));
-        $produitInCommandeRepository->save($produitInCommande, true);
-        $produitArray = [
-            "taille" => $produitInCommande->getTaille(),
-            "quantite" => $produitInCommande->getQuantite(),
-            "prix" => $produitInCommande->getPrice(),
-
-        ];
-    
-    return new JsonResponse($produitArray);
-    }
 
     /**
      * @param ProduitInCommandeRepository $produitInCommandeRepository

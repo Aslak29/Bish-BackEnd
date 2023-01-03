@@ -383,6 +383,94 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
+    #[Route('/update/multipleTrend/{trendBool}/',
+        name: 'app_update_multiple_product_trend', methods: "POST")]
+    public function updateMultipleTrendProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach ($data as $id) {
+            $produit = $produitRepository->find($id);
+            $bool = $request->attributes->get('trendBool');
+
+            if (!$produit){
+                return new JsonResponse([
+                    "errorCode" => "002",
+                    "errorMessage" => "Le produit n'existe pas !"
+                ],404);
+            }
+    
+            if ($bool === "true"){
+                $produit->setIsTrend(true);
+            }elseif ($bool === "false"){
+                $produit->setIsTrend(false);
+            }else {
+                return new JsonResponse([
+                    "errorCode" => "004",
+                    "errorMessage" => "trendBool is not boolean !"
+                ],406);
+            }
+    
+            $produitRepository->save($produit,true);
+        }
+    
+        return new JsonResponse(null,200);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/multipleAvailable/{availableBool}/',
+        name: 'app_update_multiple_product_available', methods: "POST")]
+    public function updateMultipleAvailableProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach ($data as $id) {
+            $produit = $produitRepository->find($id);
+            $bool = $request->attributes->get('availableBool');
+
+            if (!$produit){
+                return new JsonResponse([
+                    "errorCode" => "002",
+                    "errorMessage" => "Le produit n'existe pas !"
+                ],404);
+            }
+
+            if ($bool === "true"){
+                $produit->setIsAvailable(true);
+            }elseif ($bool === "false"){
+                $produit->setIsAvailable(false);
+            }else {
+                return new JsonResponse([
+                    "errorCode" => "005",
+                    "errorMessage" => "availableBool is not boolean !"
+                ],406);
+            }
+
+            $produitRepository->save($produit,true);
+        }
+
+        return new JsonResponse(null,200);
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
     #[Route('/update/available/{id}/{availableBool}/',
         name: 'app_update_product_available', methods: "POST")]
     public function updateAvailableProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse

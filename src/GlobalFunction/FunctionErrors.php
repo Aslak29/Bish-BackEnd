@@ -14,6 +14,13 @@ class FunctionErrors
         ], $status);
     }
 
+    public function generateCodeError003():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "003",
+            "errorMessage" => "la catégorie n'éxiste pas !"
+        ], 404);
+    }
     public function generateCodeError004():JsonResponse
     {
         return new JsonResponse([
@@ -21,4 +28,13 @@ class FunctionErrors
             "errorMessage" => "is_trend is not boolean !"
         ], 406);
     }
+
+    public function generateCodeError005():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "005",
+            "errorMessage" => "is_available is not boolean !"
+        ], 406);
+    }
+
 }

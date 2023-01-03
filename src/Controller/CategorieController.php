@@ -26,6 +26,34 @@ class CategorieController extends AbstractController
     #[Route('/', name: 'app_categorie', methods: ['GET'])]
     public function index(CategorieRepository $categorieRepository): JsonResponse
     {
+        $categories = $categorieRepository->getCategorieAvailable();
+        $arrayCategories = [];
+
+        foreach ($categories as $categorie) {
+            $arrayCategories[] = [
+                'id' => $categorie->getId(),
+                'name' => $categorie->getName(),
+                'pathImage' => $categorie->getPathImage(),
+                'isTrend' => $categorie->isIsTrend(),
+                'pathImageTrend' => $categorie->getPathImageTrend(),
+                'countProduit' => count($categorie->getProduits())
+            ];
+        }
+        return new JsonResponse($arrayCategories, 200);
+    }
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/forAdmin', name: 'app_categorie_admin', methods: ['GET'])]
+    public function showAdmin(CategorieRepository $categorieRepository): JsonResponse
+    {
         $categories = $categorieRepository->findAll();
         $arrayCategories = [];
 
@@ -35,6 +63,7 @@ class CategorieController extends AbstractController
                 'name' => $categorie->getName(),
                 'pathImage' => $categorie->getPathImage(),
                 'isTrend' => $categorie->isIsTrend(),
+                'available' => $categorie->isAvailable(),
                 'pathImageTrend' => $categorie->getPathImageTrend()
             ];
         }
@@ -52,7 +81,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/create/{name}/{trend}/{pathImage}', name: 'app_create_categorie', methods: ['POST'])]
+    #[Route('/create/{name}/{trend}/{available}/{pathImage}', name: 'app_create_categorie', methods: ['POST'])]
     public function create(
         CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
     ): JsonResponse
@@ -67,6 +96,14 @@ class CategorieController extends AbstractController
             $categorie->setIsTrend(false);
         } else {
             return $errorCode->generateCodeError004();
+        }
+
+        if ($request->attributes->get('available') === "true") {
+            $categorie->setAvailable(true);
+        }elseif ($request->attributes->get('available') === "false") {
+            $categorie->setAvailable(false);
+        }else {
+            return $errorCode->generateCodeError005();
         }
 
         $categorie->setPathImage($request->attributes->get('pathImage'));
@@ -93,7 +130,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{trend}/{pathImage}', name: 'app_update_categorie', methods: ['POST'])]
+    #[Route('/update/{id}/{name}/{trend}/{available}/{pathImage}', name: 'app_update_categorie', methods: ['POST'])]
     public function update(
         CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
     ): JsonResponse
@@ -108,6 +145,14 @@ class CategorieController extends AbstractController
             $categorie->setIsTrend(false);
         } else {
             return $errorCode->generateCodeError004();
+        }
+
+        if ($request->attributes->get('available') === "true") {
+            $categorie->setAvailable(true);
+        }elseif ($request->attributes->get('available') === "false") {
+            $categorie->setAvailable(false);
+        }else {
+            return $errorCode->generateCodeError005();
         }
 
         $categorie->setPathImage($request->attributes->get('pathImage'));
@@ -165,10 +210,7 @@ class CategorieController extends AbstractController
         $categorie = $categorieRepository->find($request->attributes->get('id'));
 
         if (!$categorie) {
-            return new JsonResponse([
-                "errorCode" => "002",
-                "errorMessage" => "Le produit n'existe pas !"
-            ], 404);
+            return $errorCode->generateCodeError003();
         }
 
         if ($request->attributes->get('isTrend') === "true") {
@@ -177,6 +219,48 @@ class CategorieController extends AbstractController
             $categorie->setIsTrend(false);
         }else {
             return $errorCode->generateCodeError004();
+        }
+
+        $categorieRepository->save($categorie, true);
+
+        $categorieArray = [
+            "id" => $categorie->getId(),
+            "name" => $categorie->getName()
+        ];
+
+        return new JsonResponse($categorieArray, 200);
+    }
+
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @param Request $request
+     * @param FunctionErrors $errorCode
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/updateAvailable/{id}/{available}/',
+        name: 'app_update_category_available', methods: "POST")]
+    public function updateAvailableCategory(
+        CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
+    ): JsonResponse
+    {
+        $categorie = $categorieRepository->find($request->attributes->get('id'));
+
+        if (!$categorie) {
+            return $errorCode->generateCodeError003();
+        }
+
+        if ($request->attributes->get('available') === "true") {
+            $categorie->setAvailable(true);
+        }elseif ($request->attributes->get('available') === "false") {
+            $categorie->setAvailable(false);
+        }else {
+            return $errorCode->generateCodeError005();
         }
 
         $categorieRepository->save($categorie, true);

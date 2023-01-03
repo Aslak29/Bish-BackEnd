@@ -14,34 +14,39 @@ class CategoriesFixtures extends Fixture
         $categorieFemme = (new Categorie())
             ->setName("Femme")
             ->setIsTrend(rand(0, 1))
-            ->setPathImage("femme.png");
+            ->setPathImage("femme.png")
+            ->setAvailable(1);
         $this->addReference('femme', $categorieFemme);
 
 
         $categorieHomme = (new Categorie())
             ->setName("Homme")
             ->setIsTrend(rand(0, 1))
-            ->setPathImage("homme.png");
+            ->setPathImage("homme.png")
+            ->setAvailable(1);
         $this->addReference('homme', $categorieHomme);
 
 
         $categorieFille = (new Categorie())
             ->setName("Fille")
             ->setIsTrend(1)
-            ->setPathImage("fille.png");
+            ->setPathImage("fille.png")
+            ->setAvailable(1);
         $this->addReference('fille', $categorieFille);
 
 
         $categorieGarcon = (new Categorie())
             ->setName("Garçon")
             ->setIsTrend(rand(0, 1))
-            ->setPathImage("garcon.png");
+            ->setPathImage("garcon.png")
+            ->setAvailable(1);
         $this->addReference('garcon', $categorieGarcon);
 
         $categorieBebe = (new Categorie())
             ->setName("Bébé")
             ->setIsTrend(rand(0, 1))
-            ->setPathImage("bebe.png");
+            ->setPathImage("bebe.png")
+            ->setAvailable(1);
         $this->addReference('bebe', $categorieBebe);
 
         $manager->persist($categorieFemme);

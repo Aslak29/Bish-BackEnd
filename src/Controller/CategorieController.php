@@ -35,7 +35,8 @@ class CategorieController extends AbstractController
                 'name' => $categorie->getName(),
                 'pathImage' => $categorie->getPathImage(),
                 'isTrend' => $categorie->isIsTrend(),
-                'pathImageTrend' => $categorie->getPathImageTrend()
+                'pathImageTrend' => $categorie->getPathImageTrend(),
+                'countProduit' => count($categorie->getProduits())
             ];
         }
         return new JsonResponse($arrayCategories, 200);

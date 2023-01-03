@@ -35,7 +35,7 @@ class User implements UserInterface
 
     #[ORM\Column(length: 255)]
     #[Assert\Length(min: 8, max: 255, minMessage: "le mot de passe doit contenir minimum 8 caratères !")]
-    #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@.!%?&]{8,}$/", message: "Le mot de passe doit contenir 1 Majuscule, 1 chiffre et doit contenir 8 caratères")]
+    #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d$@.!\/%?&]{8,}$/", message: "Le mot de passe doit contenir 1 Majuscule, 1 chiffre et doit contenir 8 caratères")]
     private ?string $password = null;
 
     #[ORM\Column]

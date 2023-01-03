@@ -145,7 +145,10 @@ class UserController extends AbstractController
         $user->setName($request->attributes->get('name'));
         $user->setSurname($request->attributes->get('surname'));
         $user->setEmail($request->attributes->get('email'));
-        $user->setPhone($request->attributes->get('phone'));
+
+        if ($request->attributes->get('phone') !== "-"){
+            $user->setPhone($request->attributes->get('phone'));
+        }
 
         $password = $request->attributes->get('password');
         $passwordConfirm = $request->attributes->get('passwordConfirm');
@@ -245,22 +248,53 @@ class UserController extends AbstractController
     {
         $role = $request->attributes->get('roles');
         $user = $userRepository->find($request->attributes->get('id'));
-        $user->setName($request->attributes->get('name'));
-        $user->setSurname($request->attributes->get('surname'));
-        $user->setEmail($request->attributes->get('email'));
-        $user->setPhone($request->attributes->get('phone'));
-        $password = $request->attributes->get('password');
-        $passwordConfirm = $request->attributes->get('passwordConfirm');
-        $user->setPassword($password);
-
-        if($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN'){
+        if ($user === null){
             return new JsonResponse([
-                "errorCode" => "008",
-                "errorMessage" => "Le Role n'existe pas"
-                ],409);
-        }else{
-            $user->setRoles(array($role));
+                "errorMessage" => "This user don't exist "
+            ],409);
         }
+
+        if ($request->attributes->get('name') !== "-"){
+            $user->setName($request->attributes->get('name'));
+        }
+
+        if ($request->attributes->get('surname') !== "-"){
+            $user->setSurname($request->attributes->get('surname'));
+        }
+
+        if ($request->attributes->get('email') !== "-"){
+            $user->setEmail($request->attributes->get('email'));
+        }
+
+        if ($request->attributes->get('phone') !== "-"){
+            $user->setPhone($request->attributes->get('phone'));
+        }else{
+            $user->setPhone(null);
+        }
+
+        if ($request->attributes->get('password') !== "-"){
+            $password = $request->attributes->get('password');
+            $passwordConfirm = $request->attributes->get('passwordConfirm');
+            $user->setPassword($password);
+
+            if ($password === $passwordConfirm) {
+                $user->setPassword($this->encoder->hashPassword($user, $user->getPassword()));
+            }else {
+                return new JsonResponse(["error" => "les mots de passe ne sont pas idendiques"],400);
+            }
+        }
+
+        if ($role !== "-"){
+            if ($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN'){
+                return new JsonResponse([
+                    "errorCode" => "008",
+                    "errorMessage" => "Le Role n'existe pas"
+                ],409);
+            }else{
+                $user->setRoles(array($role));
+            }
+        }
+
 
         /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/
         $errors = $validator->validate($user);
@@ -269,18 +303,12 @@ class UserController extends AbstractController
             return new JsonResponse($errorsString,400);
         }
 
-        if ($password === $passwordConfirm) {
-            $user->setPassword($this->encoder->hashPassword($user, $user->getPassword()));
-        }else {
-            return new JsonResponse(["error" => "les mots de passe ne sont pas idendiques"],400);
-        }
-
         $userRepository->save($user,true);
 
         $userArray = [
             "id" => $user->getId(),
             "name" => $user->getName(),
-            "surname" => $user->getSurname()
+            "surname" => $user->getSurname(),
         ];
         return new JsonResponse($userArray,200);
     }

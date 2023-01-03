@@ -33,6 +33,7 @@ class PromotionController extends AbstractController
         foreach ($promotions as $promotion) {
             $promoArray[] = [
                 'id' => $promotion->getId(),
+                'name' => $promotion->getName(),
                 'remise' => $promotion->getRemise(),
                 'start_date' => $promotion->getDateStart()->format("Y-m-d H:i:s"),
                 'end_date' => $promotion->getDateEnd()->format("Y-m-d H:i:s")
@@ -52,7 +53,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{remise}/{startdate}/{enddate}', name: 'app_promotion_add', methods: ['POST'])]
+    #[Route('/add/{name}/{remise}/{startdate}/{enddate}', name: 'app_promotion_add', methods: ['POST'])]
     public function addPromotion(PromotionsRepository $promotionsRepository, Request $request, ValidatorInterface $validator): JsonResponse
     {
 
@@ -66,6 +67,7 @@ class PromotionController extends AbstractController
             ]);
         } else {
             $newPromotion = new Promotions();
+            $newPromotion->setName($request->attributes->get('name'));
             $newPromotion->setRemise($request->attributes->get('remise'));
             $newPromotion->setDateStart($startDate);
             $newPromotion->setDateEnd($endDate);
@@ -130,7 +132,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['POST'])]
+    #[Route('/update/{id}/{name}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['POST'])]
     public function updatePromotion(PromotionsRepository $promotionsRepository, Request $request): JsonResponse {
 
         $promotionUpdate = $promotionsRepository->find($request->attributes->get('id'));
@@ -141,6 +143,9 @@ class PromotionController extends AbstractController
                 "errorMessage" => "This promotions dont exist"
             ]);
         } else {
+            if ($request->attributes->get('name') !== "-"){
+                $promotionUpdate->setName($request->attributes->get('name'));
+            }
             if ($request->attributes->get('remise') !== "-"){
                 $promotionUpdate->setRemise($request->attributes->get('remise'));
             }

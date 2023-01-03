@@ -18,6 +18,9 @@ class Promotions
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(nullable:true)]
+    private ?string $name = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date_start = null;
 
@@ -44,6 +47,18 @@ class Promotions
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getDateStart(): ?\DateTimeInterface

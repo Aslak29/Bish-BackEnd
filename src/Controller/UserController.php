@@ -128,6 +128,7 @@ class UserController extends AbstractController
                  'roles' => $user->getRoles(),
                  'phone' => $user->getPhone(),
                  'created_at' => $user->getCreatedAt()->format("d-m-Y"),
+                 'disable' => $user->getDisable(),
              ];
              $userArray[] = $jsonProduct;
      }

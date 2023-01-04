@@ -719,21 +719,25 @@ class ProductController extends AbstractController
     public function searchProduitIsTrend(ProduitRepository $produitRepository): JsonResponse
     {
         $produits =  $produitRepository->getProduitIsTrend();
-        shuffle($produits);
-        $arrayProduits = [];
-
-        for($i=0; $i<2; $i++){
-            $arrayProduits[] = [
-                'id' => $produits[$i]->getId(),
-                'name' => $produits[$i]->getName(),
-                'description' => $produits[$i]->getDescription(),
-                'pathImage' => $produits[$i]->getPathImage(),
-                'price' => $produits[$i]->getPrice(),
-                'is_trend' => $produits[$i]->isIsTrend(),
-                'is_available' => $produits[$i]->isIsAvailable()
-            ];
-        }
-        return new JsonResponse($arrayProduits,200);
+        if (count($produits) >= 2) {
+            shuffle($produits);
+            $arrayProduits = [];
+    
+            for($i=0; $i<2; $i++){
+                $arrayProduits[] = [
+                    'id' => $produits[$i]->getId(),
+                    'name' => $produits[$i]->getName(),
+                    'description' => $produits[$i]->getDescription(),
+                    'pathImage' => $produits[$i]->getPathImage(),
+                    'price' => $produits[$i]->getPrice(),
+                    'is_trend' => $produits[$i]->isIsTrend(),
+                    'is_available' => $produits[$i]->isIsAvailable()
+                ];
+            }
+            return new JsonResponse($arrayProduits,200);
+        } else {
+            return new JsonResponse([],200);
+        }  
     }
 
 
@@ -751,17 +755,21 @@ class ProductController extends AbstractController
     public function findBestPromo(ProduitRepository $produitRepository): JsonResponse
     {
         $produit =  $produitRepository->findByBestPromo();
-        $arrayProduits[] = [
-            "id" => $produit[0]->getId(),
-            "name"=>$produit[0]->getName(),
-            "price"=>$produit[0]->getPrice(),
-            "description"=>$produit[0]->getDescription(),
-            "path_image"=>$produit[0]->getPathImage(),
-            "created-at"=>$produit[0]->getCreatedAt(),
-            "is_trend"=>$produit[0]->isIsTrend(),
-            "is_available"=>$produit[0]->isIsAvailable(),
-        ];
-        return new JsonResponse($arrayProduits,200);
+        if(count($produit)> 0) {
+            $arrayProduits[] = [
+                "id" => $produit[0]->getId(),
+                "name"=>$produit[0]->getName(),
+                "price"=>$produit[0]->getPrice(),
+                "description"=>$produit[0]->getDescription(),
+                "path_image"=>$produit[0]->getPathImage(),
+                "created-at"=>$produit[0]->getCreatedAt(),
+                "is_trend"=>$produit[0]->isIsTrend(),
+                "is_available"=>$produit[0]->isIsAvailable(),
+            ];
+            return new JsonResponse($arrayProduits,200);
+        } else {
+            return new JsonResponse([null],200);
+        }
     }
 
     /**

@@ -14,9 +14,10 @@ class CommandeFixture extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
+        $etatCommande = ["En préparation", "En cours de livraison", "Livrée"];
         for ($i = 1; $i < 10; $i++) {
             $commande = (new Commande())
-                ->setEtatCommande("En Cours")
+                ->setEtatCommande($etatCommande[rand(0, 2)])
                 ->setUser($this->getReference('user_'.$i))
                 ->setNumRue("10")
                 ->setRue("rue du moulin")

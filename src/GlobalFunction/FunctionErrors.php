@@ -53,4 +53,19 @@ class FunctionErrors
         ], 404);
     }
 
+    public function generateCodeError014():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "014",
+            "errorMessage" => "L'utilisateur à une commande en cours !"
+        ], 406);
+    }
+    public function generateCodeError015():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "015",
+            "errorMessage" => "L'utilisateur à une commande en préparation !"
+        ], 406);
+    }
+
 }

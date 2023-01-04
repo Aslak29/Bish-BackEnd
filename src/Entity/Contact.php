@@ -43,6 +43,9 @@ class Contact
     #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
+    #[ORM\Column]
+    private bool $isFinish = false;
+
     /**
      * @throws \Exception
      */
@@ -173,5 +176,15 @@ class Contact
         $this->isComplete = $isComplete;
     }
 
+    public function isFinish(): bool
+    {
+        return $this->isFinish;
+    }
+
+    public function setIsFinish(bool $isFinish): self
+    {
+        $this->isFinish = $isFinish;
+        return $this;
+    }
 
 }

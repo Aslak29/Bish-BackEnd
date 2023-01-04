@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Contact;
+use App\GlobalFunction\FunctionErrors;
 use OpenApi\Annotations as OA;
 use App\Repository\ContactRepository;
 use App\Repository\UserRepository;
@@ -40,7 +41,8 @@ class ContactController extends AbstractController
                 'email' => $contact->getEmail(),
                 'phone' => $contact->getPhone(),
                 'date' => $contact->getDate(),
-                'message' => $contact->getMessage()
+                'message' => $contact->getMessage(),
+                'isFinish' => $contact->isFinish()
             ];
         }
         return new JsonResponse($arrayContacts,200);
@@ -126,5 +128,42 @@ class ContactController extends AbstractController
             'successMessage' => "This contact has been remove"
         ],200);
 
+    }
+
+    /**
+     * @param ContactRepository $contactRepository
+     * @param Request $request
+     * @param FunctionErrors $errorCode
+     * @return JsonResponse
+     * @OA\Tag (name="Contact")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update/isFinish/{contactId}/{isFinish}',name: 'app_contact_update_isFinish' , methods:['POST'])]
+    public function updateIsFinish(ContactRepository $contactRepository,Request $request, FunctionErrors $errorCode):JsonResponse
+    {
+        $contact = $contactRepository->find($request->attributes->get('contactId'));
+
+        if (!$contact) {
+            return $errorCode->generateCodeError007();
+        }
+
+        if ($request->attributes->get('isFinish') === "true") {
+            $contact->setIsFinish(true);
+        }elseif ($request->attributes->get('isFinish') === "false") {
+            $contact->setIsFinish(false);
+        }else {
+            return $errorCode->generateCodeError006();
+        }
+
+        $contactRepository->save($contact, true);
+
+        $categorieArray = [
+            "id" => $contact->getId(),
+        ];
+
+        return new JsonResponse($categorieArray, 200);
     }
 }

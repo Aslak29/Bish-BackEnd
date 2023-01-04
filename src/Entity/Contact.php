@@ -33,15 +33,15 @@ class Contact
     #[ORM\Column(length: 255,nullable: false)]
     private ?string $surname = null;
 
-    #[ORM\Column]
-    private bool $isComplete;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'Contacts')]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
+
+    #[ORM\Column]
+    private bool $isFinish = false;
 
     /**
      * @throws \Exception
@@ -157,21 +157,15 @@ class Contact
         $this->surname = $surname;
     }
 
-    /**
-     * @return bool
-     */
-    public function isComplete(): bool
+    public function isFinish(): bool
     {
-        return $this->isComplete;
+        return $this->isFinish;
     }
 
-    /**
-     * @param bool $isComplete
-     */
-    public function setIsComplete(bool $isComplete): void
+    public function setIsFinish(bool $isFinish): self
     {
-        $this->isComplete = $isComplete;
+        $this->isFinish = $isFinish;
+        return $this;
     }
-
 
 }

@@ -86,14 +86,18 @@ class BlogController extends AbstractController
     public function findLastArticle(BlogRepository $blogRepository): JsonResponse
     {
         $blog = $blogRepository->findLastArticle();
-        $blogArray[] = [
-            "id" => $blog[0]->getId(),
-            "title"=>$blog[0]->getTitle(),
-            "description"=>$blog[0]->getDescription(),
-            "date"=>$blog[0]->getDate()->format('d-m-Y'),
-            "path_image"=>$blog[0]->getPathImage(),
-        ];
-        return new JsonResponse($blogArray);
+        if(count($blog) > 0) {
+            $blogArray[] = [
+                "id" => $blog[0]->getId(),
+                "title"=>$blog[0]->getTitle(),
+                "description"=>$blog[0]->getDescription(),
+                "date"=>$blog[0]->getDate()->format('d-m-Y'),
+                "path_image"=>$blog[0]->getPathImage(),
+            ];
+            return new JsonResponse($blogArray);
+        } else {
+            return new JsonResponse([null]);
+        }
     }
 
     /**

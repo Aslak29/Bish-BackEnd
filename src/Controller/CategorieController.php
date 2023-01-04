@@ -287,7 +287,9 @@ class CategorieController extends AbstractController
     public function searchIsTrend(CategorieRepository $categorieRepository): JsonResponse
     {
         $categories = $categorieRepository->getCategorieIsTrend();
-        if (sizeof($categories) !== 0) {
+
+        if(count($categories) > 0) {
+            if (sizeof($categories) !== 0) {
             $arrayCategories = [];
             foreach ($categories as $category) {
                 $arrayCategories[] = [
@@ -299,12 +301,14 @@ class CategorieController extends AbstractController
                 ];
             }
             return new JsonResponse($arrayCategories, 200);
+            } else {
+                return new JsonResponse([
+                    "errorCode" => "A définir",
+                    "errorMessage" => "Aucune catégorie est en tendance"
+                ], 409);
+            }
         } else {
-            return new JsonResponse([
-                "errorCode" => "A définir",
-                "errorMessage" => "Aucune catégorie est en tendance"
-            ], 409);
+            return new JsonResponse([null], 200);
         }
-
     }
 }

@@ -37,4 +37,20 @@ class FunctionErrors
         ], 406);
     }
 
+    public function generateCodeError006():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "006",
+            "errorMessage" => "isFinish is not boolean !"
+        ], 406);
+    }
+
+    public function generateCodeError007():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "007",
+            "errorMessage" => "le contact n'éxiste pas !"
+        ], 404);
+    }
+
 }

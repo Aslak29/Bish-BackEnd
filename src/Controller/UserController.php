@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\GlobalFunction\FunctionErrors;
 use App\Repository\UserRepository;
 use ContainerCiO9nmx\getAdresseRepositoryService;
 use OpenApi\Annotations as OA;
@@ -27,6 +28,7 @@ class UserController extends AbstractController
     /**
      * @param UserRepository $userRepository
      * @param Request $request
+     * @param ValidatorInterface $validator
      * @return JsonResponse
      * @OA\Tag (name="User")
      * @OA\Response(
@@ -34,8 +36,14 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/register/{name}/{surname}/{email}/{password}/{passwordConfirm}', name: 'user_register', methods: ["POST"])]
-    public function register(UserRepository $userRepository, Request $request, ValidatorInterface $validator): JsonResponse{
+    #[Route(
+        '/register/{name}/{surname}/{email}/{password}/{passwordConfirm}',
+        name: 'user_register', methods: ["POST"])]
+    public function register (
+        UserRepository $userRepository,
+        Request $request,
+        ValidatorInterface $validator): JsonResponse
+    {
 
         /* Récupération des attributs dans la requètes POST en les settant à la nouvelle entitée User*/
         $user = new User();
@@ -126,9 +134,10 @@ class UserController extends AbstractController
      return new JsonResponse($userArray);
     }
 
-        /**
+    /**
      * @param UserRepository $userRepository
      * @param Request $request
+     * @param ValidatorInterface $validator
      * @return JsonResponse
      * @OA\Tag (name="User")
      * @OA\Response(
@@ -136,8 +145,13 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/create/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}', name: 'user_create', methods: ["POST"])]
-    public function create(UserRepository $userRepository, Request $request, ValidatorInterface $validator): JsonResponse{
+    #[Route(
+        '/create/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
+        name: 'user_create', methods: ["POST"]
+    )]
+    public function create(
+        UserRepository $userRepository, Request $request, ValidatorInterface $validator): JsonResponse
+    {
 
         $role = $request->attributes->get('roles');
         /* Récupération des attributs dans la requètes POST en les settant à la nouvelle entitée User*/
@@ -154,12 +168,12 @@ class UserController extends AbstractController
         $passwordConfirm = $request->attributes->get('passwordConfirm');
         $user->setPassword($password);
 
-        if($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN'){
+        if ($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN') {
             return new JsonResponse([
                 "errorCode" => "008",
                 "errorMessage" => "Le Role n'existe pas"
-                ],409);
-        }else{
+                ], 409);
+        } else {
             $user->setRoles(array($role));
         }
         
@@ -181,7 +195,7 @@ class UserController extends AbstractController
                 "errorCode" => "001",
                 "errorMessage" => "L'adresse email est déjà inscrite dans la base de données"
                 ],409);
-        };
+        }
 
         $userRepository->save($user,true);
 
@@ -194,8 +208,9 @@ class UserController extends AbstractController
         return new JsonResponse($userArray,200);
     }
 
-        /**
+    /**
      * @param UserRepository $userRepository
+     * @param FunctionErrors $errorsCodes
      * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="User")
@@ -205,37 +220,55 @@ class UserController extends AbstractController
      * )
      */
     #[Route('/delete/{id}', name: 'user_delete', methods:"POST")]
-    public function deleteUser(UserRepository $userRepository, Request $request): JsonResponse
+    public function deleteUser(
+        UserRepository $userRepository,
+        FunctionErrors $errorsCodes,
+        Request $request
+    ): JsonResponse
     {
         $user = $userRepository->findOneById($request->attributes->get('id'));
         $user->setName("Anonymous");
         $user->setSurname("Anonymous");
         $user->setEmail("Anonymous".$request->attributes->get('id'));
         $user->setPhone("Anonymous");
-        foreach ($user->getAdresse() as $userAdresse){
+        foreach ($user->getAdresse() as $userAdresse) {
             $userAdresse->setRue("Anonymous");
         }
+        foreach ($user->getCommandes() as $userCommande) {
+            if ($userCommande->getEtatCommande() === "En préparation") {
+                return $errorsCodes->generateCodeError015();
+            }elseif ($userCommande->getEtatCommande() === "En cours de livraison") {
+                /*Si l'utilisateur à une commande en cours l'erreur 14 est retourné */
+                return $errorsCodes->generateCodeError014();
+            }
+        }
 
-        if (!$user){
+        if (!$user) {
             return new JsonResponse([
                 "errorCode" => "009",
                 "errorMessage" => "L'utilisateur n'existe pas"
-            ],404);
-        }else{
-            $userRepository -> save($user,true);
+            ], 404);
+        }else {
+            foreach ($user->getCommandes() as $userCommande) {
+                $userCommande->setRue(null);
+                $userCommande->setNumRue(null);
+            }
+            $userRepository -> save($user, true);
         }
         
-        $userArray = [
+        $userArray[] = [
             "id" => $user->getId(),
             "name" => $user->getName(),
-            "surname" => $user->getSurname()
+            "surname" => $user->getSurname(),
+            "commande" => array()
         ];
-        return new JsonResponse($userArray,200);
+        return new JsonResponse($userArray, 200);
     }
 
-        /**
+    /**
      * @param UserRepository $userRepository
      * @param Request $request
+     * @param ValidatorInterface $validator
      * @return JsonResponse
      * @OA\Tag (name="User")
      * @OA\Response(
@@ -243,15 +276,19 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}', name: 'user_update', methods:"POST")]
-    public function updateUser(UserRepository $userRepository, Request $request,  ValidatorInterface $validator): JsonResponse
+    #[Route(
+        '/update/{id}/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
+        name: 'user_update', methods:"POST")]
+    public function updateUser(
+        UserRepository $userRepository, Request $request, ValidatorInterface $validator
+    ): JsonResponse
     {
         $role = $request->attributes->get('roles');
         $user = $userRepository->find($request->attributes->get('id'));
-        if ($user === null){
+        if ($user === null) {
             return new JsonResponse([
                 "errorMessage" => "This user don't exist "
-            ],409);
+            ], 409);
         }
 
         if ($request->attributes->get('name') !== "-"){
@@ -284,13 +321,13 @@ class UserController extends AbstractController
             }
         }
 
-        if ($role !== "-"){
+        if ($role !== "-") {
             if ($role !== 'ROLE_USER' && $role !== 'ROLE_ADMIN'){
                 return new JsonResponse([
                     "errorCode" => "008",
                     "errorMessage" => "Le Role n'existe pas"
-                ],409);
-            }else{
+                ], 409);
+            }else {
                 $user->setRoles(array($role));
             }
         }

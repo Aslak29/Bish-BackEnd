@@ -33,13 +33,13 @@ class Commande
     #[ORM\Column(length: 255)]
     private ?string $ville = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $rue = null;
 
     #[ORM\Column(length: 255)]
     private ?string $codePostal = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $numRue = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -186,7 +186,7 @@ class Commande
         return $this->numRue;
     }
 
-    public function setNumRue(string $numRue): self
+    public function setNumRue(?string $numRue): self
     {
         $this->numRue = $numRue;
 

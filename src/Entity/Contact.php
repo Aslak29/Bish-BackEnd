@@ -33,9 +33,6 @@ class Contact
     #[ORM\Column(length: 255,nullable: false)]
     private ?string $surname = null;
 
-    #[ORM\Column]
-    private bool $isComplete;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
@@ -158,22 +155,6 @@ class Contact
     public function setSurname(?string $surname): void
     {
         $this->surname = $surname;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isComplete(): bool
-    {
-        return $this->isComplete;
-    }
-
-    /**
-     * @param bool $isComplete
-     */
-    public function setIsComplete(bool $isComplete): void
-    {
-        $this->isComplete = $isComplete;
     }
 
     public function isFinish(): bool

@@ -248,11 +248,12 @@ class UserController extends AbstractController
                 "errorCode" => "009",
                 "errorMessage" => "L'utilisateur n'existe pas"
             ], 404);
-        }else {
+        }else {   
             foreach ($user->getCommandes() as $userCommande) {
                 $userCommande->setRue(null);
                 $userCommande->setNumRue(null);
             }
+            $user->setDisable(true);
             $userRepository -> save($user, true);
         }
         
@@ -260,7 +261,6 @@ class UserController extends AbstractController
             "id" => $user->getId(),
             "name" => $user->getName(),
             "surname" => $user->getSurname(),
-            "commande" => array()
         ];
         return new JsonResponse($userArray, 200);
     }

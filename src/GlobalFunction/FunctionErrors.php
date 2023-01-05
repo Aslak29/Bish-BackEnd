@@ -84,4 +84,12 @@ class FunctionErrors
         ], 406);
     }
 
+    public function generateCodeError018():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "018",
+            "errorMessage" => "Le produit ne peut pas être supprimé il est dans une commande en préparation !"
+        ], 406);
+    }
+
 }

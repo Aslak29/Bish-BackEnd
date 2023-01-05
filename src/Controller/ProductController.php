@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\GlobalFunction\FunctionErrors;
 use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\PromotionsRepository;
 use App\Repository\TailleRepository;
-use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +36,7 @@ class ProductController extends AbstractController
     {
         $produits = $produitRepository->findAll();
         $produitArray = [];
-        foreach($produits as $produit){
+        foreach ($produits as $produit) {
             $jsonProduct = [
                 'id' => $produit->getId(),
                 'name' => $produit->getName(),
@@ -47,8 +47,10 @@ class ProductController extends AbstractController
                 'is_trend' => $produit->isIsTrend(),
                 'is_available' => $produit->isIsAvailable(),
                 "stockBySize" => null,
-                'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
-                'name_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
+                'id_categorie' =>
+                    $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
+                'name_categorie' =>
+                    $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
                 'noteAverage' => null,
                 'promotion' =>
                     $produit->getPromotions() !== null ? [
@@ -61,7 +63,7 @@ class ProductController extends AbstractController
                         'heure_end' => $produit->getPromotions()->getDateEnd()->format("H:i:s"),
                     ] : [],
             ];
-            foreach ($produit->getProduitBySize() as $size){
+            foreach ($produit->getProduitBySize() as $size) {
                 $jsonProduct['stockBySize'][] = [
                     "taille" =>$size->getTaille()->getTaille(),
                     "stock" =>$size->getStock()
@@ -69,7 +71,7 @@ class ProductController extends AbstractController
             }
             $nbNote = 0;
             $totalNote = 0;
-            foreach ($produit->getNote() as $note){
+            foreach ($produit->getNote() as $note) {
                 $nbNote++;
                 $totalNote += $note->getNote();
             }
@@ -90,15 +92,15 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/find/{id}', name: 'app_produit_by_id', methods:"POST")]
-    public function findProductById(ProduitRepository $produitRepository,Request $request): JsonResponse
+    public function findProductById(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $produit = $produitRepository->findOneById($request->attributes->get('id'));
-        if (!$produit){
+        if (!$produit) {
             return new JsonResponse([
                 "errorCode" => "002",
                 "errorMessage" => "le produit n'existe pas !"
-            ],404);
-        }else{
+            ], 404);
+        }else {
             $produit = $produit[0];
         }
         $produitArray = [
@@ -121,9 +123,9 @@ class ProductController extends AbstractController
                     'heure_start' => $produit[0]->getPromotions()->getDateStart()->format("H:i:s"),
                     'date_end' => $produit[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
                     'heure_end' => $produit[0]->getPromotions()->getDateEnd()->format("H:i:s"),
-                ] : [],     
+                ] : [],
                 ];
-        foreach ($produit[0]->getProduitBySize() as $size){
+        foreach ($produit[0]->getProduitBySize() as $size) {
             $produitArray['stockBySize'][] = [
                 "taille" =>$size->getTaille()->getTaille(),
                 "stock" =>$size->getStock()
@@ -506,10 +508,10 @@ class ProductController extends AbstractController
     }
 
 
-
     /**
      * @param ProduitRepository $produitRepository
      * @param Request $request
+     * @param FunctionErrors $errorsCodes
      * @param ProduitBySizeRepository $produitBySizeRepository
      * @param NoteRepository $noteRepository
      * @return JsonResponse
@@ -520,34 +522,44 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/remove/{id}', name: 'app_delete_product', methods: "DELETE")]
-    public function removeProduit(ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository, NoteRepository $noteRepository):JsonResponse
+    public function removeProduit(
+        ProduitRepository $produitRepository,
+        Request $request,
+        FunctionErrors $errorsCodes,
+        ProduitBySizeRepository $produitBySizeRepository,
+        NoteRepository $noteRepository
+    ):JsonResponse
     {
         $produit = $produitRepository->findOneById($request->attributes->get('id'));
-        if (!$produit){
+        if (!$produit) {
             return new JsonResponse([
                 "errorCode" => "002",
                 "errorMessage" => "le produit n'éxiste pas !"
-            ],404);
-        }else{
+            ], 404);
+        }else {
            $produit = $produit[0][0];
         }
-
-        if ($produit->getProduitInCommande()[0] === null){
-            foreach ($produit->getProduitBySize() as $size ){
-                $produitBySizeRepository-> remove($size, true);
-            }
-            foreach ($produit->getNote() as $note){
-                $noteRepository-> remove($note, true);
-            }
-            $produitRepository->remove($produit, true);
-        } else {
-            return new JsonResponse([
-                "errorCode" => "006",
-                "errorMessage" => "Le produit est en cours de commande !"
-            ],404);
+        $arrayCommande = [];
+        foreach ($produit->getProduitInCommande() as $pc) {
+            $arrayCommande[] = $pc->getCommande()->getEtatCommande();
         }
 
-        return new JsonResponse(null,200);
+        if (in_array("En préparation", $arrayCommande)) {
+            return $errorsCodes->generateCodeError018();
+        }else {
+            foreach ($produit->getProduitBySize() as $size) {
+                $produitBySizeRepository-> remove($size, true);
+            }
+            foreach ($produit->getNote() as $note) {
+                $noteRepository-> remove($note, true);
+            }
+            foreach ($produit->getProduitInCommande() as $pc) {
+                $pc->setProduit(null);
+            }
+            $produitRepository->remove($produit, true);
+        }
+
+        return new JsonResponse(null, 200);
     }
 
      /**

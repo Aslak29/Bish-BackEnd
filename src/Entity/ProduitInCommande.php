@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\ProduitInCommandeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProduitInCommandeRepository::class)]
@@ -22,7 +20,7 @@ class ProduitInCommande
     private ?float $price = null;
 
     #[ORM\ManyToOne(targetEntity: Produit::class, inversedBy: 'ProduitInCommande')]
-    private Produit $produits;
+    private ?Produit $produits;
 
     #[ORM\ManyToOne(targetEntity: Commande::class, inversedBy: 'ProduitInCommande')]
     private Commande $commandes;
@@ -32,6 +30,9 @@ class ProduitInCommande
 
     #[ORM\Column(length: 10)]
     private ?string $taille = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nameProduct = null;
 
     public function getId(): ?int
     {
@@ -63,17 +64,17 @@ class ProduitInCommande
     }
 
     /**
-     * @return Produit
+     * @return Produit|null
      */
-    public function getProduit(): Produit
+    public function getProduit(): ?Produit
     {
         return $this->produits;
     }
 
     /**
-     * @param Produit $produits
+     * @param Produit|null $produits
      */
-    public function setProduit(Produit $produits): void
+    public function setProduit(?Produit $produits): void
     {
         $this->produits = $produits;
     }
@@ -114,6 +115,18 @@ class ProduitInCommande
     public function setTaille(string $taille): self
     {
         $this->taille = $taille;
+
+        return $this;
+    }
+
+    public function getNameProduct(): ?string
+    {
+        return $this->nameProduct;
+    }
+
+    public function setNameProduct(?string $nameProduct): self
+    {
+        $this->nameProduct = $nameProduct;
 
         return $this;
     }

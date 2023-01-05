@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Monolog\DateTimeImmutable;
 use OpenApi\Annotations as OA;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -62,6 +63,10 @@ class User implements UserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
+    
+    #[ORM\Column]
+    private bool $disable = false;
+
 
     public function __construct()
     {
@@ -72,7 +77,6 @@ class User implements UserInterface
         $this->adresse = new ArrayCollection();
         $this->Logs = new ArrayCollection();
         $this->commandes = new ArrayCollection();
-        $this->Relation = new ArrayCollection();
         $this->Note = new ArrayCollection();
         $this->Contacts = new ArrayCollection();
         $this->roles = ["ROLE_USER"];
@@ -330,6 +334,16 @@ class User implements UserInterface
     public function getUsername(): ?string
     {
         return $this->email;
+    }
+
+    public function getDisable(): ?bool{
+        return $this-> disable;
+    }
+    
+    public function setDisable(?bool $disable): self 
+    {
+         $this-> disable = $disable;
+         return $this;
     }
 
     public function __call(string $name, array $arguments)

@@ -68,4 +68,20 @@ class FunctionErrors
         ], 406);
     }
 
+    public function generateCodeError016():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "016",
+            "errorMessage" => "Vous ne pouvez pas annulée une commande en cours de livraison !"
+        ], 406);
+    }
+
+    public function generateCodeError017():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "017",
+            "errorMessage" => "Vous ne pouvez pas annulée une commande livrée !"
+        ], 406);
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\GlobalFunction\FunctionErrors;
 use App\Repository\CommandeRepository;
 use App\Repository\ProduitInCommandeRepository;
 use OpenApi\Annotations as OA;
@@ -145,6 +146,7 @@ class CommandeController extends AbstractController
 
     /**
      * @param CommandeRepository $commandeRepository
+     * @param FunctionErrors $errorsCodes
      * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Commande")
@@ -156,10 +158,18 @@ class CommandeController extends AbstractController
     #[Route('/cancel/{id}', name: 'app_cancel_commande', methods:"POST")]
     public function cancelOrder(
         CommandeRepository $commandeRepository,
+        FunctionErrors $errorsCodes,
         Request $request
     ): JsonResponse
     {
         $order = $commandeRepository->find($request->attributes->get('id'));
+
+        if ($order->getEtatCommande() === "En cours de livraison") {
+            return $errorsCodes->generateCodeError016();
+        }elseif ($order->getEtatCommande() === "Livrée") {
+            return $errorsCodes->generateCodeError017();
+        }
+
         $order->setEtatCommande("Annulée");
         
         $commandeRepository->save($order, true);

@@ -228,42 +228,50 @@ class UserController extends AbstractController
     ): JsonResponse
     {
         $user = $userRepository->findOneById($request->attributes->get('id'));
-        $user->setName("Anonymous");
-        $user->setSurname("Anonymous");
-        $user->setEmail("Anonymous".$request->attributes->get('id'));
-        $user->setPhone("Anonymous");
-        foreach ($user->getAdresse() as $userAdresse) {
-            $userAdresse->setRue("Anonymous");
-        }
-        foreach ($user->getCommandes() as $userCommande) {
-            if ($userCommande->getEtatCommande() === "En préparation") {
-                return $errorsCodes->generateCodeError015();
-            }elseif ($userCommande->getEtatCommande() === "En cours de livraison") {
-                /*Si l'utilisateur à une commande en cours l'erreur 14 est retourné */
-                return $errorsCodes->generateCodeError014();
-            }
-        }
 
-        if (!$user) {
+        if($user->getRoles()[0] == "ROLE_ADMIN") {
             return new JsonResponse([
-                "errorCode" => "009",
-                "errorMessage" => "L'utilisateur n'existe pas"
-            ], 404);
-        }else {   
-            foreach ($user->getCommandes() as $userCommande) {
-                $userCommande->setRue(null);
-                $userCommande->setNumRue(null);
+                "errorCode" => "016",
+                "errorMessage" => "Un administrateur ne peut pas être supprimé"
+                ], 406);
+        } else {
+            $user->setName("Anonymous");
+            $user->setSurname("Anonymous");
+            $user->setEmail("Anonymous".$request->attributes->get('id'));
+            $user->setPhone("Anonymous");
+            foreach ($user->getAdresse() as $userAdresse) {
+                $userAdresse->setRue("Anonymous");
             }
-            $user->setDisable(true);
-            $userRepository -> save($user, true);
+            foreach ($user->getCommandes() as $userCommande) {
+                if ($userCommande->getEtatCommande() === "En préparation") {
+                    return $errorsCodes->generateCodeError015();
+                }elseif ($userCommande->getEtatCommande() === "En cours de livraison") {
+                    /*Si l'utilisateur à une commande en cours l'erreur 14 est retourné */
+                    return $errorsCodes->generateCodeError014();
+                }
+            }
+    
+            if (!$user) {
+                return new JsonResponse([
+                    "errorCode" => "009",
+                    "errorMessage" => "L'utilisateur n'existe pas"
+                ], 404);
+            }else {   
+                foreach ($user->getCommandes() as $userCommande) {
+                    $userCommande->setRue(null);
+                    $userCommande->setNumRue(null);
+                }
+                $user->setDisable(true);
+                $userRepository -> save($user, true);
+            }
+            
+            $userArray[] = [
+                "id" => $user->getId(),
+                "name" => $user->getName(),
+                "surname" => $user->getSurname(),
+            ];
+            return new JsonResponse($userArray, 200);
         }
-        
-        $userArray[] = [
-            "id" => $user->getId(),
-            "name" => $user->getName(),
-            "surname" => $user->getSurname(),
-        ];
-        return new JsonResponse($userArray, 200);
     }
 
     /**

@@ -71,24 +71,28 @@ class CommandeController extends AbstractController
 
                     $jsonCommande['produitInCommande'][] = [
                         "id" =>$produitInCommande->getId(),
-                        "produit_id" => $produitInCommande->getProduit()->getId(),
+                        "produit_id" =>
+                            $produitInCommande->getProduit() ? $produitInCommande->getProduit()->getId() : null,
                         "taillesBySyze" => array(),
                         "taille_produit" => array(),
                         'quantite' => $produitInCommande->getQuantite(),
                         'price' => $produitInCommande->getPrice(),
-                        'name' => $produitInCommande->getProduit()->getName(),
+                        'name' => $produitInCommande->getNameProduct(),
                         'prix_remise' => $produitInCommande->getPrice() * $produitInCommande->getRemise()/100,
                         'remise' => $produitInCommande->getRemise(),
                         'total' => $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
                         'taille' => $produitInCommande->getTaille(),
-                        'image' => $produitInCommande->getProduit()->getPathImage(),
+                        'image' =>
+                            $produitInCommande->getProduit() ? $produitInCommande->getProduit()->getPathImage(): null,
                     ];
-                    foreach ($produitInCommande->getProduit()->getProduitBySize() as $size) {
-                        $jsonCommande['produitInCommande'][$i]["taille_produit"][] = [
-                            "taille_id" => $size->getTaille()->getId(),
-                            "taille" => $size->getTaille()->getTaille(),
-                            "stock" => $size->getStock(),
-                        ];
+                    if ($produitInCommande->getProduit()) {
+                        foreach ($produitInCommande->getProduit()->getProduitBySize() as $size) {
+                            $jsonCommande['produitInCommande'][$i]["taille_produit"][] = [
+                                "taille_id" => $size->getTaille()->getId(),
+                                "taille" => $size->getTaille()->getTaille(),
+                                "stock" => $size->getStock(),
+                            ];
+                        }
                     }
                     $i++;
                 }

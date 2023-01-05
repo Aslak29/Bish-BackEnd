@@ -358,4 +358,24 @@ class UserController extends AbstractController
         ];
         return new JsonResponse($userArray,200);
     }
+
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/getDisableById/{id}', name: 'user_getDisableById', methods: "GET")]
+    public function getDisableById(UserRepository $userRepository, Request $request): JsonResponse
+    {
+        $user = $userRepository->findOneBy(array('id' => $request->attributes->get('id')));
+        $userArray = [
+            'disable' => $user->getDisable()
+        ];
+        return new JsonResponse($userArray);
+    }
 }

@@ -45,15 +45,17 @@ class ProduitRepository extends ServiceEntityRepository
     // WHERE categorie.id = 3
     // AND produit.id = 2;
 
-    public function findAllProductsByIdCateg($idCateg, $id){
+    public function findAllProductsByIdCateg($idCateg, $id)
+    {
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->where('c.id = :idCateg')
             ->join('p.produitBySize', 'ps')
-            ->join('ps.taille','t')
+            ->join('ps.taille', 't')
             ->leftJoin('p.Note', 'pn')
             ->addSelect('avg(pn.note)')
             ->andWhere('p.id != :id')
+            ->andWhere('p.isAvailable = 1')
             ->setParameters([
                 "idCateg" => $idCateg,
                 "id" => $id
@@ -72,6 +74,7 @@ class ProduitRepository extends ServiceEntityRepository
            ->leftJoin('p.Note', 'pn')
            ->addSelect('avg(pn.note)')
            ->where('p.id = :idProduit')
+           ->andWhere('p.isAvailable = 1')
            ->setParameters([
                "idProduit" => $idProduit
            ])
@@ -90,7 +93,8 @@ class ProduitRepository extends ServiceEntityRepository
            ->addSelect('avg(pn.note)')
            ->leftJoin('p.produitBySize', 'ps')
            ->leftJoin('ps.taille', 't')
-           ->where('p.price between :minprice AND :maxprice');
+           ->where('p.price between :minprice AND :maxprice')
+           ->andWhere("p.isAvailable = 1");
             
 
        if ($idCategorie !== "-1") {
@@ -104,7 +108,7 @@ class ProduitRepository extends ServiceEntityRepository
 
        if ($orderby == "ASC") {
            $qb->orderBy('p.price', 'ASC');
-       } else if ($orderby == "DESC") {
+       } elseif ($orderby == "DESC") {
            $qb->orderBy('p.price', 'DESC');
        }
 
@@ -117,8 +121,8 @@ class ProduitRepository extends ServiceEntityRepository
                'maxprice' => $maxprice,
                'idCategorie' => $idCategorie,
            ]);
-           if ($size !== "none"){
-               $qb->setParameter('size',$size);
+           if ($size !== "none") {
+               $qb->setParameter('size', $size);
            }
        } else {
            $qb->setParameters([
@@ -126,7 +130,7 @@ class ProduitRepository extends ServiceEntityRepository
                'maxprice' => $maxprice,
            ]);
            if ($size !== "none"){
-               $qb->setParameter('size',$size);
+               $qb->setParameter('size', $size);
            }
        }
        $qb->groupBy('p.id');
@@ -136,6 +140,7 @@ class ProduitRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('p')
                     ->where("p.isTrend = 1")
+                    ->andWhere("p.isAvailable = 1")
                     ->getQuery()
                     ->getResult();
     }
@@ -144,6 +149,7 @@ class ProduitRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
                     ->join('p.promotions', 'promo')
                     ->where("p.promotions= promo.id")
+                    ->andWhere("p.isAvailable = 1")
                     ->orderBy("promo.remise", "DESC")
                     ->setMaxResults(1)
                     ->getQuery()
@@ -157,6 +163,7 @@ class ProduitRepository extends ServiceEntityRepository
        $qb = $this->createQueryBuilder('p')
            ->select('count(DISTINCT p.id)')
            ->where('p.price between :minprice AND :maxprice')
+           ->andWhere("p.isAvailable = 1")
            ->leftJoin('p.produitBySize', 'ps')
            ->leftJoin('ps.taille', 't');
 
@@ -164,13 +171,13 @@ class ProduitRepository extends ServiceEntityRepository
            $qb->leftJoin('p.categories', 'c');
            $qb->andWhere('c.id = :idCategorie');
        }
-       if ($size !== "none"){
+       if ($size !== "none") {
            $qb->andWhere('t.taille = :size AND ps.stock > 0');
        }
 
        if ($orderby == "ASC") {
            $qb->orderBy('p.price', 'ASC');
-       } else if ($orderby == "DESC") {
+       } elseif ($orderby == "DESC") {
            $qb->orderBy('p.price', 'DESC');
        }
 
@@ -180,8 +187,8 @@ class ProduitRepository extends ServiceEntityRepository
                'maxprice' => $maxprice,
                'idCategorie' => $idCategorie
            ]);
-           if ($size !== "none"){
-               $qb->setParameter('size',$size);
+           if ($size !== "none") {
+               $qb->setParameter('size', $size);
            }
        } else {
            $qb->setParameters([
@@ -189,26 +196,30 @@ class ProduitRepository extends ServiceEntityRepository
                'maxprice' => $maxprice,
            ]);
            if ($size !== "none"){
-               $qb->setParameter('size',$size);
+               $qb->setParameter('size', $size);
            }
        }
 
     return $qb->getQuery()->getResult();
    }
 
-    public function findProductPromo(){
+    public function findProductPromo()
+    {
         return $this->createQueryBuilder('p')
             ->join('p.categories', 'c')
             ->join('p.promotions', 'pp')
+            ->where("p.isAvailable = 1")
             ->addSelect('c,pp')
             ->getQuery()
             ->getResult()
             ;
     }
 
-    public function findProductByIdPromo($idPromo){
+    public function findProductByIdPromo($idPromo)
+    {
            return $this->createQueryBuilder('p')
                ->where('p.promotions = :idPromotion')
+               ->andWhere("p.isAvailable = 1")
                ->setParameters([
                    "idPromotion" => $idPromo
                ])

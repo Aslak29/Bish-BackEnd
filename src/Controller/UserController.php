@@ -378,4 +378,39 @@ class UserController extends AbstractController
         ];
         return new JsonResponse($userArray);
     }
+
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/stats/register/{year}', name: 'app_user_stats_register', methods: ['POST'])]
+    public function getUserSign(UserRepository $userRepository, Request $request):JsonResponse
+    {
+        $year = $request->attributes->get('year');
+        $data = $userRepository->getUserSignByYear($year);
+        $dateJson = [
+            "Janvier" => $data[0][1],
+            "Février" => $data[1][1],
+            "Mars" => $data[2][1],
+            "Avril" => $data[3][1],
+            "Mai" => $data[4][1],
+            "Juin" => $data[5][1],
+            "Juillet" => $data[6][1],
+            "Août" => $data[7][1],
+            "Septembre" => $data[8][1],
+            "Octobre" => $data[9][1],
+            "Novembre" => $data[10][1],
+            "Décembre" => $data[11][1],
+        ];
+
+
+
+        return new JsonResponse($dateJson);
+    }
 }

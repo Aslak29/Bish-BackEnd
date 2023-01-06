@@ -5,6 +5,7 @@ use App\Entity\Categorie;
 use App\GlobalFunction;
 use App\GlobalFunction\FunctionErrors;
 use App\Repository\CategorieRepository;
+use phpDocumentor\Reflection\Types\Void_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class CategorieController extends AbstractController
         $categories = $categorieRepository->getCategorieAvailable();
         $arrayCategories = [];
 
+        $i = 0;
         foreach ($categories as $categorie) {
             $arrayCategories[] = [
                 'id' => $categorie->getId(),
@@ -36,8 +38,19 @@ class CategorieController extends AbstractController
                 'pathImage' => $categorie->getPathImage(),
                 'isTrend' => $categorie->isIsTrend(),
                 'pathImageTrend' => $categorie->getPathImageTrend(),
-                'countProduit' => count($categorie->getProduits())
+                'countProduitAvailable' => null
             ];
+
+            $countProduit = [];
+            foreach ($categorie->getProduits() as $produit) {
+                if ($produit->isIsAvailable()) {
+                    $countProduit[] = $produit;
+                }
+            }
+
+            $arrayCategories[$i]['countProduit'] = count($countProduit);
+
+            $i++;
         }
         return new JsonResponse($arrayCategories, 200);
     }

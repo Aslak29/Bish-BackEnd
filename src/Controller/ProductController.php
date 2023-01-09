@@ -50,6 +50,7 @@ class ProductController extends AbstractController
                 'id_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getId(),
                 'name_categorie' => $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
                 'noteAverage' => null,
+                'inCommande' => $produit->getProduitInCommande()[0] === null ? false : true,
                 'promotion' =>
                     $produit->getPromotions() !== null ? [
                         'id' => $produit->getPromotions()->getId(),
@@ -787,5 +788,51 @@ class ProductController extends AbstractController
         $countProduit = $produitRepository->countProduit();
         return new JsonResponse($countProduit[0]);
 
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @param ProduitBySizeRepository $produitBySizeRepository
+     * @param NoteRepository $noteRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleRemove', name: 'app_multiple_delete_product', methods: "POST")]
+    public function multipleRemoveProduit(ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository, NoteRepository $noteRepository):JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $produit = $produitRepository->findOneById($id);
+            if (!$produit){
+                return new JsonResponse([
+                    "errorCode" => "002",
+                    "errorMessage" => "le produit n'éxiste pas !"
+                ],404);
+            }else{
+               $produit = $produit[0][0];
+            }
+
+            if ($produit->getProduitInCommande()[0] === null){
+                foreach ($produit->getProduitBySize() as $size ){
+                    $produitBySizeRepository-> remove($size, true);
+                }
+                foreach ($produit->getNote() as $note){
+                    $noteRepository-> remove($note, true);
+                }
+                $produitRepository->remove($produit, true);
+            } else {
+                return new JsonResponse([
+                    "errorCode" => "006",
+                    "errorMessage" => "Le produit est en cours de commande !"
+                ],404);
+            }
+        }
+        return new JsonResponse(null,200);
     }
 }

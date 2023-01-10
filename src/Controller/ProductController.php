@@ -65,10 +65,7 @@ class ProductController extends AbstractController
                     ] : [],
             ];
             foreach ($produit->getProduitBySize() as $size) {
-                $jsonProduct['stockBySize'][] = [
-                    "taille" =>$size->getTaille()->getTaille(),
-                    "stock" =>$size->getStock()
-                ];
+                $jsonProduct['stockBySize'][$size->getTaille()->getTaille()] = $size->getStock();
             }
             $nbNote = 0;
             $totalNote = 0;
@@ -143,92 +140,100 @@ class ProductController extends AbstractController
      * @param CategorieRepository $categorieRepository
      * @param PromotionsRepository $promotionsRepository
      * @param Request $request
+     * @param FunctionErrors $errorsCode
      * @return JsonResponse
      * @OA\Tag (name="Produit")
      * @OA\Response(
      *     response="200",
      *     description = "OK"
      * )
+     *
      */
-    #[Route('/add/{name}/{description}/{pathImage}/{idCategorie}/{promotion}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
-        name: 'app_add_product', methods: "POST")]
+    #[Route('/add', name: 'app_add_product', methods: "POST")]
     public function addProduit(
         ProduitRepository $produitRepository,ProduitBySizeRepository $produitBySizeRepo,
         TailleRepository $tailleRepository,CategorieRepository $categorieRepository,
-        PromotionsRepository $promotionsRepository, Request $request
+        PromotionsRepository $promotionsRepository, Request $request, FunctionErrors $errorsCode
     ):JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $errorsCode->generateCodeError002();
+        }
+
         $produit = new Produit();
         /* Récupération de toutes les tailles en bdd */
-        $tailles = $tailleRepository->findAll();
+        $tailles = $tailleRepository->findTypeSyze($data["typeTaille"]);
         /* Récupération de la catégorie demandée par rapport à son id en bdd */
-        $categorie = $categorieRepository->findOneById($request->attributes->get('idCategorie'));
-        $promo = $promotionsRepository->find($request->attributes->get('promotion'));
+        $categorie = $categorieRepository->findOneById($data['categorie']);
+        $promo = $promotionsRepository->find($data['promotion']);
         /* Donnation des valeurs aux attributs du produit */
-        $produit->setName($request->attributes->get('name'));
-        $produit->setDescription($request->attributes->get('description'));
-        $produit->setPathImage($request->attributes->get('pathImage'));
-        $produit->setPrice(floatval($request->attributes->get('price')));
+        $produit->setName($data['name']);
+        $produit->setDescription($data['description']);
+        $produit->setPathImage($data['infoFile']);
+        $produit->setPrice(floatval($data['price']));
 
         /* Vérifier si is_trend est bien un boolean */
-        if ($request->attributes->get('is_trend') === "true"){
+        if ($data['trend'] === true) {
             $produit->setIsTrend(true);
-        }elseif ($request->attributes->get('is_trend') === "false"){
+        }elseif ($data['trend'] === false) {
             $produit->setIsTrend(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "004",
                 "errorMessage" => "is_trend is not boolean !"
-            ],406);
+            ], 406);
         }
         /* Vérifier si is_available est bien un boolean */
-        if ($request->attributes->get('is_available') === "true"){
+        if ($data['available'] === true) {
             $produit->setIsAvailable(true);
-        }elseif ($request->attributes->get('is_available') === "false"){
+        }elseif ($data['available'] === false) {
             $produit->setIsAvailable(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "005",
                 "errorMessage" => "is_available is not boolean !"
-            ],406);
+            ], 406);
         }
         /* Vérifier si la catégorie existe bien en bdd pour faire la relation */
-        if (!$categorie){
+        if (!$categorie) {
             return new JsonResponse([
                 "errorCode" => "003",
                 "errorMessage" => "la catégorie n'éxiste pas !"
-            ],404);
+            ], 404);
         }else {
             $produit->addCategory($categorie[0]);
         }
         /* Vérifier si la promotion existe bien en bdd pour faire la relation */
-        if ($request->attributes->get('promotion') === '-'){
+        if ($data['promotion'] === '-') {
             $produit->setPromotions(null);
-        } else if (!$promo) {
+        } elseif (!$promo) {
             return new JsonResponse([
                 "errorCode" => "007",
                 "errorMessage" => "la promotion n'existe pas !"
-            ],404);
+            ], 404);
         } else {
             $produit->setPromotions($promo);
         }
         /* Première insertion en bdd pour le produit */
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
-        foreach ($tailles as $taille){
+        foreach ($tailles as $taille) {
             $produitBySize = new ProduitBySize();
             $produitBySize->setTaille($taille);
-            $produitBySize->setStock(floatval($request->attributes->get($taille->getTaille())));
+            $produitBySize->setStock(floatval($data["stock"][$taille->getTaille()]));
             $produitBySize->setProduit($produit);
             $produit->addProduitBySize($produitBySize);
             $produitBySizeRepo->save($produitBySize, true);
         }
         /* Deuxième insertion en bdd pour effectuer la relation des tailles pour le produit crée */
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
         $produitArray = [
             "id" => $produit->getId(),
-            "name" => $produit->getName()
+            "name" => $produit->getName(),
+            "res" => dump($data)
         ];
 
         return new JsonResponse($produitArray);
@@ -240,7 +245,6 @@ class ProductController extends AbstractController
      * @param CategorieRepository $categorieRepository
      * @param PromotionsRepository $promotionsRepository
      * @param ProduitBySizeRepository $produitBySizeRepo
-     * @param TailleRepository $tailleRepository
      * @return JsonResponse
      * @OA\Tag (name="Produit")
      * @OA\Response(
@@ -248,88 +252,89 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{description}/{pathImage}/{idCategorie}/{promotion}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
+    #[Route('/update',
         name: 'app_update_product', methods: "POST")]
     public function updateProduit(
         ProduitRepository $produitRepository, Request $request,CategorieRepository $categorieRepository,PromotionsRepository
         $promotionsRepository,ProduitBySizeRepository $produitBySizeRepo):JsonResponse
     {
-        $produit = $produitRepository->find($request->attributes->get('id'));
+        $data = json_decode($request->getContent(), true);
 
-        if (!$produit){
+        $produit = $produitRepository->find($data["id"]);
+
+        if (!$produit) {
             return new JsonResponse([
                 "errorCode" => "002",
                 "errorMessage" => "Le produit n'existe pas !"
-            ],404);
+            ], 404);
         }
 
-        $categorie = $categorieRepository->find($request->attributes->get('idCategorie'));
-        $promotion = $promotionsRepository->find($request->attributes->get('promotion'));
+        $categorie = $categorieRepository->find($data['categorie']);
+        $promotion = $promotionsRepository->find($data['promotion']);
 
-        $produit->setName($request->attributes->get('name'));
-        $produit->setDescription($request->attributes->get('description'));
-        $produit->setPathImage($request->attributes->get('pathImage'));
-        $produit->setPrice(floatval($request->attributes->get('price')));
+        $produit->setName($data['name']);
+        $produit->setDescription($data['description']);
+        $produit->setPathImage($data['infoFile']);
+        $produit->setPrice(floatval($data['price']));
 
-        if ($request->attributes->get('is_trend') === "true"){
+        if ($data['trend'] === true) {
             $produit->setIsTrend(true);
-        }elseif ($request->attributes->get('is_trend') === "false"){
+        }elseif ($data['trend'] === false) {
             $produit->setIsTrend(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "004",
                 "errorMessage" => "is_trend is not boolean !"
-            ],406);
+            ], 406);
         }
-        if ($request->attributes->get('is_available') === "true"){
+        if ($data['available'] === true) {
             $produit->setIsAvailable(true);
-        }elseif ($request->attributes->get('is_available') === "false"){
+        }elseif ($data['available'] === false) {
             $produit->setIsAvailable(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "005",
                 "errorMessage" => "is_available is not boolean !"
-            ],406);
+            ], 406);
         }
-        if (!$categorie && ($request->attributes->get('idCategorie') !== '-')){
+        if (!$categorie && ($data['categorie'] !== '-')) {
             return new JsonResponse([
                 "errorCode" => "003",
                 "errorMessage" => "La catégorie n'existe pas !"
-            ],404);
+            ], 404);
         }else {
-            foreach ($produit->getCategories() as $cat){
+            foreach ($produit->getCategories() as $cat) {
                 $produit->removeCategory($cat);
             }
-            if ($request->attributes->get('idCategorie') !== '-') {
+            if ($data['categorie'] !== '-') {
                 $produit->addCategory($categorie);
             }
         }
-        if ($request->attributes->get('promotion') === '-'){
+        if ($data['promotion'] === '-') {
             $produit->setPromotions(null);
-        }elseif (!$promotion){
+        }elseif (!$promotion) {
             return new JsonResponse([
                 "errorCode" => "007",
                 "errorMessage" => "La promotion n'existe pas !"
-            ],404);
+            ], 404);
         }else {
             $produit->setPromotions($promotion);
         }
 
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
-        foreach ($produit->getProduitBySize() as $ps)
-        {
-            $ps->setStock(floatval($request->attributes->get($ps->getTaille()->getTaille())));
-            $produitBySizeRepo->save($ps,true);
+        foreach ($produit->getProduitBySize() as $ps) {
+            $ps->setStock(floatval($data['stock'][$ps->getTaille()->getTaille()]));
+            $produitBySizeRepo->save($ps, true);
         }
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
         $produitArray = [
             "id" => $produit->getId(),
             "name" => $produit->getName()
         ];
 
-        return new JsonResponse($produitArray,200);
+        return new JsonResponse($produitArray, 200);
     }
 
     /**

@@ -11,8 +11,8 @@ class TailleFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $tabTaille = array('xs','s','m','l','xl');
-        $tabTailleNourrisson = array('2 mois','4 mois','6 mois','l an','2 ans');
-        $tabTailleEnfant = array('6 ans', '8 ans', '10 ans','12 ans','14 ans');
+        $tabTailleNourrisson = array('2M','4M','6M','1A','2A');
+        $tabTailleEnfant = array('6A', '8A', '10A', '12A', '14A');
 
         for ($i = 0; $i < count($tabTaille); $i++) {
             $taille = new Taille();

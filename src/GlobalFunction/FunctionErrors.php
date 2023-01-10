@@ -14,6 +14,14 @@ class FunctionErrors
         ], $status);
     }
 
+    public function generateCodeError002():JsonResponse
+    {
+        return new JsonResponse([
+            "errorCode" => "002",
+            "errorMessage" => "le produit n'éxiste pas !"
+        ], 404);
+    }
+
     public function generateCodeError003():JsonResponse
     {
         return new JsonResponse([

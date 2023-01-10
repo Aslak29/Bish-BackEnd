@@ -7,6 +7,7 @@ use App\GlobalFunction\FunctionErrors;
 use App\Repository\UserRepository;
 use ContainerCiO9nmx\getAdresseRepositoryService;
 use OpenApi\Annotations as OA;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -408,9 +409,25 @@ class UserController extends AbstractController
             "Novembre" => $data[10][1],
             "Décembre" => $data[11][1],
         ];
-
-
-
         return new JsonResponse($dateJson);
+    }
+
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/stats/count', name: 'app_user_stats_count', methods: ['GET'])]
+    public function countUser(UserRepository $userRepository, Request $request): JsonResponse{
+
+        $count = $userRepository->countUser();
+        return new JsonResponse([
+            "countUser" => $count[0][1]
+        ]);
     }
 }

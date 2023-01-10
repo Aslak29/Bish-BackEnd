@@ -198,7 +198,7 @@ class BlogController extends AbstractController
     }
 // Supprimer un article de blog
 
-/**
+    /**
      * @param BlogRepository $blogRepository
      * @param Request $request
      * @return JsonResponse
@@ -226,6 +226,34 @@ class BlogController extends AbstractController
         ],200);
     }
 
+    /**
+     * @param BlogRepository $blogRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Blog")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleRemove', name: 'app_multiple_delete_blog', methods: ['POST'])]
+    public function multipleDeleteBlog(BlogRepository $blogRepository, Request $request):JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
 
+        foreach($data as $id) {
+            $deleteBlog = $blogRepository->find($id);
+            if($deleteBlog != null){
+                $blogRepository->remove($deleteBlog,true);
+            }else{
+                return new JsonResponse([
+                    'errorCode' => "013",
+                    'errorMessage' => "Cet article de blog n'existe pas"
+                ],409);
+            }
+        }
+        return new JsonResponse(null,200);
+
+    }
 
 }

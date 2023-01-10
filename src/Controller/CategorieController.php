@@ -5,6 +5,7 @@ use App\Entity\Categorie;
 use App\GlobalFunction;
 use App\GlobalFunction\FunctionErrors;
 use App\Repository\CategorieRepository;
+use phpDocumentor\Reflection\Types\Void_;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ class CategorieController extends AbstractController
         $categories = $categorieRepository->getCategorieAvailable();
         $arrayCategories = [];
 
+        $i = 0;
         foreach ($categories as $categorie) {
             $arrayCategories[] = [
                 'id' => $categorie->getId(),
@@ -36,8 +38,19 @@ class CategorieController extends AbstractController
                 'pathImage' => $categorie->getPathImage(),
                 'isTrend' => $categorie->isIsTrend(),
                 'pathImageTrend' => $categorie->getPathImageTrend(),
-                'countProduit' => count($categorie->getProduits())
+                'countProduitAvailable' => null
             ];
+
+            $countProduit = [];
+            foreach ($categorie->getProduits() as $produit) {
+                if ($produit->isIsAvailable()) {
+                    $countProduit[] = $produit;
+                }
+            }
+
+            $arrayCategories[$i]['countProduit'] = count($countProduit);
+
+            $i++;
         }
         return new JsonResponse($arrayCategories, 200);
     }
@@ -310,5 +323,112 @@ class CategorieController extends AbstractController
         } else {
             return new JsonResponse([null], 200);
         }
+    }
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @param Request $request
+     * @param FunctionErrors $errorCode
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleUpdateIsTrend/{isTrend}/',
+        name: 'app_multiple_update_category_trend', methods: "POST")]
+    public function multipleUpdateTrendCategory(
+        CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
+    ): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $categorie = $categorieRepository->find($id);
+
+            if (!$categorie) {
+                return $errorCode->generateCodeError003();
+            }
+
+            if ($request->attributes->get('isTrend') === "true") {
+                $categorie->setIsTrend(true);
+            }elseif ($request->attributes->get('isTrend') === "false") {
+                $categorie->setIsTrend(false);
+            }else {
+                return $errorCode->generateCodeError004();
+            }
+
+            $categorieRepository->save($categorie, true);
+        }
+        
+        return new JsonResponse(null, 200);
+    }
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @param Request $request
+     * @param FunctionErrors $errorCode
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleUpdateAvailable/{available}/',
+        name: 'app_multiple_update_category_available', methods: "POST")]
+    public function multipleUpdateAvailableCategory(
+        CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
+    ): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $categorie = $categorieRepository->find($id);
+
+            if (!$categorie) {
+                return $errorCode->generateCodeError003();
+            }
+
+            if ($request->attributes->get('available') === "true") {
+                $categorie->setAvailable(true);
+            }elseif ($request->attributes->get('available') === "false") {
+                $categorie->setAvailable(false);
+            }else {
+                return $errorCode->generateCodeError005();
+            }
+
+            $categorieRepository->save($categorie, true);
+        }
+        
+        return new JsonResponse(null, 200);
+    }
+
+    /**
+     * @param CategorieRepository $categorieRepository
+     * @param FunctionErrors $errorCode
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Categorie")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     * @author
+     */
+    #[Route('/multipleDelete', name: 'app_multiple_delete_categorie', methods: ['POST'])]
+    public function multipleRemoveCategory(
+        CategorieRepository $categorieRepository, GlobalFunction\FunctionErrors $errorCode, Request $request
+    ): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $categorie = $categorieRepository->find($id);
+            $categorieRepository->remove($categorie, true);
+        }
+        
+        return new JsonResponse(null, 200);
     }
 }

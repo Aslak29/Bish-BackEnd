@@ -47,38 +47,37 @@ class UserRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-    //    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function getUserSignByYear(int $year):array
+    {
+        $countArray = [];
+        for ($i = 1;$i<=12;$i++)
+        {
+            $startDate = $year.'-'.$i.'-1';
+            if ($i === 12){
+                $endDate = ($year+1).'-1'.'-1';
+            }else {
+                $endDate = $year.'-'.($i+1).'-1';
+            }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+            $count = $this->createQueryBuilder('u');
+            $count->select('COUNT(u.id)');
+            $count->where('u.created_at >= :startDate and u.created_at < :endDate');
+            $count ->setParameters([
+                    'startDate' => $startDate,
+                    'endDate' => $endDate
+                ]);
+            ;
+            $countArray[] = $count->getQuery()->getSingleResult();
+        }
+        return $countArray;
+    }
+
+    public function countUser()
+    {
+        return $this->createQueryBuilder('u')
+            ->select('count(u)')
+            ->getQuery()
+            ->getResult();
+    }
 }

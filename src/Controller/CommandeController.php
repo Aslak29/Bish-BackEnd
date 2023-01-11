@@ -200,10 +200,7 @@ class CommandeController extends AbstractController
     {
         $commandesUser = $commandeRepository->findByUserId($request->attributes->get("id"));
         if (!$commandesUser) {
-            return new JsonResponse([
-                "errorCode" => "002",
-                "errorMessage" => "Aucune commande n'existe !"
-            ], 404);
+            return new JsonResponse([], 200);
         }else {
             $commandesByUserArray = [];
             foreach ($commandesUser as $oneCommande) {

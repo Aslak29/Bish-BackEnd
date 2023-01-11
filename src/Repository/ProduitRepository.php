@@ -219,7 +219,6 @@ class ProduitRepository extends ServiceEntityRepository
     {
            return $this->createQueryBuilder('p')
                ->where('p.promotions = :idPromotion')
-               ->andWhere("p.isAvailable = 1")
                ->setParameters([
                    "idPromotion" => $idPromo
                ])

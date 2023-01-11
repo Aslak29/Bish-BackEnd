@@ -640,48 +640,47 @@ class ProductController extends AbstractController
     public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $product = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
-        if (!$product) {
-            return new JsonResponse([
-                "errorCode" => "003",
-                "errorMessage" => "La catégorie n'existe pas"
-            ], 404);
-        }
-        shuffle($product);
-        $produitSuggestion = array_slice($product, 0, 4);
-
-        $produitArray = [];
-        foreach ($produitSuggestion as $product){
-            $jsonProduct = [
-                'id' => $product[0]->getId(),
-                'name' => $product[0]->getName(),
-                'description' => $product[0]->getDescription(),
-                'pathImage' => $product[0]->getPathImage(),
-                'price' => round($product[0]->getPrice(), 2),
-                'is_trend' => $product[0]->isIsTrend(),
-                'is_available' => $product[0]->isIsAvailable(),
-                'stockBySize' => array(),
-                'noteAverage' => $product[1] !== null ? round($product[1],1) : $product[1],
-                'id_categorie' => $product[0]->getCategories()[0] === null ? "-" : $product[0]->getCategories()[0]->getId(),
-                'promotion' =>
-                    $product[0]->getPromotions() !== null ? [
-                        'id' => $product[0]->getPromotions()->getId(),
-                        'remise' => $product[0]->getPromotions()->getRemise(),
-                        'price_remise' => round($product[0]->getPrice() - (($product[0]->getPrice() * $product[0]->getPromotions()->getRemise())/ 100), 2),
-                        'date_start' => $product[0]->getPromotions()->getDateStart()->format("d-m-Y"),
-                        'heure_start' => $product[0]->getPromotions()->getDateStart()->format("H:i:s"),
-                        'date_end' => $product[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
-                        'heure_end' => $product[0]->getPromotions()->getDateEnd()->format("H:i:s"),
-                    ] : [],
-            ];
-            foreach ($product[0]->getProduitBySize() as $size){
-                $jsonProduct['stockBySize'][] = [
-                    "taille" =>$size->getTaille()->getTaille(),
-                    "stock" =>$size->getStock(),
+        if ($product) {
+            shuffle($product);
+            $produitSuggestion = array_slice($product, 0, 4);
+    
+            $produitArray = [];
+            foreach ($produitSuggestion as $product){
+                $jsonProduct = [
+                    'id' => $product[0]->getId(),
+                    'name' => $product[0]->getName(),
+                    'description' => $product[0]->getDescription(),
+                    'pathImage' => $product[0]->getPathImage(),
+                    'price' => round($product[0]->getPrice(), 2),
+                    'is_trend' => $product[0]->isIsTrend(),
+                    'is_available' => $product[0]->isIsAvailable(),
+                    'stockBySize' => array(),
+                    'noteAverage' => $product[1] !== null ? round($product[1],1) : $product[1],
+                    'id_categorie' => $product[0]->getCategories()[0] === null ? "-" : $product[0]->getCategories()[0]->getId(),
+                    'promotion' =>
+                        $product[0]->getPromotions() !== null ? [
+                            'id' => $product[0]->getPromotions()->getId(),
+                            'remise' => $product[0]->getPromotions()->getRemise(),
+                            'price_remise' => round($product[0]->getPrice() - (($product[0]->getPrice() * $product[0]->getPromotions()->getRemise())/ 100), 2),
+                            'date_start' => $product[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                            'heure_start' => $product[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                            'date_end' => $product[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                            'heure_end' => $product[0]->getPromotions()->getDateEnd()->format("H:i:s"),
+                        ] : [],
                 ];
+                foreach ($product[0]->getProduitBySize() as $size){
+                    $jsonProduct['stockBySize'][] = [
+                        "taille" =>$size->getTaille()->getTaille(),
+                        "stock" =>$size->getStock(),
+                    ];
+                }
+                $produitArray[] = $jsonProduct;
             }
-            $produitArray[] = $jsonProduct;
+            return new JsonResponse($produitArray);
+        } else {
+            return new JsonResponse(null,200);
         }
-        return new JsonResponse($produitArray);
+        
     }
 
     /**

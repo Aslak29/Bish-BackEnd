@@ -120,7 +120,18 @@ class UserController extends AbstractController
          $users = $userRepository->findAll();
          $userArray = [];
          foreach($users as $user){
-             $jsonProduct = [
+
+            $inCommande = false;
+            foreach ($user->getCommandes() as $userCommande) {
+                if ($userCommande->getEtatCommande() === "En préparation") {
+                    $inCommande = true;
+                }elseif ($userCommande->getEtatCommande() === "En cours de livraison") {
+                    /*Si l'utilisateur à une commande en cours l'erreur 14 est retourné */
+                    $inCommande = true;
+                }
+            }
+
+            $jsonProduct = [
                  'id' => $user->getId(),
                  'name' => $user->getName(),
                  'surname' => $user->getSurname(),
@@ -128,6 +139,7 @@ class UserController extends AbstractController
                  'roles' => $user->getRoles(),
                  'phone' => $user->getPhone(),
                  'created_at' => $user->getCreatedAt()->format("d-m-Y"),
+                 'inCommande' => $inCommande,
                  'disable' => $user->getDisable(),
              ];
              $userArray[] = $jsonProduct;
@@ -377,5 +389,122 @@ class UserController extends AbstractController
             'disable' => $user->getDisable()
         ];
         return new JsonResponse($userArray);
+    }
+
+    /**
+     * @param UserRepository $userRepository
+     * @param FunctionErrors $errorsCodes
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleDelete', name: 'user_multiple_delete', methods:"POST")]
+    public function multipleDeleteUser(
+        UserRepository $userRepository,
+        FunctionErrors $errorsCodes,
+        Request $request
+    ): JsonResponse
+    {
+
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $user = $userRepository->findOneById($id);
+
+            if($user->getRoles()[0] == "ROLE_ADMIN") {
+                return new JsonResponse([
+                    "errorCode" => "016",
+                    "errorMessage" => "Un administrateur ne peut pas être supprimé"
+                    ], 406);
+            } else {
+                $user->setName("Anonymous");
+                $user->setSurname("Anonymous");
+                $user->setEmail("Anonymous".$id);
+                $user->setPhone("Anonymous");
+                foreach ($user->getAdresse() as $userAdresse) {
+                    $userAdresse->setRue("Anonymous");
+                }
+                foreach ($user->getCommandes() as $userCommande) {
+                    if ($userCommande->getEtatCommande() === "En préparation") {
+                        return $errorsCodes->generateCodeError015();
+                    }elseif ($userCommande->getEtatCommande() === "En cours de livraison") {
+                        /*Si l'utilisateur à une commande en cours l'erreur 14 est retourné */
+                        return $errorsCodes->generateCodeError014();
+                    }
+                }
+
+                if (!$user) {
+                    return new JsonResponse([
+                        "errorCode" => "009",
+                        "errorMessage" => "L'utilisateur n'existe pas"
+                    ], 404);
+                }else {
+                    foreach ($user->getCommandes() as $userCommande) {
+                        $userCommande->setRue(null);
+                        $userCommande->setNumRue(null);
+                    }
+                    $user->setDisable(true);
+                    $userRepository -> save($user, true);
+                }
+            }
+        }
+        return new JsonResponse(null,200);
+
+    }
+
+
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/stats/register/{year}', name: 'app_user_stats_register', methods: ['POST'])]
+    public function getUserSign(UserRepository $userRepository, Request $request):JsonResponse
+    {
+        $year = $request->attributes->get('year');
+        $data = $userRepository->getUserSignByYear($year);
+        $dateJson = [
+            "Janvier" => $data[0][1],
+            "Février" => $data[1][1],
+            "Mars" => $data[2][1],
+            "Avril" => $data[3][1],
+            "Mai" => $data[4][1],
+            "Juin" => $data[5][1],
+            "Juillet" => $data[6][1],
+            "Août" => $data[7][1],
+            "Septembre" => $data[8][1],
+            "Octobre" => $data[9][1],
+            "Novembre" => $data[10][1],
+            "Décembre" => $data[11][1],
+        ];
+        return new JsonResponse($dateJson);
+    }
+
+    /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/stats/count', name: 'app_user_stats_count', methods: ['GET'])]
+    public function countUser(UserRepository $userRepository, Request $request): JsonResponse{
+
+        $count = $userRepository->countUser();
+        return new JsonResponse([
+            "countUser" => $count[0][1]
+        ]);
     }
 }

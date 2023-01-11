@@ -200,10 +200,7 @@ class CommandeController extends AbstractController
     {
         $commandesUser = $commandeRepository->findByUserId($request->attributes->get("id"));
         if (!$commandesUser) {
-            return new JsonResponse([
-                "errorCode" => "002",
-                "errorMessage" => "Aucune commande n'existe !"
-            ], 404);
+            return new JsonResponse([], 200);
         }else {
             $commandesByUserArray = [];
             foreach ($commandesUser as $oneCommande) {
@@ -230,6 +227,42 @@ class CommandeController extends AbstractController
             }
         }
         return new JsonResponse($commandesByUserArray);
+    }
+
+    /**
+     * @param CommandeRepository $commandeRepository
+     * @param FunctionErrors $errorsCodes
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleCancel', name: 'app_multiple_cancel_commande', methods:"POST")]
+    public function multipleCancelOrder(
+        CommandeRepository $commandeRepository,
+        FunctionErrors $errorsCodes,
+        Request $request
+    ): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $order = $commandeRepository->find($id);
+
+            if ($order->getEtatCommande() === "En cours de livraison") {
+                return $errorsCodes->generateCodeError016();
+            }elseif ($order->getEtatCommande() === "Livrée") {
+                return $errorsCodes->generateCodeError017();
+            }
+
+            $order->setEtatCommande("Annulée");
+            $commandeRepository->save($order, true);
+        }
+
+        return new JsonResponse(null,200);
     }
 
 }

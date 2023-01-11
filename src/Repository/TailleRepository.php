@@ -38,6 +38,19 @@ class TailleRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    /**
+     * @return Taille[] Returns an array of Taille objects
+     */
+    public function findTypeSyze($value): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.type = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 
 //    /**
 //     * @return Taille[] Returns an array of Taille objects

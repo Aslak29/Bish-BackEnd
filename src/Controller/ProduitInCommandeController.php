@@ -39,13 +39,13 @@ class ProduitInCommandeController extends AbstractController {
                 'prixUnitaire' => $produitInCommande->getPrice(),
                 'prixRemise' => $produitInCommande->getRemise() ? round($produitInCommande->getPrice() - (
                         $produitInCommande->getPrice() * $produitInCommande->getRemise()/100),2) : "-",
-                'nomProduit' => $produitInCommande->getProduit()->getName(),
+                'nomProduit' => $produitInCommande->getNameProduct(),
                 'remise' => $produitInCommande->getRemise(),
                 'total' => $produitInCommande->getRemise() ? $produitInCommande->getQuantite() * (
                     $produitInCommande->getPrice() - $produitInCommande->getPrice() * $produitInCommande->getRemise()/100)
                         : $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
                 'Taille' => $produitInCommande->getTaille(),
-                'image' => $produitInCommande->getProduit()->getPathImage(),
+                'image' => $produitInCommande->getProduit() ? $produitInCommande->getProduit()->getPathImage() : "-",
             ];
             if (end($produitInCommandes)=== $produitInCommande) {
             $infosCommandes[] = [

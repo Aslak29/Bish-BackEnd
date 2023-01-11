@@ -52,6 +52,7 @@ class ProductController extends AbstractController
                 'name_categorie' =>
                     $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
                 'noteAverage' => null,
+                'inCommande' => $produit->getProduitInCommande()[0] === null ? false : true,
                 'promotion' =>
                     $produit->getPromotions() !== null ? [
                         'id' => $produit->getPromotions()->getId(),
@@ -64,10 +65,7 @@ class ProductController extends AbstractController
                     ] : [],
             ];
             foreach ($produit->getProduitBySize() as $size) {
-                $jsonProduct['stockBySize'][] = [
-                    "taille" =>$size->getTaille()->getTaille(),
-                    "stock" =>$size->getStock()
-                ];
+                $jsonProduct['stockBySize'][$size->getTaille()->getTaille()] = $size->getStock();
             }
             $nbNote = 0;
             $totalNote = 0;
@@ -142,92 +140,100 @@ class ProductController extends AbstractController
      * @param CategorieRepository $categorieRepository
      * @param PromotionsRepository $promotionsRepository
      * @param Request $request
+     * @param FunctionErrors $errorsCode
      * @return JsonResponse
      * @OA\Tag (name="Produit")
      * @OA\Response(
      *     response="200",
      *     description = "OK"
      * )
+     *
      */
-    #[Route('/add/{name}/{description}/{pathImage}/{idCategorie}/{promotion}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
-        name: 'app_add_product', methods: "POST")]
+    #[Route('/add', name: 'app_add_product', methods: "POST")]
     public function addProduit(
         ProduitRepository $produitRepository,ProduitBySizeRepository $produitBySizeRepo,
         TailleRepository $tailleRepository,CategorieRepository $categorieRepository,
-        PromotionsRepository $promotionsRepository, Request $request
+        PromotionsRepository $promotionsRepository, Request $request, FunctionErrors $errorsCode
     ):JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data) {
+            return $errorsCode->generateCodeError002();
+        }
+
         $produit = new Produit();
         /* Récupération de toutes les tailles en bdd */
-        $tailles = $tailleRepository->findAll();
+        $tailles = $tailleRepository->findTypeSyze($data["typeTaille"]);
         /* Récupération de la catégorie demandée par rapport à son id en bdd */
-        $categorie = $categorieRepository->findOneById($request->attributes->get('idCategorie'));
-        $promo = $promotionsRepository->find($request->attributes->get('promotion'));
+        $categorie = $categorieRepository->findOneById($data['categorie']);
+        $promo = $promotionsRepository->find($data['promotion']);
         /* Donnation des valeurs aux attributs du produit */
-        $produit->setName($request->attributes->get('name'));
-        $produit->setDescription($request->attributes->get('description'));
-        $produit->setPathImage($request->attributes->get('pathImage'));
-        $produit->setPrice(floatval($request->attributes->get('price')));
+        $produit->setName($data['name']);
+        $produit->setDescription($data['description']);
+        $produit->setPathImage($data['infoFile']);
+        $produit->setPrice(floatval($data['price']));
 
         /* Vérifier si is_trend est bien un boolean */
-        if ($request->attributes->get('is_trend') === "true"){
+        if ($data['trend'] === true) {
             $produit->setIsTrend(true);
-        }elseif ($request->attributes->get('is_trend') === "false"){
+        }elseif ($data['trend'] === false) {
             $produit->setIsTrend(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "004",
                 "errorMessage" => "is_trend is not boolean !"
-            ],406);
+            ], 406);
         }
         /* Vérifier si is_available est bien un boolean */
-        if ($request->attributes->get('is_available') === "true"){
+        if ($data['available'] === true) {
             $produit->setIsAvailable(true);
-        }elseif ($request->attributes->get('is_available') === "false"){
+        }elseif ($data['available'] === false) {
             $produit->setIsAvailable(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "005",
                 "errorMessage" => "is_available is not boolean !"
-            ],406);
+            ], 406);
         }
         /* Vérifier si la catégorie existe bien en bdd pour faire la relation */
-        if (!$categorie){
+        if (!$categorie) {
             return new JsonResponse([
                 "errorCode" => "003",
                 "errorMessage" => "la catégorie n'éxiste pas !"
-            ],404);
+            ], 404);
         }else {
             $produit->addCategory($categorie[0]);
         }
         /* Vérifier si la promotion existe bien en bdd pour faire la relation */
-        if ($request->attributes->get('promotion') === '-'){
+        if ($data['promotion'] === '-') {
             $produit->setPromotions(null);
-        } else if (!$promo) {
+        } elseif (!$promo) {
             return new JsonResponse([
                 "errorCode" => "007",
                 "errorMessage" => "la promotion n'existe pas !"
-            ],404);
+            ], 404);
         } else {
             $produit->setPromotions($promo);
         }
         /* Première insertion en bdd pour le produit */
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
-        foreach ($tailles as $taille){
+        foreach ($tailles as $taille) {
             $produitBySize = new ProduitBySize();
             $produitBySize->setTaille($taille);
-            $produitBySize->setStock(floatval($request->attributes->get($taille->getTaille())));
+            $produitBySize->setStock(floatval($data["stock"][$taille->getTaille()]));
             $produitBySize->setProduit($produit);
             $produit->addProduitBySize($produitBySize);
             $produitBySizeRepo->save($produitBySize, true);
         }
         /* Deuxième insertion en bdd pour effectuer la relation des tailles pour le produit crée */
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
         $produitArray = [
             "id" => $produit->getId(),
-            "name" => $produit->getName()
+            "name" => $produit->getName(),
+            "res" => dump($data)
         ];
 
         return new JsonResponse($produitArray);
@@ -239,7 +245,6 @@ class ProductController extends AbstractController
      * @param CategorieRepository $categorieRepository
      * @param PromotionsRepository $promotionsRepository
      * @param ProduitBySizeRepository $produitBySizeRepo
-     * @param TailleRepository $tailleRepository
      * @return JsonResponse
      * @OA\Tag (name="Produit")
      * @OA\Response(
@@ -247,88 +252,89 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{description}/{pathImage}/{idCategorie}/{promotion}/{price}/{is_trend}/{is_available}/{xs}/{s}/{m}/{l}/{xl}/',
+    #[Route('/update',
         name: 'app_update_product', methods: "POST")]
     public function updateProduit(
         ProduitRepository $produitRepository, Request $request,CategorieRepository $categorieRepository,PromotionsRepository
         $promotionsRepository,ProduitBySizeRepository $produitBySizeRepo):JsonResponse
     {
-        $produit = $produitRepository->find($request->attributes->get('id'));
+        $data = json_decode($request->getContent(), true);
 
-        if (!$produit){
+        $produit = $produitRepository->find($data["id"]);
+
+        if (!$produit) {
             return new JsonResponse([
                 "errorCode" => "002",
                 "errorMessage" => "Le produit n'existe pas !"
-            ],404);
+            ], 404);
         }
 
-        $categorie = $categorieRepository->find($request->attributes->get('idCategorie'));
-        $promotion = $promotionsRepository->find($request->attributes->get('promotion'));
+        $categorie = $categorieRepository->find($data['categorie']);
+        $promotion = $promotionsRepository->find($data['promotion']);
 
-        $produit->setName($request->attributes->get('name'));
-        $produit->setDescription($request->attributes->get('description'));
-        $produit->setPathImage($request->attributes->get('pathImage'));
-        $produit->setPrice(floatval($request->attributes->get('price')));
+        $produit->setName($data['name']);
+        $produit->setDescription($data['description']);
+        $produit->setPathImage($data['infoFile']);
+        $produit->setPrice(floatval($data['price']));
 
-        if ($request->attributes->get('is_trend') === "true"){
+        if ($data['trend'] === true) {
             $produit->setIsTrend(true);
-        }elseif ($request->attributes->get('is_trend') === "false"){
+        }elseif ($data['trend'] === false) {
             $produit->setIsTrend(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "004",
                 "errorMessage" => "is_trend is not boolean !"
-            ],406);
+            ], 406);
         }
-        if ($request->attributes->get('is_available') === "true"){
+        if ($data['available'] === true) {
             $produit->setIsAvailable(true);
-        }elseif ($request->attributes->get('is_available') === "false"){
+        }elseif ($data['available'] === false) {
             $produit->setIsAvailable(false);
         }else {
             return new JsonResponse([
                 "errorCode" => "005",
                 "errorMessage" => "is_available is not boolean !"
-            ],406);
+            ], 406);
         }
-        if (!$categorie && ($request->attributes->get('idCategorie') !== '-')){
+        if (!$categorie && ($data['categorie'] !== '-')) {
             return new JsonResponse([
                 "errorCode" => "003",
                 "errorMessage" => "La catégorie n'existe pas !"
-            ],404);
+            ], 404);
         }else {
-            foreach ($produit->getCategories() as $cat){
+            foreach ($produit->getCategories() as $cat) {
                 $produit->removeCategory($cat);
             }
-            if ($request->attributes->get('idCategorie') !== '-') {
+            if ($data['categorie'] !== '-') {
                 $produit->addCategory($categorie);
             }
         }
-        if ($request->attributes->get('promotion') === '-'){
+        if ($data['promotion'] === '-') {
             $produit->setPromotions(null);
-        }elseif (!$promotion){
+        }elseif (!$promotion) {
             return new JsonResponse([
                 "errorCode" => "007",
                 "errorMessage" => "La promotion n'existe pas !"
-            ],404);
+            ], 404);
         }else {
             $produit->setPromotions($promotion);
         }
 
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
-        foreach ($produit->getProduitBySize() as $ps)
-        {
-            $ps->setStock(floatval($request->attributes->get($ps->getTaille()->getTaille())));
-            $produitBySizeRepo->save($ps,true);
+        foreach ($produit->getProduitBySize() as $ps) {
+            $ps->setStock(floatval($data['stock'][$ps->getTaille()->getTaille()]));
+            $produitBySizeRepo->save($ps, true);
         }
-        $produitRepository->save($produit,true);
+        $produitRepository->save($produit, true);
 
         $produitArray = [
             "id" => $produit->getId(),
             "name" => $produit->getName()
         ];
 
-        return new JsonResponse($produitArray,200);
+        return new JsonResponse($produitArray, 200);
     }
 
     /**
@@ -634,48 +640,47 @@ class ProductController extends AbstractController
     public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $product = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
-        if (!$product) {
-            return new JsonResponse([
-                "errorCode" => "003",
-                "errorMessage" => "La catégorie n'existe pas"
-            ], 404);
-        }
-        shuffle($product);
-        $produitSuggestion = array_slice($product, 0, 4);
-
-        $produitArray = [];
-        foreach ($produitSuggestion as $product){
-            $jsonProduct = [
-                'id' => $product[0]->getId(),
-                'name' => $product[0]->getName(),
-                'description' => $product[0]->getDescription(),
-                'pathImage' => $product[0]->getPathImage(),
-                'price' => round($product[0]->getPrice(), 2),
-                'is_trend' => $product[0]->isIsTrend(),
-                'is_available' => $product[0]->isIsAvailable(),
-                'stockBySize' => array(),
-                'noteAverage' => $product[1] !== null ? round($product[1],1) : $product[1],
-                'id_categorie' => $product[0]->getCategories()[0] === null ? "-" : $product[0]->getCategories()[0]->getId(),
-                'promotion' =>
-                    $product[0]->getPromotions() !== null ? [
-                        'id' => $product[0]->getPromotions()->getId(),
-                        'remise' => $product[0]->getPromotions()->getRemise(),
-                        'price_remise' => round($product[0]->getPrice() - (($product[0]->getPrice() * $product[0]->getPromotions()->getRemise())/ 100), 2),
-                        'date_start' => $product[0]->getPromotions()->getDateStart()->format("d-m-Y"),
-                        'heure_start' => $product[0]->getPromotions()->getDateStart()->format("H:i:s"),
-                        'date_end' => $product[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
-                        'heure_end' => $product[0]->getPromotions()->getDateEnd()->format("H:i:s"),
-                    ] : [],
-            ];
-            foreach ($product[0]->getProduitBySize() as $size){
-                $jsonProduct['stockBySize'][] = [
-                    "taille" =>$size->getTaille()->getTaille(),
-                    "stock" =>$size->getStock(),
+        if ($product) {
+            shuffle($product);
+            $produitSuggestion = array_slice($product, 0, 4);
+    
+            $produitArray = [];
+            foreach ($produitSuggestion as $product){
+                $jsonProduct = [
+                    'id' => $product[0]->getId(),
+                    'name' => $product[0]->getName(),
+                    'description' => $product[0]->getDescription(),
+                    'pathImage' => $product[0]->getPathImage(),
+                    'price' => round($product[0]->getPrice(), 2),
+                    'is_trend' => $product[0]->isIsTrend(),
+                    'is_available' => $product[0]->isIsAvailable(),
+                    'stockBySize' => array(),
+                    'noteAverage' => $product[1] !== null ? round($product[1],1) : $product[1],
+                    'id_categorie' => $product[0]->getCategories()[0] === null ? "-" : $product[0]->getCategories()[0]->getId(),
+                    'promotion' =>
+                        $product[0]->getPromotions() !== null ? [
+                            'id' => $product[0]->getPromotions()->getId(),
+                            'remise' => $product[0]->getPromotions()->getRemise(),
+                            'price_remise' => round($product[0]->getPrice() - (($product[0]->getPrice() * $product[0]->getPromotions()->getRemise())/ 100), 2),
+                            'date_start' => $product[0]->getPromotions()->getDateStart()->format("d-m-Y"),
+                            'heure_start' => $product[0]->getPromotions()->getDateStart()->format("H:i:s"),
+                            'date_end' => $product[0]->getPromotions()->getDateEnd()->format("d-m-Y"),
+                            'heure_end' => $product[0]->getPromotions()->getDateEnd()->format("H:i:s"),
+                        ] : [],
                 ];
+                foreach ($product[0]->getProduitBySize() as $size){
+                    $jsonProduct['stockBySize'][] = [
+                        "taille" =>$size->getTaille()->getTaille(),
+                        "stock" =>$size->getStock(),
+                    ];
+                }
+                $produitArray[] = $jsonProduct;
             }
-            $produitArray[] = $jsonProduct;
+            return new JsonResponse($produitArray);
+        } else {
+            return new JsonResponse(null,200);
         }
-        return new JsonResponse($produitArray);
+        
     }
 
     /**
@@ -799,5 +804,51 @@ class ProductController extends AbstractController
         $countProduit = $produitRepository->countProduit();
         return new JsonResponse($countProduit[0]);
 
+    }
+
+    /**
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @param ProduitBySizeRepository $produitBySizeRepository
+     * @param NoteRepository $noteRepository
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleRemove', name: 'app_multiple_delete_product', methods: "POST")]
+    public function multipleRemoveProduit(ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository, NoteRepository $noteRepository):JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $produit = $produitRepository->findOneById($id);
+            if (!$produit){
+                return new JsonResponse([
+                    "errorCode" => "002",
+                    "errorMessage" => "le produit n'éxiste pas !"
+                ],404);
+            }else{
+               $produit = $produit[0][0];
+            }
+
+            if ($produit->getProduitInCommande()[0] === null){
+                foreach ($produit->getProduitBySize() as $size ){
+                    $produitBySizeRepository-> remove($size, true);
+                }
+                foreach ($produit->getNote() as $note){
+                    $noteRepository-> remove($note, true);
+                }
+                $produitRepository->remove($produit, true);
+            } else {
+                return new JsonResponse([
+                    "errorCode" => "006",
+                    "errorMessage" => "Le produit est en cours de commande !"
+                ],404);
+            }
+        }
+        return new JsonResponse(null,200);
     }
 }

@@ -163,4 +163,41 @@ class PromotionController extends AbstractController
             ]);
         }
     }
+
+    /**
+     * @param PromotionsRepository $promotionsRepository
+     * @param ProduitRepository $produitRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Promotion")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleRemove', name: 'app_multiple_promotion_remove', methods: ['POST'])]
+    public function multipleRemovePromotion(PromotionsRepository $promotionsRepository, ProduitRepository $produitRepository, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        foreach($data as $id) {
+            $promotion = $promotionsRepository->find($id);
+            $produitsByPromo = $produitRepository->findProductByIdPromo($id);
+    
+            if ($promotion === null) {
+                return new JsonResponse([
+                    "errorCode" => "A définir",
+                    "errorMessage" => "This promotions dont exist"
+                ]);
+            } else {
+                foreach ($produitsByPromo as $produit) {
+                    $produit->setPromotions(null);
+                }
+                $promotionsRepository->remove($promotion, true);
+            }
+        }  
+        return new JsonResponse([
+            "This promotion has been remove"
+        ]);
+    }
 }

@@ -32,6 +32,9 @@ class Adresse
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $complementAdresse = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,18 @@ class Adresse
     public function setComplementAdresse(?string $complementAdresse): self
     {
         $this->complementAdresse = $complementAdresse;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

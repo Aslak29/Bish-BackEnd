@@ -15,6 +15,7 @@ class AdresseFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 1; $i < 10; $i++ ){
 
             $adresse = (new Adresse())
+                ->setName('Adresse '.$i)
                 ->setRue('rue du pont')
                 ->setCity('Lille')
                 ->setPostalCode(59000)

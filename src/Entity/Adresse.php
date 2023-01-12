@@ -26,6 +26,12 @@ class Adresse
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $numRue = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $complementAdresse = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +81,30 @@ class Adresse
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getNumRue(): ?string
+    {
+        return $this->numRue;
+    }
+
+    public function setNumRue(string $numRue): self
+    {
+        $this->numRue = $numRue;
+
+        return $this;
+    }
+
+    public function getComplementAdresse(): ?string
+    {
+        return $this->complementAdresse;
+    }
+
+    public function setComplementAdresse(?string $complementAdresse): self
+    {
+        $this->complementAdresse = $complementAdresse;
 
         return $this;
     }

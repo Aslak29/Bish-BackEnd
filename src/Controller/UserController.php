@@ -39,10 +39,8 @@ class UserController extends AbstractController
     #[Route(
         '/register/{name}/{surname}/{email}/{password}/{passwordConfirm}',
         name: 'user_register', methods: ["POST"])]
-    public function register (
-        UserRepository $userRepository,
-        Request $request,
-        ValidatorInterface $validator): JsonResponse
+    public function register(UserRepository $userRepository, Request $request, ValidatorInterface $validator
+    ): JsonResponse
     {
 
         /* Récupération des attributs dans la requètes POST en les settant à la nouvelle entitée User*/
@@ -104,7 +102,8 @@ class UserController extends AbstractController
         ];
         return new JsonResponse($userArray);
     }
-   /**
+
+    /**
      * @param UserRepository $userRepository
      * @return JsonResponse
      * @OA\Tag (name="User")
@@ -113,7 +112,6 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-
      #[Route('/', name: 'user_all', methods:"GET")]
      public function findUser(UserRepository $userRepository): JsonResponse
      {
@@ -232,11 +230,8 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/delete/{id}', name: 'user_delete', methods:"POST")]
-    public function deleteUser(
-        UserRepository $userRepository,
-        FunctionErrors $errorsCodes,
-        Request $request
+    #[Route('/delete/{id}', name: 'user_delete', methods:"PUT")]
+    public function deleteUser(UserRepository $userRepository, FunctionErrors $errorsCodes, Request $request
     ): JsonResponse
     {
         $user = $userRepository->findOneById($request->attributes->get('id'));
@@ -299,7 +294,7 @@ class UserController extends AbstractController
      */
     #[Route(
         '/update/{id}/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
-        name: 'user_update', methods:"POST")]
+        name: 'user_update', methods:"PUT")]
     public function updateUser(
         UserRepository $userRepository, Request $request, ValidatorInterface $validator
     ): JsonResponse
@@ -402,7 +397,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleDelete', name: 'user_multiple_delete', methods:"POST")]
+    #[Route('/multipleDelete', name: 'user_multiple_delete', methods:"PUT")]
     public function multipleDeleteUser(
         UserRepository $userRepository,
         FunctionErrors $errorsCodes,

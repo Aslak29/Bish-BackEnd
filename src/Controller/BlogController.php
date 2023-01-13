@@ -44,6 +44,7 @@ class BlogController extends AbstractController
 
     /**
      * @param BlogRepository $blogRepository
+     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Blog")
      * @OA\Response(
@@ -54,7 +55,10 @@ class BlogController extends AbstractController
     #[Route('/{limit}/{offset}', name: 'app_blog_pagination', methods: "POST")]
     public function blogPagination(BlogRepository $blogRepository, Request $request): JsonResponse
     {
-        $blogs = $blogRepository->findArticlesLimit($request->attributes->get("limit"), $request->attributes->get("offset"));
+        $blogs = $blogRepository->findArticlesLimit(
+            $request->attributes->get("limit"),
+            $request->attributes->get("offset")
+        );
         $count= $blogRepository->countBlog();
         $blogArray = [];
         $blogRes=[];
@@ -67,7 +71,7 @@ class BlogController extends AbstractController
                 'date' => $blog->getDate()->format('d-m-Y'),
                 'pathImage' => $blog->getPathImage(),
             ];
-        };
+        }
         array_push($blogRes, $blogArray, $count);
         return new JsonResponse($blogRes);
     }
@@ -86,7 +90,7 @@ class BlogController extends AbstractController
     public function findLastArticle(BlogRepository $blogRepository): JsonResponse
     {
         $blog = $blogRepository->findLastArticle();
-        if(count($blog) > 0) {
+        if (count($blog) > 0) {
             $blogArray[] = [
                 "id" => $blog[0]->getId(),
                 "title"=>$blog[0]->getTitle(),
@@ -102,6 +106,7 @@ class BlogController extends AbstractController
 
     /**
      * @param BlogRepository $blogRepository
+     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Blog")
      * @OA\Response(
@@ -145,17 +150,8 @@ class BlogController extends AbstractController
         $blog->setDescription($data['description']);
         $blog->setPathImage($data['pathImage']);
 
-
         /* Insertion en bdd pour l'article de blog */
         $blogRepository->save($blog,true);
-
-        $blogArray = [
-            "id" => $blog->getId(),
-            "title" => $blog->getTitle(),
-            "description" => $blog->getDescription(),
-            "date" => $blog->getDate(),
-            "pathImage" => $blog->getPathImage()
-        ];
 
         return new JsonResponse($data, 200);
     }
@@ -173,7 +169,7 @@ class BlogController extends AbstractController
      * )
      */
     #[Route('/update',
-        name: 'app_update_blog', methods: "POST")]
+        name: 'app_update_blog', methods: "PUT")]
     public function updateBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -236,7 +232,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_delete_blog', methods: ['POST'])]
+    #[Route('/multipleRemove', name: 'app_multiple_delete_blog', methods: ['DELETE'])]
     public function multipleDeleteBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);

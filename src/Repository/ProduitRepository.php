@@ -83,6 +83,23 @@ class ProduitRepository extends ServiceEntityRepository
            ->getResult()
            ;
    }
+
+    public function findOneByIdForDelete($idProduit)
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.categories', 'c')
+            ->addSelect('c')
+            ->leftJoin('p.Note', 'pn')
+            ->addSelect('avg(pn.note)')
+            ->where('p.id = :idProduit')
+            ->setParameters([
+                "idProduit" => $idProduit
+            ])
+            ->groupBy('p.id')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
    /**
     * @return Produit[] Returns an array of Produit objects
     */

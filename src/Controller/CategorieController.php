@@ -143,7 +143,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{trend}/{available}/{pathImage}', name: 'app_update_categorie', methods: ['POST'])]
+    #[Route('/update/{id}/{name}/{trend}/{available}/{pathImage}', name: 'app_update_categorie', methods: ['PUT'])]
     public function update(
         CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
     ): JsonResponse
@@ -215,7 +215,7 @@ class CategorieController extends AbstractController
      * )
      */
     #[Route('/updateIsTrend/{id}/{isTrend}/',
-        name: 'app_update_category_trend', methods: "POST")]
+        name: 'app_update_category_trend', methods: "PUT")]
     public function updateTrendCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
     ): JsonResponse
@@ -257,7 +257,7 @@ class CategorieController extends AbstractController
      * )
      */
     #[Route('/updateAvailable/{id}/{available}/',
-        name: 'app_update_category_available', methods: "POST")]
+        name: 'app_update_category_available', methods: "PUT")]
     public function updateAvailableCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
     ): JsonResponse
@@ -337,7 +337,7 @@ class CategorieController extends AbstractController
      * )
      */
     #[Route('/multipleUpdateIsTrend/{isTrend}/',
-        name: 'app_multiple_update_category_trend', methods: "POST")]
+        name: 'app_multiple_update_category_trend', methods: "PUT")]
     public function multipleUpdateTrendCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
     ): JsonResponse
@@ -377,7 +377,7 @@ class CategorieController extends AbstractController
      * )
      */
     #[Route('/multipleUpdateAvailable/{available}/',
-        name: 'app_multiple_update_category_available', methods: "POST")]
+        name: 'app_multiple_update_category_available', methods: "PUT")]
     public function multipleUpdateAvailableCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
     ): JsonResponse
@@ -417,7 +417,7 @@ class CategorieController extends AbstractController
      * )
      * @author
      */
-    #[Route('/multipleDelete', name: 'app_multiple_delete_categorie', methods: ['POST'])]
+    #[Route('/multipleDelete', name: 'app_multiple_delete_categorie', methods: ['PUT'])]
     public function multipleRemoveCategory(
         CategorieRepository $categorieRepository, GlobalFunction\FunctionErrors $errorCode, Request $request
     ): JsonResponse

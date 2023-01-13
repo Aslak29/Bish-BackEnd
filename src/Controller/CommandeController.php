@@ -115,7 +115,7 @@ class CommandeController extends AbstractController
      * )
      */
     #[Route('/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}',
-        name: 'app_update_commande', methods:"POST")]
+        name: 'app_update_commande', methods:"PUT")]
     public function updateOrder(
         CommandeRepository $commandeRepository,
         ProduitInCommandeRepository $produitInCommandeRepository,
@@ -159,7 +159,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/cancel/{id}', name: 'app_cancel_commande', methods:"POST")]
+    #[Route('/cancel/{id}', name: 'app_cancel_commande', methods:"PUT")]
     public function cancelOrder(
         CommandeRepository $commandeRepository,
         FunctionErrors $errorsCodes,
@@ -186,6 +186,7 @@ class CommandeController extends AbstractController
 
     /**
      * @param CommandeRepository $commandeRepository
+     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Commande")
      * @OA\Response(
@@ -240,7 +241,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleCancel', name: 'app_multiple_cancel_commande', methods:"POST")]
+    #[Route('/multipleCancel', name: 'app_multiple_cancel_commande', methods:"PUT")]
     public function multipleCancelOrder(
         CommandeRepository $commandeRepository,
         FunctionErrors $errorsCodes,

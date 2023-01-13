@@ -132,7 +132,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['POST'])]
+    #[Route('/update/{id}/{name}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['PUT'])]
     public function updatePromotion(PromotionsRepository $promotionsRepository, Request $request): JsonResponse {
 
         $promotionUpdate = $promotionsRepository->find($request->attributes->get('id'));
@@ -175,8 +175,8 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_promotion_remove', methods: ['POST'])]
-    public function multipleRemovePromotion(PromotionsRepository $promotionsRepository, ProduitRepository $produitRepository, Request $request): JsonResponse
+    #[Route('/multipleRemove', name: 'app_multiple_promotion_remove', methods: ['DELETE'])]
+    public function multipleRemovePromotion(PromotionsRepository $promotionsRepository, ProduitRepository $produitRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -195,7 +195,7 @@ class PromotionController extends AbstractController
                 }
                 $promotionsRepository->remove($promotion, true);
             }
-        }  
+        }
         return new JsonResponse([
             "This promotion has been remove"
         ]);

@@ -108,25 +108,25 @@ class ContactController extends AbstractController
      *     response="200",
      *     description = "OK"
      * )
-     */         
+     */
     #[Route('/remove/{id}',name: 'app_contact_delete' , methods: ['DELETE'])]
-    public function removeContact(ContactRepository $contactRepository,Request $request):JsonResponse{
+    public function removeContact(ContactRepository $contactRepository, Request $request):JsonResponse
+    {
 
         $removeContact = $contactRepository->find($request->attributes->get('id'));
-        if($removeContact != null){
-            $contactRepository->remove($removeContact,true);
-        }else{
+        if ($removeContact != null) {
+            $contactRepository->remove($removeContact, true);
+        }else {
             return new JsonResponse([
                 'errorCode' => "013",
                 'errorMessage' => "This contact don't exist"
-            ],409);
+            ], 409);
         }
 
         return new JsonResponse([
             'successCode' => "004",
             'successMessage' => "This contact has been remove"
-        ],200);
-
+        ], 200);
     }
 
     /**
@@ -140,7 +140,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/isFinish/{contactId}/{isFinish}',name: 'app_contact_update_isFinish' , methods:['POST'])]
+    #[Route('/update/isFinish/{contactId}/{isFinish}',name: 'app_contact_update_isFinish' , methods:['PUT'])]
     public function updateIsFinish(ContactRepository $contactRepository,Request $request, FunctionErrors $errorCode):JsonResponse
     {
         $contact = $contactRepository->find($request->attributes->get('contactId'));
@@ -177,12 +177,12 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleUpdate/isFinish/{isFinish}',name: 'app_contact_multiple_update_isFinish' , methods:['POST'])]
+    #[Route('/multipleUpdate/isFinish/{isFinish}',name: 'app_contact_multiple_update_isFinish' , methods:['PUT'])]
     public function multipleUpdateIsFinish(ContactRepository $contactRepository,Request $request, FunctionErrors $errorCode):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        foreach($data as $id) {
+        foreach ($data as $id) {
             $contact = $contactRepository->find($id);
 
             if (!$contact) {
@@ -212,16 +212,17 @@ class ContactController extends AbstractController
      *     response="200",
      *     description = "OK"
      * )
-     */         
-    #[Route('/multipleRemove',name: 'app_contact_multiple_delete' , methods: ['POST'])]
-    public function multipleRemoveContact(ContactRepository $contactRepository,Request $request):JsonResponse{
+     */
+    #[Route('/multipleRemove',name: 'app_contact_multiple_delete' , methods: ['DELETE'])]
+    public function multipleRemoveContact(ContactRepository $contactRepository, Request $request):JsonResponse
+    {
         $data = json_decode($request->getContent(), true);
 
-        foreach($data as $id) {
+        foreach ($data as $id) {
             $removeContact = $contactRepository->find($id);
-            if($removeContact != null){
-                $contactRepository->remove($removeContact,true);
-            }else{
+            if ($removeContact != null){
+                $contactRepository->remove($removeContact, true);
+            }else {
                 return new JsonResponse([
                     'errorCode' => "013",
                     'errorMessage' => "This contact don't exist"

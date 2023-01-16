@@ -37,6 +37,14 @@ class ProductController extends AbstractController
         $produits = $produitRepository->findAll();
         $produitArray = [];
         foreach ($produits as $produit) {
+
+            $arrayCommande = [];
+            foreach ($produit->getProduitInCommande() as $pc) {
+                if ($pc) {
+                    $pc->getCommande()->getEtatCommande() === "En préparation" ? $arrayCommande[] = true : false;
+                }
+            }
+
             $jsonProduct = [
                 'id' => $produit->getId(),
                 'name' => $produit->getName(),
@@ -52,7 +60,7 @@ class ProductController extends AbstractController
                 'name_categorie' =>
                     $produit->getCategories()[0] === null ? "-" : $produit->getCategories()[0]->getName(),
                 'noteAverage' => null,
-                'inCommande' => $produit->getProduitInCommande()[0] === null ? false : true,
+                'inCommande' => $arrayCommande === [] ? false : true,
                 'promotion' =>
                     $produit->getPromotions() !== null ? [
                         'id' => $produit->getPromotions()->getId(),
@@ -316,7 +324,7 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/update',
-        name: 'app_update_product', methods: "POST")]
+        name: 'app_update_product', methods: "PUT")]
     public function updateProduit(
         ProduitRepository $produitRepository, Request $request,CategorieRepository $categorieRepository,PromotionsRepository
         $promotionsRepository,ProduitBySizeRepository $produitBySizeRepo):JsonResponse
@@ -411,7 +419,7 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/update/trend/{id}/{trendBool}/',
-        name: 'app_update_product_trend', methods: "POST")]
+        name: 'app_update_product_trend', methods: "PUT")]
     public function updateTrendProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
     {
         $produit = $produitRepository->find($request->attributes->get('id'));
@@ -455,7 +463,7 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/update/multipleTrend/{trendBool}/',
-        name: 'app_update_multiple_product_trend', methods: "POST")]
+        name: 'app_update_multiple_product_trend', methods: "PUT")]
     public function updateMultipleTrendProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -499,8 +507,8 @@ class ProductController extends AbstractController
      * )
      */
     #[Route('/update/multipleAvailable/{availableBool}/',
-        name: 'app_update_multiple_product_available', methods: "POST")]
-    public function updateMultipleAvailableProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
+        name: 'app_update_multiple_product_available', methods: "PUT")]
+    public function updateMultipleAvailableProduit(ProduitRepository $produitRepository, Request $request) :JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -542,8 +550,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/available/{id}/{availableBool}/',
-        name: 'app_update_product_available', methods: "POST")]
+    #[Route('/update/available/{id}/{availableBool}/', name: 'app_update_product_available', methods: "PUT")]
     public function updateAvailableProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
     {
         $produit = $produitRepository->find($request->attributes->get('id'));
@@ -881,35 +888,42 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_delete_product', methods: "POST")]
-    public function multipleRemoveProduit(ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository, NoteRepository $noteRepository):JsonResponse
+    #[Route('/multipleRemove', name: 'app_multiple_delete_product', methods: "DELETE")]
+    public function multipleRemoveProduit(
+        ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository,
+        FunctionErrors $errorsCodes, NoteRepository $noteRepository
+    ):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         foreach($data as $id) {
-            $produit = $produitRepository->findOneById($id);
-            if (!$produit){
+            $produit = $produitRepository->findOneByIdForDelete($id);
+            if (!$produit) {
                 return new JsonResponse([
                     "errorCode" => "002",
                     "errorMessage" => "le produit n'éxiste pas !"
-                ],404);
-            }else{
+                ], 404);
+            }else {
                $produit = $produit[0][0];
             }
 
-            if ($produit->getProduitInCommande()[0] === null){
-                foreach ($produit->getProduitBySize() as $size ){
+            $arrayCommande = [];
+            foreach ($produit->getProduitInCommande() as $pc) {
+                $arrayCommande[] = $pc->getCommande()->getEtatCommande();
+            }
+            if (in_array("En préparation", $arrayCommande)) {
+                return $errorsCodes->generateCodeError018();
+            }else {
+                foreach ($produit->getProduitBySize() as $size) {
                     $produitBySizeRepository-> remove($size, true);
                 }
-                foreach ($produit->getNote() as $note){
+                foreach ($produit->getNote() as $note) {
                     $noteRepository-> remove($note, true);
                 }
+                foreach ($produit->getProduitInCommande() as $pc) {
+                    $pc->setProduit(null);
+                }
                 $produitRepository->remove($produit, true);
-            } else {
-                return new JsonResponse([
-                    "errorCode" => "006",
-                    "errorMessage" => "Le produit est en cours de commande !"
-                ],404);
             }
         }
         return new JsonResponse(null,200);

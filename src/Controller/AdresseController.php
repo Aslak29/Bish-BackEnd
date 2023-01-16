@@ -126,20 +126,20 @@ class AdresseController extends AbstractController
     #[Route('/create', name: 'app_route_adresse', methods: "POST")]
     public function create(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
 
+        $data = json_decode($request->getContent(), true);
+
         $adresse = new Adresse();
-        $adresse->setCity($request->query->get("city"));
-        $adresse->setRue($request->query->get("rue"));
-        $adresse->setNumRue($request->query->get("num_rue"));
-        $adresse->setComplementAdresse($request->query->get("cpm_adresse"));
-        $adresse->setName($request->query->get("name"));
-        $adresse->setCity($request->query->get("city"));
-        $adresse->setPostalCode(($request->query->get("postalCode")));
-        $adresse->setUser($userRepository->find($request->query->get("userId")));
+        $adresse->setCity($data["city"]);
+        $adresse->setRue($data["rue"]);
+        $adresse->setNumRue($data["num_rue"]);
+        $adresse->setComplementAdresse($data["cpm_adresse"]);
+        $adresse->setName($data["name"]);
+        $adresse->setPostalCode($data["postalCode"]);
+        $adresse->setUser($userRepository->find($data["userId"]));
 
         $adresseRepository->save($adresse,true);
 
         return new JsonResponse();
-
     }
 
      /**
@@ -232,40 +232,36 @@ class AdresseController extends AbstractController
     #[Route('/update', name: 'app_route_adresse_update', methods: "PUT")]
     public function update(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
 
-        $adresse = $adresseRepository->find($request->query->get('adresseId'));
+        $data = json_decode($request->getContent(), true);
+
+        $adresse = $adresseRepository->find($data['adresseId']);
         if ($adresse === null){
             return new JsonResponse([
                 "errorMessage" => "L'adresse indiqué n'existe pas"
             ]);
         }
 
-        if ($request->query->get("city") !== null){
-            $adresse->setCity($request->query->get("city"));
+        if ($data['city'] !== null){
+            $adresse->setCity($data['city']);
         }
-        if ($request->query->get("rue") !== null){
-            $adresse->setRue($request->query->get("rue"));
+        if ($data['rue'] !== null){
+            $adresse->setRue($data['rue']);
         }
-        if ($request->query->get("num_rue") !== null){
-            $adresse->setNumRue($request->query->get("num_rue"));
+        if ($data['num_rue'] !== null){
+            $adresse->setNumRue($data['num_rue']);
         }
-        if ($request->query->get("cpm_adresse") !== null){
-            $adresse->setComplementAdresse($request->query->get("cpm_adresse"));
+        if ($data['cpm_adresse'] !== null){
+            $adresse->setComplementAdresse($data['cpm_adresse']);
         }
-        if ($request->query->get("name") !== null){
-            $adresse->setName($request->query->get("name"));
+        if ($data['name'] !== null){
+            $adresse->setName($data['name']);
         }
-        if ($request->query->get("city") !== null){
-            $adresse->setCity($request->query->get("city"));
+        if ($data['city'] !== null){
+            $adresse->setCity($data['city']);
         }
-        if ($request->query->get("postalCode") !== null){
-            $adresse->setPostalCode(($request->query->get("postalCode")));
+        if ($data['postalCode'] !== null){
+            $adresse->setPostalCode($data['postalCode']);
         }
-
-
-
-
-
-
 
         $adresseRepository->save($adresse,true);
 

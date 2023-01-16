@@ -176,4 +176,101 @@ class AdresseController extends AbstractController
         return new JsonResponse($adressesJson,200);
     }
 
+    /**
+     * @param AdresseRepository $adresseRepository
+     * @param Request $request
+     * @return JsonResponse
+     * * @OA\Tag (name="Adresse")
+     * *  @OA\Parameter(
+     *     name="adresseId",
+     *     in="query",
+     *     description="Adresse a changer",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag (name="Adresse")
+     * * @OA\Parameter(
+     *     name="city",
+     *     in="query",
+     *     description="Ville de l'adresse",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Parameter(
+     *     name="rue",
+     *     in="query",
+     *     description="Rue de l'adresse",
+     *     @OA\Schema(type="string")
+     * )
+     *  @OA\Parameter(
+     *     name="postalCode",
+     *     in="query",
+     *     description="Code postal de l'adresse",
+     *     @OA\Schema(type="string")
+     * )
+     *  @OA\Parameter(
+     *     name="num_rue",
+     *     in="query",
+     *     description="Numéro de rue de l'adresse",
+     *     @OA\Schema(type="string")
+     * )
+     *   @OA\Parameter(
+     *     name="cpm_adresse",
+     *     in="query",
+     *     description="Complément d'adresse de l'adresse",
+     *     @OA\Schema(type="string")
+     * )
+     *  @OA\Parameter(
+     *     name="name",
+     *     in="query",
+     *     description="Nom de l'adresse",
+     *     @OA\Schema(type="string")
+     * )
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/update', name: 'app_route_adresse_update', methods: "PUT")]
+    public function update(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
+
+        $adresse = $adresseRepository->find($request->query->get('adresseId'));
+        if ($adresse === null){
+            return new JsonResponse([
+                "errorMessage" => "L'adresse indiqué n'existe pas"
+            ]);
+        }
+
+        if ($request->query->get("city") !== null){
+            $adresse->setCity($request->query->get("city"));
+        }
+        if ($request->query->get("rue") !== null){
+            $adresse->setRue($request->query->get("rue"));
+        }
+        if ($request->query->get("num_rue") !== null){
+            $adresse->setNumRue($request->query->get("num_rue"));
+        }
+        if ($request->query->get("cpm_adresse") !== null){
+            $adresse->setComplementAdresse($request->query->get("cpm_adresse"));
+        }
+        if ($request->query->get("name") !== null){
+            $adresse->setName($request->query->get("name"));
+        }
+        if ($request->query->get("city") !== null){
+            $adresse->setCity($request->query->get("city"));
+        }
+        if ($request->query->get("postalCode") !== null){
+            $adresse->setPostalCode(($request->query->get("postalCode")));
+        }
+
+
+
+
+
+
+
+        $adresseRepository->save($adresse,true);
+
+        return new JsonResponse();
+
+    }
+
 }

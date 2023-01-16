@@ -39,6 +39,14 @@ class AdresseRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByUser($idUser): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.user = :id')
+            ->setParameter('id', $idUser)
+            ->getQuery()
+            ->getResult();
+    }
 //    /**
 //     * @return Adresse[] Returns an array of Adresse objects
 //     */

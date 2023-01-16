@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Adresse;
 use App\Repository\AdresseRepository;
 use App\Repository\UserRepository;
+use PHPUnit\Util\Json;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -140,6 +140,40 @@ class AdresseController extends AbstractController
 
         return new JsonResponse();
 
+    }
+
+     /**
+      * @param AdresseRepository $adresseRepository
+      * @param Request $request
+      * @return JsonResponse
+      * @OA\Tag (name="Adresse")
+      */
+    #[Route('/findByUser/{id}', name:'app_adresse_idUser', methods: "POST")]
+    public function findByUserId(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
+
+        if ($userRepository->find($request->attributes->get('id')) === null){
+            return new JsonResponse([
+                "errorMessage" => "L'utilisateur n'existe pas"
+            ]);
+        }
+
+        $adresses = $adresseRepository->findByUser($request->attributes->get('id'));
+        $adressesJson = [];
+
+        foreach ($adresses as $adress){
+            $adressesJson[] = [
+                'id' => $adress->getId(),
+                'user_id' => $adress->getUser()->getId(),
+                'city' => $adress->getCity(),
+                'rue' => $adress->getRue(),
+                'postal_code' => $adress->getPostalCode(),
+                'num_rue' => $adress->getNumRue(),
+                'complement_adresse' => $adress->getComplementAdresse(),
+                'name' => $adress->getName()
+            ];
+        }
+
+        return new JsonResponse($adressesJson,200);
     }
 
 }

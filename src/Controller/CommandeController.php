@@ -266,4 +266,24 @@ class CommandeController extends AbstractController
         return new JsonResponse(null,200);
     }
 
+    /**
+     * @param CommandeRepository $commandeRepository
+     * @param FunctionErrors $errorsCodes
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+        #[Route('/count', name: 'commande_count', methods: "GET")]
+    public function countCommande(CommandeRepository $commandeRepository):JsonResponse{
+
+        $countCommande = $commandeRepository->countAll();
+        return new JsonResponse($countCommande[0]);
+
+    }
+
 }

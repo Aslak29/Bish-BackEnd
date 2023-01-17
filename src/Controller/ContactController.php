@@ -232,4 +232,21 @@ class ContactController extends AbstractController
         
         return new JsonResponse(null, 200);
     }
+    /**
+     * @param ContactRepository $contactRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Contact")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/countNotFinish', name: 'contact_count', methods: "GET")]
+    public function countContactNotFinish(ContactRepository $contactRepository):JsonResponse{
+
+        $countCommande = $contactRepository->countNotFinish();
+        return new JsonResponse($countCommande[0]);
+
+    }
 }

@@ -67,5 +67,12 @@ class CommandeRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+public function countAll():array {
+    return $this->createQueryBuilder('c')
+        ->select("COUNT(c.id)")
+        ->getQuery()
+        ->getResult();
+}
 }
 

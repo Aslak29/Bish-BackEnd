@@ -114,7 +114,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/{articleID}', name: 'app_blog_by_id', methods: "GET")]
+    #[Route('/find/{articleID}', name: 'app_blog_by_id', methods: "GET")]
     public function findById(BlogRepository $blogRepository, Request $request): JsonResponse
     {
         $blog = $blogRepository->findOneBy(array('id' => $request->attributes->get('articleID')));
@@ -249,6 +249,24 @@ class BlogController extends AbstractController
             }
         }
         return new JsonResponse(null,200);
+
+    }
+
+    /**
+     * @param BlogRepository $blogRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Blog")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/count', name: 'blog_count', methods: "GET")]
+    public function countBlog(BlogRepository $blogRepository):JsonResponse{
+
+        $countBlog = $blogRepository->countAll();
+        return new JsonResponse($countBlog[0]);
 
     }
 

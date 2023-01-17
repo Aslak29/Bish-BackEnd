@@ -242,5 +242,11 @@ class ProduitRepository extends ServiceEntityRepository
                ->getQuery()
                ->getResult();
     }
-
+    
+    public function countAll():array {
+        return $this->createQueryBuilder('p')
+            ->select("COUNT(p.id)")
+            ->getQuery()
+            ->getResult();
+ }
 }

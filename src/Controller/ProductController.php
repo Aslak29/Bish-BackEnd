@@ -796,7 +796,7 @@ class ProductController extends AbstractController
         }
     }
 
-    /**
+/**
      * @param ProduitRepository $produitRepository
      * @return JsonResponse
      * @OA\Tag (name="Produit")
@@ -808,7 +808,7 @@ class ProductController extends AbstractController
     #[Route('/count', name: 'product_count', methods: "GET")]
     public function countProduct(ProduitRepository $produitRepository):JsonResponse{
 
-        $countProduit = $produitRepository->countProduit();
+        $countProduit = $produitRepository->countAll();
         return new JsonResponse($countProduit[0]);
 
     }

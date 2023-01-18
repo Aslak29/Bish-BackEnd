@@ -70,4 +70,12 @@ class ContactRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+public function countNotFinish():array {
+    return $this->createQueryBuilder('c')
+        ->select("COUNT(c.id)")
+        ->where("c.isFinish = 0")
+        ->getQuery()
+        ->getResult();
+}
 }

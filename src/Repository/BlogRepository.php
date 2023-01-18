@@ -95,4 +95,13 @@ class BlogRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+public function countAll():array {
+    return $this->createQueryBuilder('b')
+        ->select("COUNT(b.id)")
+        ->getQuery()
+        ->getResult();
 }
+}
+
+

@@ -502,4 +502,30 @@ class UserController extends AbstractController
             "countUser" => $count[0][1]
         ]);
     }
+
+        /**
+     * @param UserRepository $userRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="User")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/recentUser', name: 'app_recent_user', methods: ['GET'])]
+    public function recentUser(UserRepository $userRepository): JsonResponse{
+
+        $recentUser = $userRepository->recentUser();
+        $userArray = [];
+        foreach($recentUser as $user){
+            $userArray[]=[
+                "name"=>$user->getName(),
+                "surname"=>$user->getSurname(),
+                "email"=> $user->getEmail(),
+                "phone"=>$user->getPhone(),
+            ];
+        }
+        return new JsonResponse($userArray);
+    }
 }

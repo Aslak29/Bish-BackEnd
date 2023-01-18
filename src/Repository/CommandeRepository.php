@@ -68,9 +68,18 @@ class CommandeRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-public function countAll():array {
+public function countMonth() {
     return $this->createQueryBuilder('c')
-        ->select("COUNT(c.id)")
+        ->where("MONTH(c.dateFacture)=01")
+        ->getQuery()
+        ->getResult();
+}
+
+public function recentCommande()
+{
+    return $this->createQueryBuilder('c')
+        ->OrderBy('c.created_at',"ASC")
+        ->setMaxResults(15)
         ->getQuery()
         ->getResult();
 }

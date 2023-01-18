@@ -278,12 +278,51 @@ class CommandeController extends AbstractController
      * )
      */
 
-        #[Route('/count', name: 'commande_count', methods: "GET")]
-    public function countCommande(CommandeRepository $commandeRepository):JsonResponse{
+        #[Route('/countMonth', name: 'commande_count', methods: "GET")]
+    public function countCommandeMonth(CommandeRepository $commandeRepository):JsonResponse{
 
-        $countCommande = $commandeRepository->countAll();
-        return new JsonResponse($countCommande[0]);
+        $date = new \DateTime();
+
+        $countCommandeMonth = $commandeRepository->countMonth();
+        $commandeArray = [];
+        foreach($countCommandeMonth as $commande){
+            $commandeArray[]=[
+                "date"=>$commande->getDateFacture()
+            ];
+        }
+
+        return new JsonResponse($commandeArray);
 
     }
+
+        /**
+     * @param CommandeRepository $commandeRepository
+     * @param FunctionErrors $errorsCodes
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+     #[Route('/recentCommande', name: 'commande_recent', methods: "GET")]
+     public function recentCommande(CommandeRepository $commandeRepository):JsonResponse{
+ 
+ 
+        $recentCommande = $commandeRepository->recentCommande();
+        $userArray = [];
+        foreach($recentCommande as $commande){
+            $userArray[]=[
+                "name"=>$commande->getName(),
+                "surname"=>$commande->getSurname(),
+                "email"=> $commande->getEmail(),
+                "phone"=>$commande->getPhone(),
+            ];
+        }
+        return new JsonResponse($userArray);
+ 
+     }
 
 }

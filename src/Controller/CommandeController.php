@@ -316,9 +316,9 @@ class CommandeController extends AbstractController
         foreach($recentCommande as $commande){
             $userArray[]=[
                 "name"=>$commande->getName(),
-                "surname"=>$commande->getSurname(),
-                "email"=> $commande->getEmail(),
-                "phone"=>$commande->getPhone(),
+                "stock"=>$commande->getStock(),
+                "paiement"=> $commande->getPaiement(),
+                "etat"=>$commande->getEtatCommande(),
             ];
         }
         return new JsonResponse($userArray);

@@ -85,7 +85,7 @@ class UserRepository extends ServiceEntityRepository
     public function recentUser()
     {
         return $this->createQueryBuilder('u')
-            ->OrderBy('u.created_at',"ASC")
+            ->OrderBy('u.created_at',"DESC")
             ->setMaxResults(15)
             ->getQuery()
             ->getResult();

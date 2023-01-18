@@ -277,23 +277,18 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-
-        #[Route('/countMonth', name: 'commande_count', methods: "GET")]
+    #[Route('/countMonth', name: 'commande_count', methods: "GET")]
     public function countCommandeMonth(CommandeRepository $commandeRepository):JsonResponse{
 
         $date = new \DateTime();
+        $startDate = $date->format('Y/m/01');
+        $endDate = $date->format('Y/m/t');
 
-        $countCommandeMonth = $commandeRepository->countMonth();
-        $commandeArray = [];
-        foreach($countCommandeMonth as $commande){
-            $commandeArray[]=[
-                "date"=>$commande->getDateFacture()
-            ];
-        }
+        $countCommandeMonth = $commandeRepository->countMonth($startDate,$endDate);
 
-        return new JsonResponse($commandeArray);
-
+        return new JsonResponse($countCommandeMonth[0]);
     }
+
 
         /**
      * @param CommandeRepository $commandeRepository

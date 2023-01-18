@@ -266,4 +266,68 @@ class CommandeController extends AbstractController
         return new JsonResponse(null,200);
     }
 
+    /**
+     * @param CommandeRepository $commandeRepository
+     * @param FunctionErrors $errorsCodes
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/countMonth', name: 'commande_count', methods: "GET")]
+    public function countCommandeMonth(CommandeRepository $commandeRepository):JsonResponse{
+
+        $date = new \DateTime();
+        $startDate = $date->format('Y/m/01');
+        $endDate = $date->format('Y/m/t');
+
+        $countCommandeMonth = $commandeRepository->countMonth($startDate,$endDate);
+
+        return new JsonResponse($countCommandeMonth[0]);
+    }
+
+
+        /**
+     * @param CommandeRepository $commandeRepository
+     * @param FunctionErrors $errorsCodes
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+     #[Route('/recentCommande', name: 'commande_recent', methods: "GET")]
+     public function recentCommande(CommandeRepository $commandeRepository):JsonResponse{
+ 
+ 
+        $recentCommande = $commandeRepository->recentCommande();
+        $commandeArray = [];
+        
+        foreach($recentCommande as $commande){
+            $total=0;
+
+            $commandes=[
+                'user_name' => $commande->getUser()->getName(),
+                "dateFacture"=>$commande->getDateFacture(),
+                "price"=> [],
+                "etat"=>$commande->getEtatCommande(),
+            ];
+            foreach ($commande->getProduitInCommande() as $pc) {
+                $total += $pc->getRemise() ? $pc->getQuantite() * (
+                          $pc->getPrice() - $pc->getPrice() * $pc->getRemise()/100)
+                        : $pc->getQuantite() * $pc->getPrice();
+            }
+            $commandes["price"]=round($total, 2);
+            $commandeArray[]=$commandes;
+        }
+        return new JsonResponse($commandeArray);
+ 
+     }
+
 }

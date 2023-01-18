@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Mapping\OrderBy;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -77,6 +78,15 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->select('count(u)')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function recentUser()
+    {
+        return $this->createQueryBuilder('u')
+            ->OrderBy('u.created_at',"DESC")
+            ->setMaxResults(15)
             ->getQuery()
             ->getResult();
     }

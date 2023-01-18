@@ -78,7 +78,7 @@ public function countMonth() {
 public function recentCommande()
 {
     return $this->createQueryBuilder('c')
-        ->OrderBy('c.created_at',"ASC")
+        ->OrderBy('c.dateFacture',"ASC")
         ->setMaxResults(15)
         ->getQuery()
         ->getResult();

@@ -312,16 +312,26 @@ class CommandeController extends AbstractController
  
  
         $recentCommande = $commandeRepository->recentCommande();
-        $userArray = [];
+        $commandeArray = [];
+        
         foreach($recentCommande as $commande){
-            $userArray[]=[
-                "name"=>$commande->getName(),
-                "stock"=>$commande->getStock(),
-                "paiement"=> $commande->getPaiement(),
+            $total=0;
+
+            $commandes=[
+                'user_name' => $commande->getUser()->getName(),
+                "dateFacture"=>$commande->getDateFacture(),
+                "price"=> [],
                 "etat"=>$commande->getEtatCommande(),
             ];
+            foreach ($commande->getProduitInCommande() as $pc) {
+                $total += $pc->getRemise() ? $pc->getQuantite() * (
+                          $pc->getPrice() - $pc->getPrice() * $pc->getRemise()/100)
+                        : $pc->getQuantite() * $pc->getPrice();
+            }
+            $commandes["price"]=round($total, 2);
+            $commandeArray[]=$commandes;
         }
-        return new JsonResponse($userArray);
+        return new JsonResponse($commandeArray);
  
      }
 

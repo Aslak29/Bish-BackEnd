@@ -50,11 +50,11 @@ class CommandeController extends AbstractController
                         'user_phone' => $commande->getUser()->getPhone() ? $commande->getUser()->getPhone() : "null",
                     ],
                     'adresse' => [
-                        'num_rue' => $commande->getNumRue(),
-                        'complement_adresse' => $commande->getComplementAdresse(),
-                        'rue' => $commande->getRue(),
-                        'ville' => $commande->getVille(),
-                        'code_postal' => $commande->getCodePostal(),
+                        'num_rue' => $commande->getNumRueLivraison(),
+                        'complement_adresse' => $commande->getComplementAdresseLivraison(),
+                        'rue' => $commande->getRueLivraison(),
+                        'ville' => $commande->getVilleLivraison(),
+                        'code_postal' => $commande->getCodePostalLivraison(),
                     ],
                     'date_facture' => $commande->getDateFacture()->format("d-m-Y"),
                     'heure_facture' => $commande->getDateFacture()->format('H:i:s'),
@@ -124,24 +124,24 @@ class CommandeController extends AbstractController
     {
         $order = $commandeRepository->find($request->attributes->get('orderId'));
 
-        $order->setRue($request->attributes->get('rue'));
-        $order->setNumRue($request->attributes->get('num_rue'));
-        $order->setVille($request->attributes->get('ville'));
+        $order->setRueLivraison($request->attributes->get('rue'));
+        $order->setNumRueLivraison($request->attributes->get('num_rue'));
+        $order->setVilleLivraison($request->attributes->get('ville'));
         if ($request->attributes->get('complement_adresse' ) != 'null') {
-            $order->setComplementAdresse($request->attributes->get('complement_adresse'));
+            $order->setComplementAdresseLivraison($request->attributes->get('complement_adresse'));
         } else {
-            $order->setComplementAdresse(null);
+            $order->setComplementAdresseLivraison(null);
         }
         
-        $order->setCodePostal($request->attributes->get('code_postal'));
+        $order->setCodePostalLivraison($request->attributes->get('code_postal'));
         $order->setEtatCommande($request->attributes->get('etat_commande'));
         
         $commandeRepository->save($order, true);
         $orderArray = [
-            "rue" => $order->getRue(),
-            "num_rue" => $order->getNumRue(),
-            "complement_adresse" => $order->getComplementAdresse(),
-            "code_postal" => $order->getCodePostal(),
+            "rue" => $order->getRueLivraison(),
+            "num_rue" => $order->getNumRueLivraison(),
+            "complement_adresse" => $order->getComplementAdresseLivraison(),
+            "code_postal" => $order->getCodePostalLivraison(),
             "etat_commande" => $order->getEtatCommande()
         ];
 

@@ -95,6 +95,22 @@ class StripeController extends AbstractController
         return new JsonResponse($paymentIntent,200);
     }
 
+    /**
+     * @OA\Tag (name="Stripe")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     * @throws ApiErrorException
+     */
+    #[Route('/confirmPayment/{idPaymentIntent}', name:'app_stripe_confirm_PaymentIntent', methods:['POST'])]
+    public function confirmPayment(Request $request): JsonResponse{
+
+        $stripe = new StripeClient('sk_test_51LwmsKBjYw0WvT4HhDKEhAOoXseKSd0B2JhUhd4eoF2NyrGyA79rOc7VfK4KvSRJLlpweRv7HHQVOsgHrP9VPRAo008FNyvIbg'); //TODO Put the secret key in .env
+        $paymentIntent = $stripe->paymentIntents->confirm($request->attributes->get('idPaymentIntent'));
+        return new JsonResponse($paymentIntent,200);
+    }
+
 
 
 }

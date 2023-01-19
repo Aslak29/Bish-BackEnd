@@ -25,6 +25,7 @@ class CodePromoService
         if ($code) {
             foreach ($code as $codePromo) {
                 $codeArray[] = [
+                    "id" => $codePromo->getId(),
                     "name" => $codePromo->getName(),
                     "remise" => $codePromo->getRemise(),
                     "montantMin" => $codePromo->getMontantMinimum(),

@@ -31,19 +31,34 @@ class Commande
     private ?Collection $ProduitInCommande;
 
     #[ORM\Column(length: 255)]
-    private ?string $ville = null;
+    private ?string $villeLivraison = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $rue = null;
+    private ?string $rueLivraison = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $codePostal = null;
+    private ?string $codePostalLivraison = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $numRue = null;
+    private ?string $numRueLivraison = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $complementAdresse = null;
+    private ?string $complementAdresseLivraison = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $villeFacturation = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $rueFacturation = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $codePostalFacturation = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $numRueFacturation = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $complementAdresseFacturation = null;
 
     /**
      * @param DateTimeImmutable $dateFacture
@@ -145,62 +160,122 @@ class Commande
         $this->ProduitInCommande = $ProduitInCommande;
     }
 
-    public function getVille(): ?string
+    public function getVilleLivraison(): ?string
     {
-        return $this->ville;
+        return $this->villeLivraison;
     }
 
-    public function setVille(string $ville): self
+    public function setVilleLivraison(string $villeLivraison): self
     {
-        $this->ville = $ville;
+        $this->villeLivraison = $villeLivraison;
 
         return $this;
     }
 
-    public function getRue(): ?string
+    public function getRueLivraison(): ?string
     {
-        return $this->rue;
+        return $this->rueLivraison;
     }
 
-    public function setRue(?string $rue): self
+    public function setRueLivraison(?string $rueLivraison): self
     {
-        $this->rue = $rue;
+        $this->rueLivraison = $rueLivraison;
 
         return $this;
     }
 
-    public function getCodePostal(): ?string
+    public function getCodePostalLivraison(): ?string
     {
-        return $this->codePostal;
+        return $this->codePostalLivraison;
     }
 
-    public function setCodePostal(string $codePostal): self
+    public function setCodePostalLivraison(string $codePostalLivraison): self
     {
-        $this->codePostal = $codePostal;
+        $this->codePostalLivraison = $codePostalLivraison;
 
         return $this;
     }
 
-    public function getNumRue(): ?string
+    public function getNumRueLivraison(): ?string
     {
-        return $this->numRue;
+        return $this->numRueLivraison;
     }
 
-    public function setNumRue(?string $numRue): self
+    public function setNumRueLivraison(?string $numRueLivraison): self
     {
-        $this->numRue = $numRue;
+        $this->numRueLivraison = $numRueLivraison;
 
         return $this;
     }
 
-    public function getComplementAdresse(): ?string
+    public function getComplementAdresseLivraison(): ?string
     {
-        return $this->complementAdresse;
+        return $this->complementAdresseLivraison;
     }
 
-    public function setComplementAdresse(?string $complementAdresse): self
+    public function setComplementAdresseLivraison(?string $complementAdresseLivraison): self
     {
-        $this->complementAdresse = $complementAdresse;
+        $this->complementAdresseLivraison = $complementAdresseLivraison;
+
+        return $this;
+    }
+
+    public function getVilleFacturation(): ?string
+    {
+        return $this->villeFacturation;
+    }
+
+    public function setVilleFacturation(string $villeFacturation): self
+    {
+        $this->villeFacturation = $villeFacturation;
+
+        return $this;
+    }
+
+    public function getRueFacturation(): ?string
+    {
+        return $this->rueFacturation;
+    }
+
+    public function setRueFacturation(string $rueFacturation): self
+    {
+        $this->rueFacturation = $rueFacturation;
+
+        return $this;
+    }
+
+    public function getCodePostalFacturation(): ?string
+    {
+        return $this->codePostalFacturation;
+    }
+
+    public function setCodePostalFacturation(string $codePostalFacturation): self
+    {
+        $this->codePostalFacturation = $codePostalFacturation;
+
+        return $this;
+    }
+
+    public function getNumRueFacturation(): ?string
+    {
+        return $this->numRueFacturation;
+    }
+
+    public function setNumRueFacturation(string $numRueFacturation): self
+    {
+        $this->numRueFacturation = $numRueFacturation;
+
+        return $this;
+    }
+
+    public function getComplementAdresseFacturation(): ?string
+    {
+        return $this->complementAdresseFacturation;
+    }
+
+    public function setComplementAdresseFacturation(string $complementAdresseFacturation): self
+    {
+        $this->complementAdresseFacturation = $complementAdresseFacturation;
 
         return $this;
     }

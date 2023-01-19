@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b485a93ad297df2ce3d0578bad791b1",
+    "content-hash": "022434810f1ef0347a5f008b6161875f",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2720,72 +2720,6 @@
             "time": "2021-07-14T16:41:46+00:00"
         },
         {
-            "name": "scienta/doctrine-json-functions",
-            "version": "4.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ScientaNL/DoctrineJsonFunctions.git",
-                "reference": "64c3f8875a46d4f33f807a2d3260335c2f5f2eea"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ScientaNL/DoctrineJsonFunctions/zipball/64c3f8875a46d4f33f807a2d3260335c2f5f2eea",
-                "reference": "64c3f8875a46d4f33f807a2d3260335c2f5f2eea",
-                "shasum": ""
-            },
-            "require": {
-                "ext-pdo": "*",
-                "php": "^7.1 || ^8.0"
-            },
-            "require-dev": {
-                "doctrine/coding-standard": "^8.0 || ^9.0",
-                "doctrine/orm": "^2.7",
-                "phpunit/phpunit": "^8.0 || ^9.0"
-            },
-            "suggest": {
-                "dunglas/doctrine-json-odm": "To serialize / deserialize objects as JSON documents."
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Scienta\\DoctrineJsonFunctions\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Doctrine Json Functions Contributors",
-                    "homepage": "https://github.com/ScientaNL/DoctrineJsonFunctions/contributors"
-                }
-            ],
-            "description": "A set of extensions to Doctrine 2 that add support for json query functions.",
-            "keywords": [
-                "database",
-                "doctrine",
-                "dql",
-                "json",
-                "mariadb",
-                "mysql",
-                "orm",
-                "postgres",
-                "postgresql",
-                "sqlite"
-            ],
-            "support": {
-                "issues": "https://github.com/ScientaNL/DoctrineJsonFunctions/issues",
-                "source": "https://github.com/ScientaNL/DoctrineJsonFunctions/tree/4.4.0"
-            },
-            "time": "2021-09-17T11:20:14+00:00"
-        },
-        {
             "name": "sensio/framework-extra-bundle",
             "version": "v6.2.9",
             "source": {
@@ -2910,6 +2844,67 @@
                 "source": "https://github.com/stella-maris-solutions/clock/tree/0.1.7"
             },
             "time": "2022-11-25T16:15:06+00:00"
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "v10.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "417d66a5b27a5ec53a706a346b05bfe170043d52"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/417d66a5b27a5ec53a706a346b05bfe170043d52",
+                "reference": "417d66a5b27a5ec53a706a346b05bfe170043d52",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "3.5.0",
+                "php-coveralls/php-coveralls": "^2.5",
+                "phpstan/phpstan": "^1.2",
+                "phpunit/phpunit": "^5.7 || ^9.0",
+                "squizlabs/php_codesniffer": "^3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Stripe\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stripe and contributors",
+                    "homepage": "https://github.com/stripe/stripe-php/contributors"
+                }
+            ],
+            "description": "Stripe PHP Library",
+            "homepage": "https://stripe.com/",
+            "keywords": [
+                "api",
+                "payment processing",
+                "stripe"
+            ],
+            "support": {
+                "issues": "https://github.com/stripe/stripe-php/issues",
+                "source": "https://github.com/stripe/stripe-php/tree/v10.3.0"
+            },
+            "time": "2022-12-22T20:07:30+00:00"
         },
         {
             "name": "symfony/amqp-messenger",

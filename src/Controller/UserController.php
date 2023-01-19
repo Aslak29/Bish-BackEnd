@@ -5,24 +5,29 @@ namespace App\Controller;
 use App\Entity\User;
 use App\GlobalFunction\FunctionErrors;
 use App\Repository\UserRepository;
-use ContainerCiO9nmx\getAdresseRepositoryService;
 use OpenApi\Annotations as OA;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-use function PHPSTORM_META\map;
 
 #[Route('api/user')]
 class UserController extends AbstractController
 {
     private UserPasswordHasherInterface $encoder;
+    private MailerInterface $mailer;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher) {
+    public function __construct(UserPasswordHasherInterface $passwordHasher, MailerInterface $mailer)
+    {
         $this->encoder = $passwordHasher;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -30,6 +35,7 @@ class UserController extends AbstractController
      * @param Request $request
      * @param ValidatorInterface $validator
      * @return JsonResponse
+     * @throws TransportExceptionInterface
      * @OA\Tag (name="User")
      * @OA\Response(
      *     response="200",
@@ -55,7 +61,10 @@ class UserController extends AbstractController
 
 
 
-        /* Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple #[Assert\Email(message: "L'email n'est pas valide.")]*/
+        /*
+        Gestion des erreurs avec ValidatorInterface qui utilise les annotations Assets exemple
+        #[Assert\Email(message: "L'email n'est pas valide.")]
+        */
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
             $errorsString = (string) $errors;
@@ -65,20 +74,29 @@ class UserController extends AbstractController
         if ($password === $passwordConfirm) {
             $user->setPassword($this->encoder->hashPassword($user, $user->getPassword()));
         }else {
-            return new JsonResponse(["error" => "les mots de passe ne sont pas idendiques"],400);
+            return new JsonResponse(["error" => "les mots de passe ne sont pas idendiques"], 400);
         }
 
         if ($userRepository->findUserByMail($user->getEmail()) != null){
             return new JsonResponse([
                 "errorCode" => "001",
                 "errorMessage" => "L'adresse email est déjà inscrite dans la base de données"
-                ],409);
-        } ;
+                ], 409);
+        }
 
-        $userRepository->save($user,true);
+        $userRepository->save($user, true);
 
 
-        return new JsonResponse(null,200);
+        $email = (new TemplatedEmail())
+            ->from(new Address('bishincubateur@gmail.com', 'Bish'))
+            ->to($user->getEmail())
+            ->subject('Bienvenue chez Bish !')
+            ->htmlTemplate('register/confirmation.html.twig')
+            ->context(["username" => $user->getName()])
+        ;
+        $this->mailer->send($email);
+
+        return new JsonResponse(null, 200);
     }
 
     /**

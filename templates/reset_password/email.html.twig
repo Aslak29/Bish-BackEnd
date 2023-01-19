@@ -1,9 +1,35 @@
-<h1>Hi!</h1>
+<table width="70%" align="center">
+    <tbody>
+    <tr>
+        <td
+                width="100%"
+                valign="middle"
+                align="center"
+                bgcolor="#2EB7EB"
+                style="
+                padding: 0 3rem;
+                border-radius: 10px 10px 10px 10px;
+                box-shadow: 1px 7px 14px -13px rgba(0,0,0,0.98);
 
-<p>To reset your password, please visit the following link</p>
+                ">
+            <h1 style="color: #FFFFFF">Bonjour {{ username }} !</h1>
+        </td>
+    </tr>
+    <tr>
+        <td width="50%" align="left" style="padding:2rem;">
+            <p>Voici le lien pour réinitialiser votre Mot de Passe.</p>
 
-<a href="{{ 'http://127.0.0.1:5173/reset-password/reset/' ~ resetToken.token }}"> {{ 'http://127.0.0.1:5173/reset-password/reset/' ~ resetToken.token }}</a>
+            <a href="{{ 'http://127.0.0.1:5173/reset-password/reset/' ~ resetToken.token }}">{{ 'http://127.0.0.1:5173/reset-password/reset/' ~ resetToken.token }}</a>
 
-<p>This link will expire in {{ resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle') }}.</p>
+            <p>Si vous rencontrez un problème, veuillez contactez notre Service Client</p>
+            <p>dans notre espace Contact !</p>
+        </td>
+    </tr>
 
-<p>Cheers!</p>
+    <tr>
+        <td align="left" style="padding:0 1rem;">
+            <p>À bientot !</p>
+        </td>
+    </tr>
+    </tbody>
+</table>

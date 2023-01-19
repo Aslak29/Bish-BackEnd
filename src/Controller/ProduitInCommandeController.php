@@ -53,9 +53,9 @@ class ProduitInCommandeController extends AbstractController {
                 'numeroCommande' => $produitInCommande->getCommande()->getId(),
                 'Etat' => $produitInCommande->getCommande()->getEtatCommande(),
                 'Adresse' => [
-                    'ville' => $produitInCommande->getCommande()->getVille(),
-                    'rue' => $produitInCommande->getCommande()->getRue(),
-                    'Code_Postal' => $produitInCommande->getCommande()->getCodePostal()
+                    'ville' => $produitInCommande->getCommande()->getVilleLivraison(),
+                    'rue' => $produitInCommande->getCommande()->getRueLivraison(),
+                    'Code_Postal' => $produitInCommande->getCommande()->getCodePostalLivraison()
                 ]
             ];
             $produitInCommandeArray[] = $infosCommandes;

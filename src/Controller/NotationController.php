@@ -66,9 +66,7 @@ class NotationController extends AbstractController
         $userId = $request->attributes->get('id');
         $productId = $request->attributes->get('idProduct');
         $noteValue = $request->attributes->get('value');
-        $note = $this->noteService->updateNoteByUser($userId, $productId, $noteValue);
-
-        return new JsonResponse($note);
+        return $this->noteService->updateNoteByUser($userId, $productId, $noteValue);
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\NoteRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,6 +15,7 @@ class ProduitInCommandeController extends AbstractController {
 
     /**
      * @param ProduitInCommandeRepository $produitInCommandeRepository
+     * @param NoteRepository $noteRepository
      * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="ProduitInCommande")
@@ -25,14 +27,24 @@ class ProduitInCommandeController extends AbstractController {
     #[Route('/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
     public function singleOrder(
         ProduitInCommandeRepository $produitInCommandeRepository,
+        NoteRepository $noteRepository,
         Request $request
     ): JsonResponse
     {
         $produitInCommandes = $produitInCommandeRepository->
         findOneOrderbyIdCommandes($request->attributes->get('idCommande'));
-
         $produitInCommandeArray = [];
+        $note = 0;
         foreach ($produitInCommandes as $produitInCommande) {
+            if ($produitInCommande->getCommande()->getEtatCommande() === "Livrée") {
+                $note = $noteRepository->findNoteByUser(
+                    $produitInCommande->getCommande()->getUser()->getId(),
+                    $produitInCommande->getProduit()->getId()
+                );
+            }
+            if (!$note) {
+                $note = 0;
+            }
             $produitInCommandeArray[] = [
                 'id' => $produitInCommande->getId(),
                 'quantite' => $produitInCommande->getQuantite(),
@@ -46,8 +58,11 @@ class ProduitInCommandeController extends AbstractController {
                         : $produitInCommande->getQuantite() * $produitInCommande->getPrice(),
                 'Taille' => $produitInCommande->getTaille(),
                 'image' => $produitInCommande->getProduit() ? $produitInCommande->getProduit()->getPathImage() : "-",
+                'produitId' => $produitInCommande->getProduit()->getId(),
+                'noteByUser' => $note > 0 ? $note[0]->getNote() : 0
             ];
-            if (end($produitInCommandes)=== $produitInCommande) {
+
+            if (end($produitInCommandes) === $produitInCommande) {
             $infosCommandes[] = [
                 'dateFacture' => $produitInCommande->getCommande()->getDateFacture()->format("d-m-Y"),
                 'numeroCommande' => $produitInCommande->getCommande()->getId(),
@@ -82,20 +97,17 @@ class ProduitInCommandeController extends AbstractController {
     ): JsonResponse
     {
         $deleteProduitInCommande = $produitInCommandeRepository->find($request->attributes->get('id'));
-        if($deleteProduitInCommande != null){
-            $produitInCommandeRepository->remove($deleteProduitInCommande,true);
-        }else{
+        if ($deleteProduitInCommande != null) {
+            $produitInCommandeRepository->remove($deleteProduitInCommande, true);
+        }else {
             return new JsonResponse([
                 'errorCode' => "013",
                 'errorMessage' => "Ce produit n'existe pas"
-            ],409);
+            ], 409);
         }
         return new JsonResponse([
             'successCode' => "004",
             'successMessage' => "Le produit a bien été supprimé de la commande"
-        ],200);
-
-    
-    return new JsonResponse();
+        ], 200);
     }
 }

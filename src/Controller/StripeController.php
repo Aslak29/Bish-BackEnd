@@ -112,5 +112,32 @@ class StripeController extends AbstractController
     }
 
 
+    /**
+     * @OA\Tag (name="Stripe")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     * @throws ApiErrorException
+     */
+    #[Route('/setPaymentIntent/amount/{idPaymentIntent}/{amount}', name: 'app_stripe_amount_update', methods:['POST'])]
+    public function updateAmount(Request $request): JsonResponse{
+
+        $stripe = new StripeClient('sk_test_51LwmsKBjYw0WvT4HhDKEhAOoXseKSd0B2JhUhd4eoF2NyrGyA79rOc7VfK4KvSRJLlpweRv7HHQVOsgHrP9VPRAo008FNyvIbg'); //TODO Put the secret key in .env
+        $paymentIntent = $stripe->paymentIntents->retrieve($request->attributes->get("idPaymentIntent"));
+
+        $epsilon = 0.0000001;
+        if (abs($paymentIntent->amount - $request->attributes->get("amount") * 100) > $epsilon){
+            $paymentIntent = $stripe->paymentIntents->update($request->attributes->get("idPaymentIntent"),
+                [
+                    "amount" => $request->attributes->get("amount") * 100
+                ]);
+            return new JsonResponse($paymentIntent);
+        }
+
+        return new JsonResponse("La valeur a update est la même");
+    }
+
+
 
 }

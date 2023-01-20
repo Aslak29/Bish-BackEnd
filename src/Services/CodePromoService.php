@@ -101,10 +101,27 @@ class CodePromoService
      */
     public function update($data): JsonResponse
     {
+        $codeVerif = $this->codePromoRepository->findAll();
+        $nameBefore = $this->codePromoRepository->find($data["id"])->getName();
+        $tabCodePromo = [];
+
+        foreach ($codeVerif as $cv) {
+            $tabCodePromo[] = $cv->getName();
+        }
+
+        $index = array_search($nameBefore, $tabCodePromo);
+        unset($tabCodePromo[$index]);
+
+        if (in_array($data["name"], $tabCodePromo)) {
+            return new JsonResponse([
+                "errorCode" => "035",
+                "errorMessage" => "Le nom de cette promotion est déjà utiliser !"
+            ], 404);
+        }
         $codeArray = [];
-        $code = $this->codePromoRepository->find($data["id"]);
 
         if (!empty($data)) {
+            $code = $this->codePromoRepository->find($data["id"]);
             $code->setName($data["name"]);
             $code->setRemise($data["remise"]);
             $code->setMontantMinimum($data["montantMin"]);
@@ -129,7 +146,7 @@ class CodePromoService
         $code = $this->codePromoRepository->find($id);
 
         if ($code) {
-            $this->codePromoRepository->remove($code,true);
+            $this->codePromoRepository->remove($code, true);
         }else {
             return new JsonResponse([
                 "errorCode" => "030",
@@ -156,4 +173,32 @@ class CodePromoService
         return new JsonResponse(null, 200);
     }
 
+    public function findByName($name, $total): JsonResponse
+    {
+        $codePromo = $this->codePromoRepository->findOneBy(array('name' => $name));
+
+        if ($codePromo) {
+            if(strtotime($codePromo->getEndDate()->format('Y-m-d H:m:s')) < strtotime(date("Y-m-d H:i:s"))) {
+                return new JsonResponse([
+                    "error" => true,
+                    "message" => "Ce code est expiré",
+                    "end" => strtotime($codePromo->getEndDate()->format('Y-m-d H:m:s')),
+                    "now" => strtotime(date("Y-m-d H:i:s")),
+                ], 200);
+            } else {
+                return new JsonResponse([
+                    "error" => false,
+                    "remise" => $codePromo->getRemise(),
+                    "type" => $codePromo->getType(),
+                ], 200);
+            }
+        } else {
+            return new JsonResponse([
+                "error" => true,
+                "message" => "Ce code n'existe pas"
+            ], 200);
+        }
+        return new JsonResponse(null, 200);
+    }
+    
 }

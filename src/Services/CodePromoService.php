@@ -53,7 +53,7 @@ class CodePromoService
     public function create($data): JsonResponse
     {
         $codeArray = [];
-        if (empty($data)) {
+        if (!empty($data)) {
             $code = new CodePromo();
             $code->setName($data["name"]);
             $code->setRemise($data["remise"]);
@@ -80,17 +80,22 @@ class CodePromoService
         return new JsonResponse($codeArray, 200);
     }
 
+    /**
+     * @throws Exception
+     */
     public function update($data): JsonResponse
     {
         $codeArray = [];
         $code = $this->codePromoRepository->find($data["id"]);
 
-        if (empty($data)) {
+        if (!empty($data)) {
             $code->setName($data["name"]);
             $code->setRemise($data["remise"]);
             $code->setMontantMinimum($data["montantMin"]);
-            $code->setStartDate($data["startDate"]);
-            $code->setEndDate($data["endDate"]);
+            $startDate = new \DateTime($data["startDate"]);
+            $code->setStartDate($startDate);
+            $endDate = new \DateTime($data["endDate"]);
+            $code->setEndDate($endDate);
             $code->setType($data["type"]);
             $this->codePromoRepository->save($code, true);
         }else {

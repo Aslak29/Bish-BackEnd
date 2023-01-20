@@ -116,7 +116,7 @@ class CodePromoController extends AbstractController
     public function findByName(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        return $this->codePromoService->findByName($data['name'], $data['total']);
+        return $this->codePromoService->findByName($data['name']);
     }
 
 }

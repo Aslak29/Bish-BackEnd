@@ -173,7 +173,7 @@ class CodePromoService
         return new JsonResponse(null, 200);
     }
 
-    public function findByName($name, $total): JsonResponse
+    public function findByName($name): JsonResponse
     {
         $codePromo = $this->codePromoRepository->findOneBy(array('name' => $name));
 

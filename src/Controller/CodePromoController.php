@@ -103,4 +103,20 @@ class CodePromoController extends AbstractController
         return $this->codePromoService->multipleRemoveCodePromo($data);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="CodePromo")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/findByName', name: 'app_find_by_name_code_promo', methods: "POST")]
+    public function findByName(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        return $this->codePromoService->findByName($data['name'], $data['total']);
+    }
+
 }

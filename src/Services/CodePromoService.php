@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Entity\CodePromo;
 use App\Repository\CodePromoRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class CodePromoService
 {
@@ -41,8 +43,73 @@ class CodePromoService
                 ];
             }
         }
+        return new JsonResponse($codeArray, 200);
+    }
 
+    public function create($data): JsonResponse
+    {
+        $codeArray = [];
+        if (empty($data)) {
+            $code = new CodePromo();
+            $code->setName($data["name"]);
+            $code->setRemise($data["remise"]);
+            $code->setMontantMinimum($data["montantMin"]);
+            $code->setStartDate($data["startDate"]);
+            $code->setEndDate($data["endDate"]);
+            $code->setType($data["type"]);
+
+            $this->codePromoRepository->save($code);
+
+            $codeArray[] = [
+                "id" => $code->getId(),
+                "name" => $code->getName()
+            ];
+        }else {
+            return new JsonResponse([
+                "errorCode" => "030",
+                "errorMessage" => "Les données attendue ne sont pas correct !"
+            ], 404);
+        }
 
         return new JsonResponse($codeArray, 200);
     }
+
+    public function update($data): JsonResponse
+    {
+        $codeArray = [];
+        $code = $this->codePromoRepository->find($data["id"]);
+
+        if (empty($data)) {
+            $code->setName($data["name"]);
+            $code->setRemise($data["remise"]);
+            $code->setMontantMinimum($data["montantMin"]);
+            $code->setStartDate($data["startDate"]);
+            $code->setEndDate($data["endDate"]);
+            $code->setType($data["type"]);
+            $this->codePromoRepository->save($code);
+        }else {
+            return new JsonResponse([
+                "errorCode" => "030",
+                "errorMessage" => "Les données attendue ne sont pas correct !"
+            ], 404);
+        }
+
+        return new JsonResponse($codeArray, 200);
+    }
+
+    public function delete($id): JsonResponse
+    {
+        $code = $this->codePromoRepository->find($id);
+
+        if ($code) {
+            $this->codePromoRepository->remove($code);
+        }else {
+            return new JsonResponse([
+                "errorCode" => "030",
+                "errorMessage" => "Le Code Promo n'existe pas !"
+            ], 404);
+        }
+        return new JsonResponse(null, 200);
+    }
+
 }

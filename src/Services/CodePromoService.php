@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\CodePromo;
 use App\Repository\CodePromoRepository;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -46,6 +47,9 @@ class CodePromoService
         return new JsonResponse($codeArray, 200);
     }
 
+    /**
+     * @throws Exception
+     */
     public function create($data): JsonResponse
     {
         $codeArray = [];
@@ -54,11 +58,13 @@ class CodePromoService
             $code->setName($data["name"]);
             $code->setRemise($data["remise"]);
             $code->setMontantMinimum($data["montantMin"]);
-            $code->setStartDate($data["startDate"]);
-            $code->setEndDate($data["endDate"]);
+            $startDate = new \DateTime($data["startDate"]);
+            $code->setStartDate($startDate);
+            $endDate = new \DateTime($data["endDate"]);
+            $code->setEndDate($endDate);
             $code->setType($data["type"]);
 
-            $this->codePromoRepository->save($code);
+            $this->codePromoRepository->save($code, true);
 
             $codeArray[] = [
                 "id" => $code->getId(),
@@ -86,7 +92,7 @@ class CodePromoService
             $code->setStartDate($data["startDate"]);
             $code->setEndDate($data["endDate"]);
             $code->setType($data["type"]);
-            $this->codePromoRepository->save($code);
+            $this->codePromoRepository->save($code, true);
         }else {
             return new JsonResponse([
                 "errorCode" => "030",

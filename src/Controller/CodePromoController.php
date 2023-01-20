@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Services\CodePromoService;
+use Exception;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -44,11 +45,12 @@ class CodePromoController extends AbstractController
      *     response="200",
      *     description = "OK"
      * )
+     * @throws Exception
      */
     #[Route('/create', name: 'app_create_code_promo', methods: "POST")]
     public function create(Request $request): JsonResponse
     {
-        $data = $request->getContent();
+        $data = json_decode($request->getContent(), true);
         return $this->codePromoService->create($data);
     }
 
@@ -64,7 +66,7 @@ class CodePromoController extends AbstractController
     #[Route('/update', name: 'app_update_code_promo', methods: "PUT")]
     public function update(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent());
+        $data = json_decode($request->getContent(), true);
         return $this->codePromoService->update($data);
     }
 

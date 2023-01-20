@@ -82,7 +82,7 @@ class CodePromoController extends AbstractController
     #[Route('/delete/{id}', name: 'app_delete_code_promo', methods: "DELETE")]
     public function delete(Request $request): JsonResponse
     {
-        return $this->codePromoService->update($request->attributes->get("id"));
+        return $this->codePromoService->delete($request->attributes->get("id"));
     }
 
 }

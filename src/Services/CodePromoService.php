@@ -33,6 +33,8 @@ class CodePromoService
                     "remise" => $codePromo->getRemise(),
                     "montantMin" => $codePromo->getMontantMinimum(),
                     "type" => $codePromo->getType(),
+                    "startDateEN" => $codePromo->getStartDate()->format("Y-m-d"),
+                    "endDateEN" => $codePromo->getEndDate()->format("Y-m-d"),
                     "startDate" => [
                         "date" => $codePromo->getStartDate()->format("d-m-Y"),
                         "time" => $codePromo->getStartDate()->format("H:m:s")
@@ -113,7 +115,7 @@ class CodePromoService
         $code = $this->codePromoRepository->find($id);
 
         if ($code) {
-            $this->codePromoRepository->remove($code);
+            $this->codePromoRepository->remove($code,true);
         }else {
             return new JsonResponse([
                 "errorCode" => "030",

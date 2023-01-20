@@ -101,10 +101,23 @@ class CodePromoService
      */
     public function update($data): JsonResponse
     {
+        $codeVerif = $this->codePromoRepository->findAll();
+        $tabCodePromo = [];
+
+        foreach ($codeVerif as $cv) {
+            $tabCodePromo[] = $cv->getName();
+        }
+
+        if (in_array($data["name"], $tabCodePromo)) {
+            return new JsonResponse([
+                "errorCode" => "035",
+                "errorMessage" => "Le nom de cette promotion est déjà utiliser !"
+            ], 404);
+        }
         $codeArray = [];
-        $code = $this->codePromoRepository->find($data["id"]);
 
         if (!empty($data)) {
+            $code = $this->codePromoRepository->find($data["id"]);
             $code->setName($data["name"]);
             $code->setRemise($data["remise"]);
             $code->setMontantMinimum($data["montantMin"]);
@@ -129,7 +142,7 @@ class CodePromoService
         $code = $this->codePromoRepository->find($id);
 
         if ($code) {
-            $this->codePromoRepository->remove($code,true);
+            $this->codePromoRepository->remove($code, true);
         }else {
             return new JsonResponse([
                 "errorCode" => "030",

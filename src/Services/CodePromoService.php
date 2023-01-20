@@ -54,6 +54,20 @@ class CodePromoService
      */
     public function create($data): JsonResponse
     {
+        $codeVerif = $this->codePromoRepository->findAll();
+        $tabCodePromo = [];
+
+        foreach ($codeVerif as $cv) {
+            $tabCodePromo[] = $cv->getName();
+        }
+
+        if (in_array($data["name"], $tabCodePromo)) {
+            return new JsonResponse([
+                "errorCode" => "035",
+                "errorMessage" => "Le nom de cette promotion est déjà utiliser !"
+            ], 404);
+        }
+
         $codeArray = [];
         if (!empty($data)) {
             $code = new CodePromo();

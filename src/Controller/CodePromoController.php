@@ -62,6 +62,7 @@ class CodePromoController extends AbstractController
      *     response="200",
      *     description = "OK"
      * )
+     * @throws Exception
      */
     #[Route('/update', name: 'app_update_code_promo', methods: "PUT")]
     public function update(Request $request): JsonResponse
@@ -78,11 +79,28 @@ class CodePromoController extends AbstractController
      *     response="200",
      *     description = "OK"
      * )
+     * @throws Exception
      */
     #[Route('/delete/{id}', name: 'app_delete_code_promo', methods: "DELETE")]
     public function delete(Request $request): JsonResponse
     {
-        return $this->codePromoService->update($request->attributes->get("id"));
+        return $this->codePromoService->delete($request->attributes->get("id"));
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="CodePromo")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/multipleRemove', name: 'app_multiple_delete_code_promo', methods: "DELETE")]
+    public function multipleRemoveCodePromo(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        return $this->codePromoService->multipleRemoveCodePromo($data);
     }
 
 }

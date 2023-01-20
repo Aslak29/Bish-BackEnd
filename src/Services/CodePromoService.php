@@ -125,4 +125,21 @@ class CodePromoService
         return new JsonResponse(null, 200);
     }
 
+    public function multipleRemoveCodePromo($data): JsonResponse
+    {
+        foreach ($data as $id) {
+            $code = $this->codePromoRepository->find($id);
+
+            if (!$code) {
+                return new JsonResponse([
+                    "errorCode" => "A définir",
+                    "errorMessage" => "Le code promo n'éxiste pas !"
+                ]);
+            }
+
+            $this->codePromoRepository->remove($code, true);
+        }
+        return new JsonResponse(null, 200);
+    }
+
 }

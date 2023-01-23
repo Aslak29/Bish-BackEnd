@@ -138,6 +138,22 @@ class StripeController extends AbstractController
         return new JsonResponse("La valeur a update est la même");
     }
 
+    /**
+     * @OA\Tag (name="Stripe")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     * @throws ApiErrorException
+     */
+    #[Route('/cancelPaymentIntent/{idPaymentIntent}', name: 'app_stripe_paymentIntent_cancel', methods:['POST'])]
+    public function cancelPaymentIntent(Request $request): JsonResponse{
+
+        $stripe = new StripeClient('sk_test_51LwmsKBjYw0WvT4HhDKEhAOoXseKSd0B2JhUhd4eoF2NyrGyA79rOc7VfK4KvSRJLlpweRv7HHQVOsgHrP9VPRAo008FNyvIbg'); //TODO Put the secret key in .env
+        $paymentIntent =  $stripe->paymentIntents->cancel($request->attributes->get("idPaymentIntent"),[]);
+
+        return new JsonResponse($paymentIntent,200);
+    }
 
 
 }

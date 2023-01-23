@@ -190,6 +190,7 @@ class CodePromoService
                     "error" => false,
                     "remise" => $codePromo->getRemise(),
                     "type" => $codePromo->getType(),
+                    "montantMin" => $codePromo->getMontantMinimum()
                 ], 200);
             }
         } else {

@@ -19,7 +19,7 @@ class CodePromoFixtures extends Fixture
 
         for ($i = 1; $i < 10; $i++) {
             $code = (new CodePromo())
-                ->setName('CODEPROMO- '.$i)
+                ->setName('CODEPROMO'.$i)
                 ->setRemise(random_int(10, 50))
                 ->setMontantMinimum(random_int(20, 50))
                 ->setStartDate(new \DateTime())

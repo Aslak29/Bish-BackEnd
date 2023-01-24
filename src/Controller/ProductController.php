@@ -21,15 +21,15 @@ use App\Repository\ProduitBySizeRepository;
 #[Route('api/produit')]
 class ProductController extends AbstractController
 {
-        /**
-     * @param ProduitRepository $produitRepository
-     * @return JsonResponse
-     * @OA\Tag (name="Produit")
-     * @OA\Response(
-     *     response="200",
-     *     description = "OK"
-     * )
-     */
+    /**
+    * @param ProduitRepository $produitRepository
+    * @return JsonResponse
+    * @OA\Tag (name="Produit")
+    * @OA\Response(
+    *     response="200",
+    *     description = "OK"
+    * )
+    */
 
     #[Route('/', name: 'app_produit', methods:"GET")]
     public function findProduct(ProduitRepository $produitRepository): JsonResponse

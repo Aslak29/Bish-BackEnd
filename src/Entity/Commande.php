@@ -273,7 +273,7 @@ class Commande
         return $this->complementAdresseFacturation;
     }
 
-    public function setComplementAdresseFacturation(string $complementAdresseFacturation): self
+    public function setComplementAdresseFacturation(?string $complementAdresseFacturation): self
     {
         $this->complementAdresseFacturation = $complementAdresseFacturation;
 

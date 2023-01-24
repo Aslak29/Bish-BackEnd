@@ -54,13 +54,14 @@ class ProduitBySizeRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findByIdProductAndSize($productId, $sizeId){
+    public function findByIdProductAndSize($productId, $size){
         return $this->createQueryBuilder('ps')
+            ->innerJoin('ps.taille', 't')
             ->where('ps.produit = :productId')
-            ->andWhere('ps.taille = :sizeId')
+            ->andWhere('t.taille = :size')
             ->setParameters([
                 "productId" => $productId,
-                "sizeId" => $sizeId
+                "size" => $size
             ])
             ->getQuery()
             ->getResult()

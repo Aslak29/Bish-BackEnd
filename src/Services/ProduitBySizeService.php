@@ -19,9 +19,9 @@ class ProduitBySizeService
         $this->produitBySizeRepository = $produitBySizeRepository;
     }
 
-    public function updateStockInCart($productId, $sizeId, $stock, $type): JsonResponse
+    public function updateStockInCart($productId, $size, $stock, $type): JsonResponse
     {
-        $productBysize = $this->produitBySizeRepository->findByIdProductAndSize($productId, $sizeId)[0];
+        $productBysize = $this->produitBySizeRepository->findByIdProductAndSize($productId, $size)[0];
 
         if($type == 'increment') {
             $productBysize->setStock($productBysize->getStock() + $stock);
@@ -36,7 +36,6 @@ class ProduitBySizeService
         $this->produitBySizeRepository->save($productBysize, true);
         return new JsonResponse([
             "id" => $productBysize->getId(),
-            "product" => $productBysize->getProduit(),
             "message" => "Le stock a bien été modifié"
         ], 200);
     }

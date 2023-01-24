@@ -31,9 +31,10 @@ class ProduitBySizeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/updateStockInCart/{productId}/{size}/{stock}/{type}', name: 'app_product_by_size_update_stock', methods: "POST")]
+    #[Route('/updateStockInCart/{type}', name: 'app_product_by_size_update_stock', methods: "POST")]
     public function updateStockInCart(Request $request): JsonResponse
     {
-        return $this->produitBySizeService->updateStockInCart($request->attributes->get("productId"), $request->attributes->get("size"), $request->attributes->get("stock"), $request->attributes->get("type"));
+        $data = json_decode($request->getContent(), true);
+        return $this->produitBySizeService->updateStockInCart($data, $request->attributes->get("type"));
     }
 }

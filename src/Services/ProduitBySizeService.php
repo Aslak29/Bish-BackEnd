@@ -19,23 +19,28 @@ class ProduitBySizeService
         $this->produitBySizeRepository = $produitBySizeRepository;
     }
 
-    public function updateStockInCart($productId, $size, $stock, $type): JsonResponse
+    public function updateStockInCart($data, $type): JsonResponse
     {
-        $productBysize = $this->produitBySizeRepository->findByIdProductAndSize($productId, $size)[0];
+        foreach($data as $item) {
+            $productBysize = $this->produitBySizeRepository->findByIdProductAndSize($item['productId'], $item['size'])[0];
 
-        if($type == 'increment') {
-            $productBysize->setStock($productBysize->getStock() + $stock);
-        } elseif($type == 'decrement') {
-            $productBysize->setStock($productBysize->getStock() - $stock);
-        } else {
-            return new JsonResponse([
-                "errorCode" => "040",
-                "errorMessage" => "Le type doit être decrement ou increment"
-            ], 404);
+            $ids = [];
+
+            if($type == 'increment') {
+                $productBysize->setStock($productBysize->getStock() + $item['stock']);
+            } elseif($type == 'decrement') {
+                $productBysize->setStock($productBysize->getStock() - $item['stock']);
+            } else {
+                return new JsonResponse([
+                    "errorCode" => "040",
+                    "errorMessage" => "Le type doit être decrement ou increment"
+                ], 404);
+            }
+            $this->produitBySizeRepository->save($productBysize, true);
+            $ids[] = $productBysize->getId();
         }
-        $this->produitBySizeRepository->save($productBysize, true);
         return new JsonResponse([
-            "id" => $productBysize->getId(),
+            "id" => $ids,
             "message" => "Le stock a bien été modifié"
         ], 200);
     }

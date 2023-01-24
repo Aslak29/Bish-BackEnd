@@ -125,7 +125,11 @@ class StripeController extends AbstractController
 
         $stripe = new StripeClient('sk_test_51LwmsKBjYw0WvT4HhDKEhAOoXseKSd0B2JhUhd4eoF2NyrGyA79rOc7VfK4KvSRJLlpweRv7HHQVOsgHrP9VPRAo008FNyvIbg'); //TODO Put the secret key in .env
         $paymentIntent = $stripe->paymentIntents->retrieve($request->attributes->get("idPaymentIntent"));
-        $paymentMethods = $stripe->paymentMethods->retrieve($paymentIntent->payment_method);
+        $paymentMethods = null;
+        
+        if($paymentIntent->payment_method) {
+            $paymentMethods = $stripe->paymentMethods->retrieve($paymentIntent->payment_method);
+        }
 
         $epsilon = 0.0000001;
         if (abs($paymentIntent->amount - $request->attributes->get("amount") * 100) > $epsilon){

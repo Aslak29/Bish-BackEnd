@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Commande;
+use App\Entity\ProduitInCommande;
+use App\Repository\ProduitRepository;
+use App\Repository\TailleRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
@@ -347,7 +350,7 @@ class CommandeController extends AbstractController
      */
 
      #[Route('/createCommande', name: 'commande_create', methods: "POST")]
-     public function createCommande(CommandeRepository $commandeRepository,UserRepository $userRepository, Request $request):JsonResponse{
+     public function createCommande(CommandeRepository $commandeRepository,UserRepository $userRepository,ProduitInCommandeRepository $produitInCommandeRepository,ProduitRepository $produitRepository, Request $request):JsonResponse{
         $data=json_decode($request->getContent(),true);
  
         $order = new Commande();
@@ -366,6 +369,21 @@ class CommandeController extends AbstractController
         $order->setEtatCommande($data['etat_commande']);
         
         $commandeRepository->save($order, true);
+        
+        foreach($data['produits'] as $produit){
+            $produitInCommande = new ProduitInCommande();
+
+            $produitInCommande->setProduit($produitRepository->find($produit['id']));
+            $produitInCommande->setCommande($order);
+            $produitInCommande->setQuantite($produit['quantity']);
+            $produitInCommande->setPrice($produit['price']);
+            $produitInCommande->setRemise($produit['remise']);
+            $produitInCommande->setTaille($produit['size']);
+            $produitInCommande->setNameProduct($produit['name']);
+
+            $produitInCommandeRepository->save($produitInCommande, true);
+        };
+
         $orderArray = [
             "id" => $order->getId(),
         ];

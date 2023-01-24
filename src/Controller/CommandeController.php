@@ -10,6 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Commande;
+use App\Repository\UserRepository;
+use DateTime;
+use DateTimeImmutable;
 
 #[Route('/api/commande')]
 class CommandeController extends AbstractController
@@ -327,6 +331,45 @@ class CommandeController extends AbstractController
             $commandeArray[]=$commandes;
         }
         return new JsonResponse($commandeArray);
+ 
+     }
+
+     
+        /**
+     * @param CommandeRepository $commandeRepository
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Commande")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+
+     #[Route('/createCommande', name: 'commande_create', methods: "POST")]
+     public function createCommande(CommandeRepository $commandeRepository,UserRepository $userRepository, Request $request):JsonResponse{
+        $data=json_decode($request->getContent(),true);
+ 
+        $order = new Commande();
+
+        $order->setUser($userRepository->find($data['userId']));
+        $order->setRueLivraison($data['rueLivraison']);
+        $order->setNumRueLivraison($data['num_rueLivraison']);
+        $order->setVilleLivraison($data['villeLivraison']);
+        $order->setRueFacturation($data['rueFacturation']);
+        $order->setNumRueFacturation($data['num_rueFacturation']);
+        $order->setVilleFacturation($data['villeFacturation']);
+        $order->setComplementAdresseLivraison($data['complement_adresseLivraison']);
+        $order->setComplementAdresseFacturation($data['complement_adresseFacturation']);
+        $order->setCodePostalLivraison($data['code_postalLivraison']);
+        $order->setCodePostalFacturation($data['code_postalFacturation']);
+        $order->setEtatCommande($data['etat_commande']);
+        
+        $commandeRepository->save($order, true);
+        $orderArray = [
+            "id" => $order->getId(),
+        ];
+        return new JsonResponse($orderArray);
  
      }
 

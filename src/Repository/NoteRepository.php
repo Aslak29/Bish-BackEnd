@@ -39,7 +39,7 @@ class NoteRepository extends ServiceEntityRepository
         }
     }
 
-        public function findNote(Notation $entity, bool $flush = false): void
+    public function findNote(Notation $entity, bool $flush = false): void
     {
         $this->getEntityManager()->find($entity);
 
@@ -47,28 +47,19 @@ class NoteRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-//    /**
-//     * @return Notation[] Returns an array of Notation objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('n')
-//            ->andWhere('n.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('n.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
 
-//    public function findOneBySomeField($value): ?Notation
-//    {
-//        return $this->createQueryBuilder('n')
-//            ->andWhere('n.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findNoteByUser($userId, $productId)
+    {
+        return $this->createQueryBuilder('n')
+            ->join("n.user", "nu")
+            ->join("n.produit", "np")
+            ->andWhere("nu.id = :userId")
+            ->andWhere("np.id = :productId")
+            ->setParameters([
+                "userId" => $userId,
+                "productId" => $productId
+            ])
+            ->getQuery()
+            ->getResult();
+    }
 }

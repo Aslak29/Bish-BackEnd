@@ -53,28 +53,18 @@ class ProduitBySizeRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
-//    /**
-//     * @return ProduitBySize[] Returns an array of ProduitBySize objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
 
-//    public function findOneBySomeField($value): ?ProduitBySize
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findByIdProductAndSize($productId, $size){
+        return $this->createQueryBuilder('ps')
+            ->innerJoin('ps.taille', 't')
+            ->where('ps.produit = :productId')
+            ->andWhere('t.taille = :size')
+            ->setParameters([
+                "productId" => $productId,
+                "size" => $size
+            ])
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

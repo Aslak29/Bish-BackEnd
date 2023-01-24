@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\Contact;
+use App\Entity\CodePromo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Contact>
+ * @extends ServiceEntityRepository<CodePromo>
  *
- * @method Contact|null find($id, $lockMode = null, $lockVersion = null)
- * @method Contact|null findOneBy(array $criteria, array $orderBy = null)
- * @method Contact[]    findAll()
- * @method Contact[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method CodePromo|null find($id, $lockMode = null, $lockVersion = null)
+ * @method CodePromo|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CodePromo[]    findAll()
+ * @method CodePromo[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ContactRepository extends ServiceEntityRepository
+class CodePromoRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Contact::class);
+        parent::__construct($registry, CodePromo::class);
     }
 
-    public function save(Contact $entity, bool $flush = false): void
+    public function save(CodePromo $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class ContactRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Contact $entity, bool $flush = false): void
+    public function remove(CodePromo $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -38,16 +38,9 @@ class ContactRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    public function findAllOrderBy()
-    {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.date','DESC')
-            ->getQuery()
-            ->getResult();
-    }
 
 //    /**
-//     * @return Contact[] Returns an array of Contact objects
+//     * @return CodePromo[] Returns an array of CodePromo objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -61,7 +54,7 @@ class ContactRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Contact
+//    public function findOneBySomeField($value): ?CodePromo
 //    {
 //        return $this->createQueryBuilder('c')
 //            ->andWhere('c.exampleField = :val')
@@ -70,12 +63,4 @@ class ContactRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-
-public function countNotFinish():array {
-    return $this->createQueryBuilder('c')
-        ->select("COUNT(c.id)")
-        ->where("c.isFinish = 0")
-        ->getQuery()
-        ->getResult();
-}
 }

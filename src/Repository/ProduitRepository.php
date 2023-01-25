@@ -249,4 +249,13 @@ class ProduitRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
  }
+
+    public function likeName($name):array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.name LIKE :name')
+            ->setParameter('name',  '%'.$name.'%')
+            ->getQuery()
+            ->getResult();
+    }
 }

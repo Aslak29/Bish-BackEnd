@@ -25,7 +25,8 @@ class ProduitService
             $jsonProduit[] = [
                 "id" => $produit->getId(),
                 "name" => $produit->getName(),
-                "price" => $produit->getPrice()
+                "price" => $produit->getPrice(),
+                "pathImage" => $produit->getPathImage()
             ];
         }
         return new JsonResponse($jsonProduit);

@@ -253,7 +253,7 @@ class ProduitRepository extends ServiceEntityRepository
     public function likeName($name):array
     {
         return $this->createQueryBuilder('p')
-            ->where('p.name LIKE :name')
+            ->where('p.name LIKE :name and p.isAvailable = 1')
             ->setParameter('name',  '%'.$name.'%')
             ->setMaxResults(10)
             ->getQuery()

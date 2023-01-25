@@ -255,6 +255,7 @@ class ProduitRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->where('p.name LIKE :name')
             ->setParameter('name',  '%'.$name.'%')
+            ->setMaxResults(10)
             ->getQuery()
             ->getResult();
     }

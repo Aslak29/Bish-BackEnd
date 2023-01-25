@@ -7,6 +7,7 @@ use App\Repository\CategorieRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\PromotionsRepository;
 use App\Repository\TailleRepository;
+use App\Services\ProduitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +21,17 @@ use App\Repository\ProduitBySizeRepository;
 // exporter vers AdminProductView ? - Flo
 #[Route('api/produit')]
 class ProductController extends AbstractController
-{
+{private ProduitService $produitService;
+
+    /**
+     * @param ProduitService $produitService
+     */
+    public function __construct(ProduitService $produitService)
+    {
+        $this->produitService = $produitService;
+    }
+
+
     /**
     * @param ProduitRepository $produitRepository
     * @return JsonResponse
@@ -927,5 +938,20 @@ class ProductController extends AbstractController
             }
         }
         return new JsonResponse(null,200);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @OA\Tag (name="Produit")
+     * @OA\Response(
+     *     response="200",
+     *     description = "OK"
+     * )
+     */
+    #[Route('/bySearchBar/{name}', name: 'app_multiple_delete_product', methods: "POST")]
+    public function searchBar(Request $request): JsonResponse{
+        $nameProduct = $request->attributes->get('name');
+        return $this->produitService->update($nameProduct);
     }
 }

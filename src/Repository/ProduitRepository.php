@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Produit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -103,53 +104,53 @@ class ProduitRepository extends ServiceEntityRepository
    /**
     * @return Produit[] Returns an array of Produit objects
     */
-   public function findByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size,$limit,$offset): array
+   public function findByFilter($orderby,$minprice,$maxprice,$idCategorie,$size,$limit,$offset): array
    {
        $qb = $this->createQueryBuilder('p')
            ->leftJoin('p.Note', 'pn')
            ->addSelect('avg(pn.note)')
            ->leftJoin('p.produitBySize', 'ps')
            ->leftJoin('ps.taille', 't')
-           ->where('p.price between :minprice AND :maxprice')
+           ->leftJoin('p.promotions', 'pp')
+           ->andWhere('p.price between :minprice AND :maxprice')
            ->andWhere("p.isAvailable = 1");
-            
 
-       if ($idCategorie !== "-1") {
+       if ($idCategorie !== -1) {
            $qb->leftJoin('p.categories', 'c');
            $qb->andWhere('c.id = :idCategorie');
        }
 
-       if ($size !== "none"){
-           $qb->andWhere('t.taille = :size AND ps.stock > 0');
+       if (!empty($size)) {
+           $qb->andWhere('t.taille IN (:size) AND ps.stock > 0');
        }
 
-       if ($orderby == "ASC") {
+       if (in_array("ASC", $orderby)) {
            $qb->orderBy('p.price', 'ASC');
-       } elseif ($orderby == "DESC") {
+       } elseif (in_array("DESC", $orderby)) {
            $qb->orderBy('p.price', 'DESC');
        }
 
        $qb->setMaxResults($limit);
        $qb->setFirstResult($offset);
-
-       if ($idCategorie !== "-1") {
+       if ($idCategorie !== -1) {
            $qb->setParameters([
                'minprice' => $minprice,
                'maxprice' => $maxprice,
                'idCategorie' => $idCategorie,
            ]);
-           if ($size !== "none") {
-               $qb->setParameter('size', $size);
+           if (!empty($size)) {
+               $qb->setParameter('size', $size, Connection::PARAM_STR_ARRAY);
            }
        } else {
            $qb->setParameters([
                'minprice' => $minprice,
-               'maxprice' => $maxprice,
+               'maxprice' => $maxprice
            ]);
-           if ($size !== "none"){
-               $qb->setParameter('size', $size);
+           if (!empty($size)) {
+               $qb->setParameter('size', $size, Connection::PARAM_STR_ARRAY);
            }
        }
+
        $qb->groupBy('p.id');
        return $qb->getQuery()->getResult();
    }
@@ -175,7 +176,7 @@ class ProduitRepository extends ServiceEntityRepository
        /**
         * @return Produit[] Returns an array of Produit objects
         */
-       public function countByFilter($orderby,$moyenne,$minprice,$maxprice,$idCategorie,$size): array
+       public function countByFilter($orderby,$minprice,$maxprice,$idCategorie,$size): array
    {
        $qb = $this->createQueryBuilder('p')
            ->select('count(DISTINCT p.id)')
@@ -184,36 +185,36 @@ class ProduitRepository extends ServiceEntityRepository
            ->leftJoin('p.produitBySize', 'ps')
            ->leftJoin('ps.taille', 't');
 
-       if ($idCategorie !== "-1") {
+       if ($idCategorie !== -1) {
            $qb->leftJoin('p.categories', 'c');
            $qb->andWhere('c.id = :idCategorie');
        }
-       if ($size !== "none") {
-           $qb->andWhere('t.taille = :size AND ps.stock > 0');
+       if (!empty($size)) {
+           $qb->andWhere('t.taille IN (:size) AND ps.stock > 0');
        }
 
-       if ($orderby == "ASC") {
+       if (in_array("ASC", $orderby)) {
            $qb->orderBy('p.price', 'ASC');
-       } elseif ($orderby == "DESC") {
+       } elseif (in_array("DESC", $orderby)) {
            $qb->orderBy('p.price', 'DESC');
        }
 
-       if ($idCategorie !== "-1") {
+       if ($idCategorie !== -1) {
            $qb->setParameters([
                'minprice' => $minprice,
                'maxprice' => $maxprice,
                'idCategorie' => $idCategorie
            ]);
-           if ($size !== "none") {
-               $qb->setParameter('size', $size);
+           if (!empty($size)) {
+               $qb->setParameter('size', $size, Connection::PARAM_STR_ARRAY);
            }
        } else {
            $qb->setParameters([
                'minprice' => $minprice,
                'maxprice' => $maxprice,
            ]);
-           if ($size !== "none"){
-               $qb->setParameter('size', $size);
+           if (!empty($size)) {
+               $qb->setParameter('size', $size, Connection::PARAM_STR_ARRAY);
            }
        }
 

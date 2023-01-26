@@ -660,13 +660,28 @@ class ProductController extends AbstractController
      * )
      */
 
-    #[Route('/filter/{orderby}/{moyenne}/{minprice}/{maxprice}/{idCategorie}/{size}/{limit}/{offset}', name: 'app_filter_product', methods: "POST")]
-    public function searchFilter(ProduitRepository $produitRepository,Request $request):JsonResponse
+    #[Route('/filter/', name: 'app_filter_product', methods: "POST")]
+    public function searchFilter(ProduitRepository $produitRepository, Request $request):JsonResponse
     {
-        $produits = $produitRepository->findByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('size'),$request->attributes->get('limit'),$request->attributes->get("offset"));
-        $countProduits = $produitRepository->countByFilter($request->attributes->get("orderby"),$request->attributes->get("moyenne"),$request->attributes->get("minprice"),$request->attributes->get("maxprice"),$request->attributes->get("idCategorie"),$request->attributes->get('size'));
+        $dataFilter = json_decode($request->getContent(), true);
+        $produits = $produitRepository->findByFilter(
+            $dataFilter["filterValue"],
+            $dataFilter["priceRangeMin"],
+            $dataFilter["priceRangeMax"],
+            $dataFilter["categorie"],
+            $dataFilter["size"],
+            $dataFilter["limit"],
+            $dataFilter["page"],
+        );
+        $countProduits = $produitRepository->countByFilter(
+            $dataFilter["filterValue"],
+            $dataFilter["priceRangeMin"],
+            $dataFilter["priceRangeMax"],
+            $dataFilter["categorie"],
+            $dataFilter["size"]
+        );
         $produitArray = [];
-        foreach($produits as $produit){
+        foreach ($produits as $produit) {
             $jsonProduct = [
                 'id' => $produit[0]->getId(),
                 'name' => $produit[0]->getName(),
@@ -697,8 +712,8 @@ class ProductController extends AbstractController
             }
             $produitArray[] = $jsonProduct;
         }
-
         $resultArray = [];
+
         $resultArray[] = $produitArray;
         $resultArray[] = [
             "count" => $countProduits

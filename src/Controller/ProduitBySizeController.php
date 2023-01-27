@@ -9,7 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
 
-#[Route('api/produit/by/size')]
 class ProduitBySizeController extends AbstractController
 {
     private ProduitBySizeService $produitBySizeService;
@@ -31,7 +30,7 @@ class ProduitBySizeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/updateStockInCart/{type}', name: 'app_product_by_size_update_stock', methods: "POST")]
+    #[Route('api/authenticated/produit/by/size/updateStockInCart/{type}', name: 'app_product_by_size_update_stock', methods: "POST")]
     public function updateStockInCart(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

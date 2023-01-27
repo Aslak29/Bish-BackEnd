@@ -67,22 +67,22 @@ class ProduitRepository extends ServiceEntityRepository
         ;
     }
 
-   public function findOneById($idProduit)
+   public function findOneById($idProduit, $bool = 1)
    {
-       return $this->createQueryBuilder('p')
-           ->leftJoin('p.categories', 'c')
-           ->addSelect('c')
-           ->leftJoin('p.Note', 'pn')
-           ->addSelect('avg(pn.note)')
-           ->where('p.id = :idProduit')
-           ->andWhere('p.isAvailable = 1')
-           ->setParameters([
-               "idProduit" => $idProduit
-           ])
-           ->groupBy('p.id')
-           ->getQuery()
-           ->getResult()
-           ;
+       $qb = $this->createQueryBuilder('p');
+       $qb->leftJoin('p.categories', 'c');
+       $qb ->addSelect('c');
+       $qb->leftJoin('p.Note', 'pn');
+       $qb->addSelect('avg(pn.note)');
+       $qb->where('p.id = :idProduit');
+       if ($bool) {
+           $qb->andWhere('p.isAvailable = 1');
+       }
+       $qb->setParameters([
+            "idProduit" => $idProduit,
+       ]);
+       $qb->groupBy('p.id');
+       return $qb->getQuery()->getResult();
    }
 
     public function findOneByIdForDelete($idProduit)

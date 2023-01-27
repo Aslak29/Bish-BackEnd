@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 
-#[Route('/api/categorie')]
 class CategorieController extends AbstractController
 {
     /**
@@ -24,7 +23,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_categorie', methods: ['GET'])]
+    #[Route('api/public/categorie/', name: 'app_categorie', methods: ['GET'])]
     public function index(CategorieRepository $categorieRepository): JsonResponse
     {
         $categories = $categorieRepository->getCategorieAvailable();
@@ -64,7 +63,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/forAdmin', name: 'app_categorie_admin', methods: ['GET'])]
+    #[Route('api/admin/categorie/forAdmin', name: 'app_categorie_admin', methods: ['GET'])]
     public function showAdmin(CategorieRepository $categorieRepository): JsonResponse
     {
         $categories = $categorieRepository->findAll();
@@ -94,7 +93,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/create/{name}/{trend}/{available}/{pathImage}', name: 'app_create_categorie', methods: ['POST'])]
+    #[Route('api/admin/categorie/create/{name}/{trend}/{available}/{pathImage}', name: 'app_create_categorie', methods: ['POST'])]
     public function create(
         CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
     ): JsonResponse
@@ -143,7 +142,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{trend}/{available}/{pathImage}', name: 'app_update_categorie', methods: ['PUT'])]
+    #[Route('api/admin/categorie/update/{id}/{name}/{trend}/{available}/{pathImage}', name: 'app_update_categorie', methods: ['PUT'])]
     public function update(
         CategorieRepository $categorieRepository, Request $request, GlobalFunction\FunctionErrors $errorCode
     ): JsonResponse
@@ -192,7 +191,7 @@ class CategorieController extends AbstractController
      * )
      * @author
      */
-    #[Route('/delete/{id}', name: 'app_delete_categorie', methods: ['DELETE'])]
+    #[Route('api/admin/categorie/delete/{id}', name: 'app_delete_categorie', methods: ['DELETE'])]
     public function removeCategory(
         CategorieRepository $categorieRepository, GlobalFunction\FunctionErrors $errorCode, Request $request
     ): JsonResponse
@@ -214,7 +213,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/updateIsTrend/{id}/{isTrend}/',
+    #[Route('api/admin/categorie/updateIsTrend/{id}/{isTrend}/',
         name: 'app_update_category_trend', methods: "PUT")]
     public function updateTrendCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
@@ -256,7 +255,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/updateAvailable/{id}/{available}/',
+    #[Route('api/admin/blog/updateAvailable/{id}/{available}/',
         name: 'app_update_category_available', methods: "PUT")]
     public function updateAvailableCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
@@ -296,7 +295,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/isTrend', name: 'categorie_is_trend', methods: ['GET'])]
+    #[Route('api/public/categorie/isTrend', name: 'categorie_is_trend', methods: ['GET'])]
     public function searchIsTrend(CategorieRepository $categorieRepository): JsonResponse
     {
         $categories = $categorieRepository->getCategorieIsTrend();
@@ -336,7 +335,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleUpdateIsTrend/{isTrend}/',
+    #[Route('api/admin/categorie/multipleUpdateIsTrend/{isTrend}/',
         name: 'app_multiple_update_category_trend', methods: "PUT")]
     public function multipleUpdateTrendCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
@@ -376,7 +375,7 @@ class CategorieController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleUpdateAvailable/{available}/',
+    #[Route('api/admin/categorie/multipleUpdateAvailable/{available}/',
         name: 'app_multiple_update_category_available', methods: "PUT")]
     public function multipleUpdateAvailableCategory(
         CategorieRepository $categorieRepository, Request $request, FunctionErrors $errorCode
@@ -417,7 +416,7 @@ class CategorieController extends AbstractController
      * )
      * @author
      */
-    #[Route('/multipleDelete', name: 'app_multiple_delete_categorie', methods: ['PUT'])]
+    #[Route('api/public/categorie/multipleDelete', name: 'app_multiple_delete_categorie', methods: ['PUT'])]
     public function multipleRemoveCategory(
         CategorieRepository $categorieRepository, GlobalFunction\FunctionErrors $errorCode, Request $request
     ): JsonResponse

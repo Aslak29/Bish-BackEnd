@@ -1,9 +1,14 @@
 nelmio_api_doc:
-    documentation:
-        info:
-            title: API Bish
-            description: Documentation de l'API pour l'application WEB "BISH"
-            version: 0.0.1
-    areas: # to filter documented areas
-        path_patterns:
-            - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+  documentation:
+    info:
+      title: Bish
+      description: API du site Bish
+      version: 1.0.0
+    components:
+      securitySchemes:
+        Bearer:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+    security:
+      - Bearer: []

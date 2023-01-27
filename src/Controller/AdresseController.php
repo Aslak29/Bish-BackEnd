@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
+use Nelmio\ApiDocBundle\Annotation\Security;
 
-#[Route('api/adresse')]
 class AdresseController extends AbstractController
 {
     /**
@@ -23,7 +23,7 @@ class AdresseController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_adresse', methods: "GET")]
+    #[Route('api/admin/adresse/', name: 'app_adresse', methods: "GET")]
     public function load(AdresseRepository $adresseRepository): JsonResponse{
 
         $adresses = $adresseRepository->findAll();
@@ -54,7 +54,7 @@ class AdresseController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/delete/{id}', name: 'app_delete_adresse', methods: "DELETE")]
+    #[Route('/api/authenticated/adresse/delete/{id}', name: 'app_delete_adresse', methods: "DELETE")]
     public function delete(AdresseRepository $adresseRepository, Request $request): JsonResponse{
 
         $adresse = $adresseRepository->find($request->attributes->get('id'));
@@ -123,7 +123,7 @@ class AdresseController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/create', name: 'app_route_adresse', methods: "POST")]
+    #[Route('/api/authenticated/adresse/create', name: 'app_route_adresse', methods: "POST")]
     public function create(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
 
         $data = json_decode($request->getContent(), true);
@@ -147,8 +147,9 @@ class AdresseController extends AbstractController
       * @param Request $request
       * @return JsonResponse
       * @OA\Tag (name="Adresse")
+      * @Security(name="Bearer")
       */
-    #[Route('/findByUser/{id}', name:'app_adresse_idUser', methods: "POST")]
+    #[Route('/api/authenticated/adresse/findByUser/{id}', name:'app_adresse_idUser', methods: "POST")]
     public function findByUserId(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
 
         if ($userRepository->find($request->attributes->get('id')) === null){
@@ -229,7 +230,7 @@ class AdresseController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update', name: 'app_route_adresse_update', methods: "PUT")]
+    #[Route('/api/authenticated/adresse/update', name: 'app_route_adresse_update', methods: "PUT")]
     public function update(AdresseRepository $adresseRepository, UserRepository $userRepository, Request $request):JsonResponse{
 
         $data = json_decode($request->getContent(), true);

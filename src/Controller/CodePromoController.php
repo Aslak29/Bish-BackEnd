@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Route('api/code/promo')]
+
 class CodePromoController extends AbstractController
 {
     private CodePromoService $codePromoService;
@@ -31,7 +31,7 @@ class CodePromoController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/findForAdmin', name: 'app_code_promo', methods: "GET")]
+    #[Route('api/admin/code/promo/findForAdmin', name: 'app_code_promo', methods: "GET")]
     public function readAll(): JsonResponse
     {
         return $this->codePromoService->findAll();
@@ -47,7 +47,7 @@ class CodePromoController extends AbstractController
      * )
      * @throws Exception
      */
-    #[Route('/create', name: 'app_create_code_promo', methods: "POST")]
+    #[Route('api/admin/code/promo/create', name: 'app_create_code_promo', methods: "POST")]
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -64,7 +64,7 @@ class CodePromoController extends AbstractController
      * )
      * @throws Exception
      */
-    #[Route('/update', name: 'app_update_code_promo', methods: "PUT")]
+    #[Route('api/admin/code/promo/update', name: 'app_update_code_promo', methods: "PUT")]
     public function update(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -81,7 +81,7 @@ class CodePromoController extends AbstractController
      * )
      * @throws Exception
      */
-    #[Route('/delete/{id}', name: 'app_delete_code_promo', methods: "DELETE")]
+    #[Route('api/admin/code/promo/delete/{id}', name: 'app_delete_code_promo', methods: "DELETE")]
     public function delete(Request $request): JsonResponse
     {
         return $this->codePromoService->delete($request->attributes->get("id"));
@@ -96,7 +96,7 @@ class CodePromoController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_delete_code_promo', methods: "DELETE")]
+    #[Route('api/admin/code/promo/multipleRemove', name: 'app_multiple_delete_code_promo', methods: "DELETE")]
     public function multipleRemoveCodePromo(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -112,7 +112,7 @@ class CodePromoController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/findByName', name: 'app_find_by_name_code_promo', methods: "POST")]
+    #[Route('api/authenticated/code/promo/findByName', name: 'app_find_by_name_code_promo', methods: "POST")]
     public function findByName(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

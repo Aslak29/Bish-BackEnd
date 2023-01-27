@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
-#[Route('api/user')]
 class UserController extends AbstractController
 {
     private UserPasswordHasherInterface $encoder;
@@ -42,8 +41,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route(
-        '/register/{name}/{surname}/{email}/{password}/{passwordConfirm}',
+    #[Route('api/public/user/register/{name}/{surname}/{email}/{password}/{passwordConfirm}',
         name: 'user_register', methods: ["POST"])]
     public function register(UserRepository $userRepository, Request $request, ValidatorInterface $validator
     ): JsonResponse
@@ -109,7 +107,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/getUserByMail/{email}', name: 'user_getByMail', methods: "GET")]
+    #[Route('api/public/user/getUserByMail/{email}', name: 'user_getByMail', methods: "GET")]
     public function getUserByMail(UserRepository $userRepository, Request $request): JsonResponse
     {
         $user = $userRepository->findOneBy(array('email' => $request->attributes->get('email')));
@@ -130,7 +128,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-     #[Route('/', name: 'user_all', methods:"GET")]
+     #[Route('api/admin/user/', name: 'user_all', methods:"GET")]
      public function findUser(UserRepository $userRepository): JsonResponse
      {
          $users = $userRepository->findAll();
@@ -175,7 +173,7 @@ class UserController extends AbstractController
      * )
      */
     #[Route(
-        '/create/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
+        'api/admin/user/create/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
         name: 'user_create', methods: ["POST"]
     )]
     public function create(
@@ -248,7 +246,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/delete/{id}', name: 'user_delete', methods:"PUT")]
+    #[Route('api/admin/user/delete/{id}', name: 'user_delete', methods:"PUT")]
     public function deleteUser(UserRepository $userRepository, FunctionErrors $errorsCodes, Request $request
     ): JsonResponse
     {
@@ -311,7 +309,7 @@ class UserController extends AbstractController
      * )
      */
     #[Route(
-        '/update/{id}/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
+        'api/authenticated/user/update/{id}/{name}/{surname}/{email}/{password}/{passwordConfirm}/{roles}/{phone}',
         name: 'user_update', methods:"PUT")]
     public function updateUser(
         UserRepository $userRepository, Request $request, ValidatorInterface $validator
@@ -394,7 +392,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/getDisableById/{id}', name: 'user_getDisableById', methods: "GET")]
+    #[Route('api/authenticated/user/getDisableById/{id}', name: 'user_getDisableById', methods: "GET")]
     public function getDisableById(UserRepository $userRepository, Request $request): JsonResponse
     {
         $user = $userRepository->findOneBy(array('id' => $request->attributes->get('id')));
@@ -415,7 +413,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleDelete', name: 'user_multiple_delete', methods:"PUT")]
+    #[Route('api/admin/user/multipleDelete', name: 'user_multiple_delete', methods:"PUT")]
     public function multipleDeleteUser(
         UserRepository $userRepository,
         FunctionErrors $errorsCodes,
@@ -480,7 +478,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/stats/register/{year}', name: 'app_user_stats_register', methods: ['POST'])]
+    #[Route('api/public/user/stats/register/{year}', name: 'app_user_stats_register', methods: ['POST'])]
     public function getUserSign(UserRepository $userRepository, Request $request):JsonResponse
     {
         $year = $request->attributes->get('year');
@@ -512,7 +510,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/stats/count', name: 'app_user_stats_count', methods: ['GET'])]
+    #[Route('api/admin/user/stats/count', name: 'app_user_stats_count', methods: ['GET'])]
     public function countUser(UserRepository $userRepository, Request $request): JsonResponse{
 
         $count = $userRepository->countUser();
@@ -531,7 +529,7 @@ class UserController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/recentUser', name: 'app_recent_user', methods: ['GET'])]
+    #[Route('api/admin/user/recentUser', name: 'app_recent_user', methods: ['GET'])]
     public function recentUser(UserRepository $userRepository): JsonResponse{
 
         $recentUser = $userRepository->recentUser();

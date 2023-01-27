@@ -14,8 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-
-#[Route('/api/contact')]
 class ContactController extends AbstractController
 {
     /**
@@ -27,7 +25,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_contact', methods: ['GET'])]
+    #[Route('api/admin/contact/', name: 'app_contact', methods: ['GET'])]
     public function index(ContactRepository $contactRepository): JsonResponse
     {
         $contacts =  $contactRepository->findAllOrderBy();
@@ -60,7 +58,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add',name : 'app_contact_add' , methods: ['POST'])]
+    #[Route('api/public/contact/add',name : 'app_contact_add' , methods: ['POST'])]
     public function addContact(ContactRepository $contactRepository ,UserRepository $userRepository, Request $request, ValidatorInterface $validator):JsonResponse{
 
         $data = json_decode($request->getContent(), true);
@@ -109,7 +107,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/remove/{id}',name: 'app_contact_delete' , methods: ['DELETE'])]
+    #[Route('api/admin/contact/remove/{id}',name: 'app_contact_delete' , methods: ['DELETE'])]
     public function removeContact(ContactRepository $contactRepository, Request $request):JsonResponse
     {
 
@@ -140,7 +138,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/isFinish/{contactId}/{isFinish}',name: 'app_contact_update_isFinish' , methods:['PUT'])]
+    #[Route('api/admin/contact/update/isFinish/{contactId}/{isFinish}',name: 'app_contact_update_isFinish' , methods:['PUT'])]
     public function updateIsFinish(ContactRepository $contactRepository,Request $request, FunctionErrors $errorCode):JsonResponse
     {
         $contact = $contactRepository->find($request->attributes->get('contactId'));
@@ -177,7 +175,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleUpdate/isFinish/{isFinish}',name: 'app_contact_multiple_update_isFinish' , methods:['PUT'])]
+    #[Route('api/admin/contact/multipleUpdate/isFinish/{isFinish}',name: 'app_contact_multiple_update_isFinish' , methods:['PUT'])]
     public function multipleUpdateIsFinish(ContactRepository $contactRepository,Request $request, FunctionErrors $errorCode):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -213,7 +211,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove',name: 'app_contact_multiple_delete' , methods: ['DELETE'])]
+    #[Route('api/admin/contact/multipleRemove',name: 'app_contact_multiple_delete' , methods: ['DELETE'])]
     public function multipleRemoveContact(ContactRepository $contactRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -234,7 +232,6 @@ class ContactController extends AbstractController
     }
     /**
      * @param ContactRepository $contactRepository
-     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Contact")
      * @OA\Response(
@@ -242,7 +239,7 @@ class ContactController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/countNotFinish', name: 'contact_count', methods: "GET")]
+    #[Route('api/admin/contact/countNotFinish', name: 'contact_count', methods: "GET")]
     public function countContactNotFinish(ContactRepository $contactRepository):JsonResponse{
 
         $countCommande = $contactRepository->countNotFinish();

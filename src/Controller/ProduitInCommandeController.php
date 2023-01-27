@@ -10,7 +10,6 @@ use OpenApi\Annotations as OA;
 use App\Repository\ProduitInCommandeRepository;
 use Symfony\Component\HttpFoundation\Request;
 
-#[Route('api/produitInCommande')]
 class ProduitInCommandeController extends AbstractController {
 
     /**
@@ -24,7 +23,7 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
+    #[Route('api/public/produitInCommande/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
     public function singleOrder(
         ProduitInCommandeRepository $produitInCommandeRepository,
         NoteRepository $noteRepository,
@@ -90,7 +89,7 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('/single_order/delete/{id}', name: 'delete_produit_in_commande', methods:"DELETE")]
+    #[Route('api/admin/produitInCommande/single_order/delete/{id}', name: 'delete_produit_in_commande', methods:"DELETE")]
     public function deleteOneProduct(
         ProduitInCommandeRepository $produitInCommandeRepository,
         Request $request

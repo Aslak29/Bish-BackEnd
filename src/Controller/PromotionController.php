@@ -12,7 +12,6 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
-#[Route('/api/promotion')]
 class PromotionController extends AbstractController
 {
     /**
@@ -24,7 +23,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_promotion', methods: ['GET'])]
+    #[Route('api/public/promotion/', name: 'app_promotion', methods: ['GET'])]
     public function index(PromotionsRepository $promotionRepository): JsonResponse
     {
         $promotions = $promotionRepository->findAll();
@@ -53,7 +52,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add/{name}/{remise}/{startdate}/{enddate}', name: 'app_promotion_add', methods: ['POST'])]
+    #[Route('api/admin/promotion/add/{name}/{remise}/{startdate}/{enddate}', name: 'app_promotion_add', methods: ['POST'])]
     public function addPromotion(PromotionsRepository $promotionsRepository, Request $request, ValidatorInterface $validator): JsonResponse
     {
 
@@ -98,7 +97,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/remove/{id}', name: 'app_promotion_remove', methods: ['DELETE'])]
+    #[Route('api/admin/promotion/remove/{id}', name: 'app_promotion_remove', methods: ['DELETE'])]
     public function removePromotion(PromotionsRepository $promotionsRepository, ProduitRepository $produitRepository, Request $request): JsonResponse
     {
 
@@ -132,7 +131,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{id}/{name}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['PUT'])]
+    #[Route('api/admin/promotion/update/{id}/{name}/{remise}/{datestart}/{dateend}', name: 'app_promotion_update', methods: ['PUT'])]
     public function updatePromotion(PromotionsRepository $promotionsRepository, Request $request): JsonResponse {
 
         $promotionUpdate = $promotionsRepository->find($request->attributes->get('id'));
@@ -175,7 +174,7 @@ class PromotionController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_promotion_remove', methods: ['DELETE'])]
+    #[Route('api/admin/promotion/multipleRemove', name: 'app_multiple_promotion_remove', methods: ['DELETE'])]
     public function multipleRemovePromotion(PromotionsRepository $promotionsRepository, ProduitRepository $produitRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);

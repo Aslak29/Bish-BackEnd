@@ -10,9 +10,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use OpenApi\Annotations as OA;
-
-#[Route('api/size')]
-
 class SizeController extends AbstractController
 {
 
@@ -25,7 +22,7 @@ class SizeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_size', methods: "GET")]
+    #[Route('api/public/size/', name: 'app_size', methods: "GET")]
     public function findAll(TailleRepository $tailleRepository):JsonResponse
     {
         $tailles = $tailleRepository->findAll();
@@ -50,7 +47,7 @@ class SizeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/allSizeProduct/{idProduct}', name: 'app_size_allSize', methods: "GET")]
+    #[Route('api/public/size/allSizeProduct/{idProduct}', name: 'app_size_allSize', methods: "GET")]
     public function allSizeProduct(ProduitBySizeRepository $produitBySizeRepo, Request $request): JsonResponse
     {
         $productBySize = $produitBySizeRepo->findAllStockByIdProduct($request->attributes->get('idProduct'));
@@ -75,7 +72,7 @@ class SizeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/typeTaille/{typeTaille}', name: 'app_type_size', methods: "GET")]
+    #[Route('api/public/size/typeTaille/{typeTaille}', name: 'app_type_size', methods: "GET")]
     public function typeTaille(TailleRepository $tailleRepository, Request $request): JsonResponse
     {
         if ($request->attributes->get('typeTaille')) {

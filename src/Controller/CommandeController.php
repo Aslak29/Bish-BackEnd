@@ -379,7 +379,7 @@ class CommandeController extends AbstractController
             $produitInCommande->setCommande($order);
             $produitInCommande->setQuantite($produit['quantity']);
             $produitInCommande->setPrice($produitOrder->getPrice());
-            $produitInCommande->setRemise($produitOrder->getPromotions()->getRemise());
+            $produitInCommande->setRemise($produitOrder->getPromotions() ? $produitOrder->getPromotions()->getRemise() : 0);
             $produitInCommande->setTaille($produit['size']);
             $produitInCommande->setNameProduct($produit['name']);
 

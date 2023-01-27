@@ -373,11 +373,13 @@ class CommandeController extends AbstractController
         foreach($data['produits'] as $produit){
             $produitInCommande = new ProduitInCommande();
 
-            $produitInCommande->setProduit($produitRepository->find($produit['id']));
+            $produitOrder = $produitRepository->find($produit['id']);
+
+            $produitInCommande->setProduit($produitOrder);
             $produitInCommande->setCommande($order);
             $produitInCommande->setQuantite($produit['quantity']);
-            $produitInCommande->setPrice($produit['price']);
-            $produitInCommande->setRemise($produit['remise']);
+            $produitInCommande->setPrice($produitOrder->getPrice());
+            $produitInCommande->setRemise($produitOrder->getPromotions()->getRemise());
             $produitInCommande->setTaille($produit['size']);
             $produitInCommande->setNameProduct($produit['name']);
 

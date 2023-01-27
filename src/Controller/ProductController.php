@@ -19,7 +19,6 @@ use App\Repository\NoteRepository;
 use App\Repository\ProduitBySizeRepository;
 
 // exporter vers AdminProductView ? - Flo
-#[Route('api/produit')]
 class ProductController extends AbstractController
 {private ProduitService $produitService;
 
@@ -42,7 +41,7 @@ class ProductController extends AbstractController
     * )
     */
 
-    #[Route('/', name: 'app_produit', methods:"GET")]
+    #[Route('api/public/produit/', name: 'app_produit', methods:"GET")]
     public function findProduct(ProduitRepository $produitRepository): JsonResponse
     {
         $produits = $produitRepository->findAll();
@@ -108,7 +107,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/find/{id}', name: 'app_produit_by_id', methods:"POST")]
+    #[Route('api/public/produit/find/{id}', name: 'app_produit_by_id', methods:"POST")]
     public function findProductById(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $produit = $produitRepository->findOneById($request->attributes->get('id'));
@@ -162,7 +161,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/findProductsByIds', name: 'app_produits_by_ids', methods:"POST")]
+    #[Route('api/public/produit/findProductsByIds', name: 'app_produits_by_ids', methods:"POST")]
     public function findProductsByIds(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -231,7 +230,7 @@ class ProductController extends AbstractController
      * )
      *
      */
-    #[Route('/add', name: 'app_add_product', methods: "POST")]
+    #[Route('api/admin/produit/add', name: 'app_add_product', methods: "POST")]
     public function addProduit(
         ProduitRepository $produitRepository,ProduitBySizeRepository $produitBySizeRepo,
         TailleRepository $tailleRepository,CategorieRepository $categorieRepository,
@@ -334,7 +333,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update',
+    #[Route('api/admin/produit/update',
         name: 'app_update_product', methods: "PUT")]
     public function updateProduit(
         ProduitRepository $produitRepository, Request $request,CategorieRepository $categorieRepository,PromotionsRepository
@@ -429,7 +428,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/trend/{id}/{trendBool}/',
+    #[Route('api/admin/produit/update/trend/{id}/{trendBool}/',
         name: 'app_update_product_trend', methods: "PUT")]
     public function updateTrendProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
     {
@@ -473,7 +472,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/multipleTrend/{trendBool}/',
+    #[Route('api/admin/produit/update/multipleTrend/{trendBool}/',
         name: 'app_update_multiple_product_trend', methods: "PUT")]
     public function updateMultipleTrendProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
     {
@@ -517,7 +516,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/multipleAvailable/{availableBool}/',
+    #[Route('api/admin/produit/update/multipleAvailable/{availableBool}/',
         name: 'app_update_multiple_product_available', methods: "PUT")]
     public function updateMultipleAvailableProduit(ProduitRepository $produitRepository, Request $request) :JsonResponse
     {
@@ -561,7 +560,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/available/{id}/{availableBool}/', name: 'app_update_product_available', methods: "PUT")]
+    #[Route('api/admin/produit/update/available/{id}/{availableBool}/', name: 'app_update_product_available', methods: "PUT")]
     public function updateAvailableProduit(ProduitRepository $produitRepository, Request $request) : JsonResponse
     {
         $produit = $produitRepository->find($request->attributes->get('id'));
@@ -608,7 +607,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/remove/{id}', name: 'app_delete_product', methods: "DELETE")]
+    #[Route('api/admin/produit/remove/{id}', name: 'app_delete_product', methods: "DELETE")]
     public function removeProduit(
         ProduitRepository $produitRepository,
         Request $request,
@@ -617,7 +616,7 @@ class ProductController extends AbstractController
         NoteRepository $noteRepository
     ):JsonResponse
     {
-        $produit = $produitRepository->findOneById($request->attributes->get('id'));
+        $produit = $produitRepository->findOneById($request->attributes->get('id'),0);
         if (!$produit) {
             return new JsonResponse([
                 "errorCode" => "002",
@@ -660,7 +659,7 @@ class ProductController extends AbstractController
      * )
      */
 
-    #[Route('/filter/', name: 'app_filter_product', methods: "POST")]
+    #[Route('api/public/produit/filter/', name: 'app_filter_product', methods: "POST")]
     public function searchFilter(ProduitRepository $produitRepository, Request $request):JsonResponse
     {
         $dataFilter = json_decode($request->getContent(), true);
@@ -732,7 +731,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/suggestions/{idCategorie}/{id}', name: 'product_suggest', methods: "POST")]
+    #[Route('api/public/produit/suggestions/{idCategorie}/{id}', name: 'product_suggest', methods: "POST")]
     public function findProductsByCat(ProduitRepository $produitRepository, Request $request): JsonResponse
     {
         $product = $produitRepository->findAllProductsByIdCateg($request->attributes->get('idCategorie'), $request->attributes->get('id'));
@@ -788,7 +787,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/promotions', name: 'app_produit_promotion', methods:"GET")]
+    #[Route('api/public/produit/promotions', name: 'app_produit_promotion', methods:"GET")]
     public function PromoProduct(ProduitRepository $produitRepository): JsonResponse
     {
         $produits = $produitRepository->findProductPromo();
@@ -828,7 +827,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/isTrend', name: 'produit_is_trend', methods: ['POST'])]
+    #[Route('api/public/produit/isTrend', name: 'produit_is_trend', methods: ['POST'])]
     public function searchProduitIsTrend(ProduitRepository $produitRepository): JsonResponse
     {
         $produits =  $produitRepository->getProduitIsTrend();
@@ -864,7 +863,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/bestPromo', name: 'best_promo', methods: ['GET'])]
+    #[Route('api/public/produit/bestPromo', name: 'best_promo', methods: ['GET'])]
     public function findBestPromo(ProduitRepository $produitRepository): JsonResponse
     {
         $produit =  $produitRepository->findByBestPromo();
@@ -894,7 +893,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/count', name: 'product_count', methods: "GET")]
+    #[Route('api/public/produit/count', name: 'product_count', methods: "GET")]
     public function countProduct(ProduitRepository $produitRepository):JsonResponse{
 
         $countProduit = $produitRepository->countAll();
@@ -914,7 +913,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_delete_product', methods: "DELETE")]
+    #[Route('api/admin/produit/multipleRemove', name: 'app_multiple_delete_product', methods: "DELETE")]
     public function multipleRemoveProduit(
         ProduitRepository $produitRepository, Request $request, ProduitBySizeRepository $produitBySizeRepository,
         FunctionErrors $errorsCodes, NoteRepository $noteRepository
@@ -964,7 +963,7 @@ class ProductController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/bySearchBar/{name}', name: 'app_multiple_delete_product', methods: "POST")]
+    #[Route('api/public/produit/bySearchBar/{name}', name: 'app_multiple_delete_product', methods: "POST")]
     public function searchBar(Request $request): JsonResponse{
         $nameProduct = $request->attributes->get('name');
         return $this->produitService->update($nameProduct);

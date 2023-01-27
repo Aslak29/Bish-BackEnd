@@ -12,7 +12,6 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Blog;
 
-#[Route('api/blog')]
 class BlogController extends AbstractController
 {
 /**
@@ -24,7 +23,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_blog', methods: "GET")]
+    #[Route('api/public/blog/', name: 'app_blog', methods: "GET")]
     public function index(BlogRepository $blogRepository): JsonResponse
     {
         $blogs = $blogRepository->findAll();
@@ -52,7 +51,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/{limit}/{offset}', name: 'app_blog_pagination', methods: "POST")]
+    #[Route('api/public/blog/{limit}/{offset}', name: 'app_blog_pagination', methods: "POST")]
     public function blogPagination(BlogRepository $blogRepository, Request $request): JsonResponse
     {
         $blogs = $blogRepository->findArticlesLimit(
@@ -86,7 +85,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/lastArticle', name: 'app_blog_last-article', methods: "GET")]
+    #[Route('api/public/blog/lastArticle', name: 'app_blog_last-article', methods: "GET")]
     public function findLastArticle(BlogRepository $blogRepository): JsonResponse
     {
         $blog = $blogRepository->findLastArticle();
@@ -114,7 +113,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/find/{articleID}', name: 'app_blog_by_id', methods: "GET")]
+    #[Route('api/public/blog/find/{articleID}', name: 'app_blog_by_id', methods: "GET")]
     public function findById(BlogRepository $blogRepository, Request $request): JsonResponse
     {
         $blog = $blogRepository->findOneBy(array('id' => $request->attributes->get('articleID')));
@@ -139,7 +138,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/add', name: 'app_add_blog', methods: "POST")]
+    #[Route('api/admin/blog/add', name: 'app_add_blog', methods: "POST")]
     public function addBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $blog = new Blog();        
@@ -168,8 +167,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update',
-        name: 'app_update_blog', methods: "PUT")]
+    #[Route('api/admin/blog/update', name: 'app_update_blog', methods: "PUT")]
     public function updateBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -204,7 +202,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/remove/{id}', name: 'app_delete_blog', methods: ['DELETE'])]
+    #[Route('api/admin/blog/remove/{id}', name: 'app_delete_blog', methods: ['DELETE'])]
     public function deleteBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $deleteBlog = $blogRepository->find($request->attributes->get('id'));
@@ -232,7 +230,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleRemove', name: 'app_multiple_delete_blog', methods: ['DELETE'])]
+    #[Route('api/admin/blog/multipleRemove', name: 'app_multiple_delete_blog', methods: ['DELETE'])]
     public function multipleDeleteBlog(BlogRepository $blogRepository, Request $request):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -254,7 +252,6 @@ class BlogController extends AbstractController
 
     /**
      * @param BlogRepository $blogRepository
-     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Blog")
      * @OA\Response(
@@ -262,7 +259,7 @@ class BlogController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/count', name: 'blog_count', methods: "GET")]
+    #[Route('api/public/blog/count', name: 'blog_count', methods: "GET")]
     public function countBlog(BlogRepository $blogRepository):JsonResponse{
 
         $countBlog = $blogRepository->countAll();

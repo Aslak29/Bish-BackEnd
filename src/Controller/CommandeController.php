@@ -18,7 +18,6 @@ use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
 
-#[Route('/api/commande')]
 class CommandeController extends AbstractController
 {
 
@@ -32,7 +31,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/', name: 'app_commande', methods:"GET")]
+    #[Route('api/admin/commande/', name: 'app_commande', methods:"GET")]
     public function findAll(
         CommandeRepository $commandeRepository,
         ProduitInCommandeRepository $produitInCommandeRepository,
@@ -121,7 +120,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}',
+    #[Route('api/admin/commande/update/{orderId}/{rue}/{num_rue}/{complement_adresse}/{code_postal}/{ville}/{etat_commande}',
         name: 'app_update_commande', methods:"PUT")]
     public function updateOrder(
         CommandeRepository $commandeRepository,
@@ -166,7 +165,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/cancel/{id}', name: 'app_cancel_commande', methods:"PUT")]
+    #[Route('api/admin/commande/cancel/{id}', name: 'app_cancel_commande', methods:"PUT")]
     public function cancelOrder(
         CommandeRepository $commandeRepository,
         FunctionErrors $errorsCodes,
@@ -201,7 +200,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/byUser/{id}', name: 'app_commandes_by_user', methods:"POST")]
+    #[Route('api/authenticated/commande/byUser/{id}', name: 'app_commandes_by_user', methods:"POST")]
     public function findAllCommandesByUser(
         CommandeRepository $commandeRepository, Request $request
     ): JsonResponse
@@ -248,7 +247,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/multipleCancel', name: 'app_multiple_cancel_commande', methods:"PUT")]
+    #[Route('api/admin/commande/multipleCancel', name: 'app_multiple_cancel_commande', methods:"PUT")]
     public function multipleCancelOrder(
         CommandeRepository $commandeRepository,
         FunctionErrors $errorsCodes,
@@ -275,8 +274,6 @@ class CommandeController extends AbstractController
 
     /**
      * @param CommandeRepository $commandeRepository
-     * @param FunctionErrors $errorsCodes
-     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Commande")
      * @OA\Response(
@@ -284,7 +281,7 @@ class CommandeController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/countMonth', name: 'commande_count', methods: "GET")]
+    #[Route('api/admin/commande/countMonth', name: 'commande_count', methods: "GET")]
     public function countCommandeMonth(CommandeRepository $commandeRepository):JsonResponse{
 
         $date = new \DateTime();
@@ -299,8 +296,6 @@ class CommandeController extends AbstractController
 
         /**
      * @param CommandeRepository $commandeRepository
-     * @param FunctionErrors $errorsCodes
-     * @param Request $request
      * @return JsonResponse
      * @OA\Tag (name="Commande")
      * @OA\Response(
@@ -309,7 +304,7 @@ class CommandeController extends AbstractController
      * )
      */
 
-     #[Route('/recentCommande', name: 'commande_recent', methods: "GET")]
+     #[Route('api/admin/commande/recentCommande', name: 'commande_recent', methods: "GET")]
      public function recentCommande(CommandeRepository $commandeRepository):JsonResponse{
  
  
@@ -338,7 +333,7 @@ class CommandeController extends AbstractController
      }
 
      
-        /**
+     /**
      * @param CommandeRepository $commandeRepository
      * @param Request $request
      * @return JsonResponse
@@ -349,7 +344,7 @@ class CommandeController extends AbstractController
      * )
      */
 
-     #[Route('/createCommande', name: 'commande_create', methods: "POST")]
+     #[Route('api/admin/commande/createCommande', name: 'commande_create', methods: "POST")]
      public function createCommande(CommandeRepository $commandeRepository,UserRepository $userRepository,ProduitInCommandeRepository $produitInCommandeRepository,ProduitRepository $produitRepository, Request $request):JsonResponse{
         $data=json_decode($request->getContent(),true);
  

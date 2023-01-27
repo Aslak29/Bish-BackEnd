@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Annotations as OA;
 use App\Entity\Produit;
 
-#[Route('api/notation')]
 class NotationController extends AbstractController
 {
     private NoteService $noteService;
@@ -35,7 +34,7 @@ class NotationController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/note', name: 'note_produit', methods:"GET")]
+    #[Route('api/public/notation/note', name: 'note_produit', methods:"GET")]
     public function productNotation(NoteRepository $notesRepository): JsonResponse
     {
         $notes = $notesRepository->findAll();
@@ -60,7 +59,7 @@ class NotationController extends AbstractController
      *     description = "OK"
      * )
      */
-    #[Route('/noteUser/{id}/{idProduct}/{value}', name: 'note_update_produit', methods:"POST")]
+    #[Route('api/authenticated/notation/noteUser/{id}/{idProduct}/{value}', name: 'note_update_produit', methods:"POST")]
     public function noteByUser(Request $request): JsonResponse
     {
         $userId = $request->attributes->get('id');

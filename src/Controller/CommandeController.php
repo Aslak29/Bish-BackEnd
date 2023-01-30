@@ -228,8 +228,15 @@ class CommandeController extends AbstractController
                               $pc->getPrice() - $pc->getPrice() * $pc->getRemise()/100)
                             : $pc->getQuantite() * $pc->getPrice();
                 }
-                $jsonCommande["montant"]=$total;
-
+                if ($oneCommande->getRemise() !== null) {
+                    if ($oneCommande->getRemiseType() === "pourcent") {
+                        $jsonCommande["montant"]= ($total - (($total * $oneCommande->getRemise())/100));
+                    }elseif ($oneCommande->getRemiseType() === "euro") {
+                        $jsonCommande["montant"]= ($total - $oneCommande->getRemise());
+                    }
+                }else {
+                    $jsonCommande["montant"]=$total;
+                }
                 $commandesByUserArray[] = $jsonCommande;
             }
         }
@@ -344,9 +351,16 @@ class CommandeController extends AbstractController
      * )
      */
 
-     #[Route('api/admin/commande/createCommande', name: 'commande_create', methods: "POST")]
-     public function createCommande(CommandeRepository $commandeRepository,UserRepository $userRepository,ProduitInCommandeRepository $produitInCommandeRepository,ProduitRepository $produitRepository, Request $request):JsonResponse{
-        $data=json_decode($request->getContent(),true);
+     #[Route('api/authenticated/commande/createCommande', name: 'commande_create', methods: "POST")]
+     public function createCommande(
+         CommandeRepository $commandeRepository,
+         UserRepository $userRepository,
+         ProduitInCommandeRepository $produitInCommandeRepository,
+         ProduitRepository $produitRepository,
+         Request $request
+     ):JsonResponse
+     {
+        $data=json_decode($request->getContent(), true);
  
         $order = new Commande();
 
@@ -362,10 +376,12 @@ class CommandeController extends AbstractController
         $order->setCodePostalLivraison($data['code_postalLivraison']);
         $order->setCodePostalFacturation($data['code_postalFacturation']);
         $order->setEtatCommande($data['etat_commande']);
+        $order->setRemise(!empty($data["remise"]) ? floatval($data["remise"]) : null);
+        $order->setRemiseType(!empty($data["remise_type"]) ? $data["remise_type"] : null);
         
         $commandeRepository->save($order, true);
         
-        foreach($data['produits'] as $produit){
+        foreach ($data['produits'] as $produit) {
             $produitInCommande = new ProduitInCommande();
 
             $produitOrder = $produitRepository->find($produit['id']);
@@ -374,12 +390,14 @@ class CommandeController extends AbstractController
             $produitInCommande->setCommande($order);
             $produitInCommande->setQuantite($produit['quantity']);
             $produitInCommande->setPrice($produitOrder->getPrice());
-            $produitInCommande->setRemise($produitOrder->getPromotions() ? $produitOrder->getPromotions()->getRemise() : 0);
+            $produitInCommande->setRemise(
+                $produitOrder->getPromotions() ? $produitOrder->getPromotions()->getRemise() : 0
+            );
             $produitInCommande->setTaille($produit['size']);
             $produitInCommande->setNameProduct($produit['name']);
 
             $produitInCommandeRepository->save($produitInCommande, true);
-        };
+        }
 
         $orderArray = [
             "id" => $order->getId(),

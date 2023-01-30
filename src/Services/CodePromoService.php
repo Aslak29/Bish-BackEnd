@@ -68,6 +68,13 @@ class CodePromoService
             ], 404);
         }
 
+        if($data['type'] !== 'pourcent' && $data['montantMin'] < $data['remise']) {
+            return new JsonResponse([
+                "errorCode" => "051",
+                "errorMessage" => "Le montant minimum doit être supérieur à la remise en euro !"
+            ], 404);
+        }
+
         $codeArray = [];
         if (!empty($data)) {
             $code = new CodePromo();
@@ -119,6 +126,13 @@ class CodePromoService
             ], 404);
         }
         $codeArray = [];
+
+        if($data['type'] !== 'pourcent' && $data['montantMin'] < $data['remise']) {
+            return new JsonResponse([
+                "errorCode" => "051",
+                "errorMessage" => "Le montant minimum doit être supérieur à la remise en euro !"
+            ], 404);
+        }
 
         if (!empty($data)) {
             $code = $this->codePromoRepository->find($data["id"]);

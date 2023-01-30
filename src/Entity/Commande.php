@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 class Commande
@@ -60,8 +61,15 @@ class Commande
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $complementAdresseFacturation = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $remise = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $remiseType = null;
+
     /**
      * @param DateTimeImmutable $dateFacture
+     * @throws Exception
      */
     public function __construct()
     {
@@ -276,6 +284,30 @@ class Commande
     public function setComplementAdresseFacturation(?string $complementAdresseFacturation): self
     {
         $this->complementAdresseFacturation = $complementAdresseFacturation;
+
+        return $this;
+    }
+
+    public function getRemise(): ?float
+    {
+        return $this->remise;
+    }
+
+    public function setRemise(?float $remise): self
+    {
+        $this->remise = $remise;
+
+        return $this;
+    }
+
+    public function getRemiseType(): ?string
+    {
+        return $this->remiseType;
+    }
+
+    public function setRemiseType(?string $remiseType): self
+    {
+        $this->remiseType = $remiseType;
 
         return $this;
     }

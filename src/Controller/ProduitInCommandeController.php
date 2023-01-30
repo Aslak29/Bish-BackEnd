@@ -23,7 +23,7 @@ class ProduitInCommandeController extends AbstractController {
      *     description = "OK"
      * )
      */
-    #[Route('api/public/produitInCommande/single_order/{idCommande}', name: 'produit_in_commande', methods:"POST")]
+    #[Route('api/authenticated/produitInCommande/single_order/{idCommande}', name: 'produit_in_commande', methods:"GET")]
     public function singleOrder(
         ProduitInCommandeRepository $produitInCommandeRepository,
         NoteRepository $noteRepository,
@@ -70,6 +70,12 @@ class ProduitInCommandeController extends AbstractController {
                     'ville' => $produitInCommande->getCommande()->getVilleLivraison(),
                     'rue' => $produitInCommande->getCommande()->getRueLivraison(),
                     'Code_Postal' => $produitInCommande->getCommande()->getCodePostalLivraison()
+                ],
+                'codePromo' => [
+                    'remise' =>
+                        $produitInCommande->getCommande()->getRemise() ? $produitInCommande->getCommande()->getRemise() : "-",
+                    'remiseType' =>
+                        $produitInCommande->getCommande()->getRemiseType() ? $produitInCommande->getCommande()->getRemiseType() : "-"
                 ]
             ];
             $produitInCommandeArray[] = $infosCommandes;

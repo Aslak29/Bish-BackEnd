@@ -1,15 +1,46 @@
 version: "3.8"
 services:
 
-  maildev:
-    image: maildev/maildev
-    container_name: maildev_bish
-    command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+  db_mysql:
+    image: mysql
+    container_name: db_mysql_docker_symfony
     ports:
-      - "8081:80"
+      - "6000:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     restart: always
+    networks:
+      - dev
+
+  web:
+    build: BackEnd/php
+    container_name: www_docker_symfony
+    ports:
+      - "6001:80"
+    volumes:
+      - ./BackEnd/php/vhosts:/etc/apache2/sites-enabled
+      - ./:/var/www
+    depends_on:
+      - db_mysql
+    restart: always
+    networks:
+      - dev
+
+  phpMyAdmin:
+    image: phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db_mysql
+      PMA_PORT: 3306
+    depends_on:
+      - db_mysql
     networks:
       - dev
 
 networks:
   dev:
+
+volumes:
+  db-data:
+

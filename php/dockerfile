@@ -18,7 +18,7 @@ RUN docker-php-ext-configure intl
 RUN docker-php-ext-install pdo pdo_mysql gd opcache intl zip calendar dom mbstring zip gd xsl
 RUN pecl install apcu && docker-php-ext-enable apcu
 
-WORKDIR /var/www/BackEnd/
+WORKDIR /var/www/back_end/
 CMD ["apache2-foreground"]
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
